@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" fill="none" stroke="#233a55" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- manchas coloridas bem suaves (cores do logo) -->
+  <circle cx="70" cy="90" r="34" fill="#47c249" fill-opacity=".18" stroke="none"/>
+  <circle cx="360" cy="330" r="40" fill="#ffc803" fill-opacity=".18" stroke="none"/>
+  <circle cx="330" cy="70" r="22" fill="#2b5cd2" fill-opacity=".14" stroke="none"/>
+  <circle cx="110" cy="360" r="26" fill="#d63a5a" fill-opacity=".12" stroke="none"/>
+
+  <!-- coração -->
+  <path d="M60 60c-10-14-32-8-32 8 0 14 18 24 32 38 14-14 32-24 32-38 0-16-22-22-32-8z"/>
+  <!-- peça de quebra-cabeça -->
+  <path d="M150 30h34c0-10 12-10 12 0h34v34c10 0 10 12 0 12v34h-34c0 10-12 10-12 0h-34V76c-10 0-10-12 0-12z" transform="rotate(12 190 70)"/>
+  <!-- livro aberto -->
+  <path d="M260 40c14-8 30-8 44 0v54c-14-8-30-8-44 0zM304 40c14-8 30-8 44 0v54c-14-8-30-8-44 0z"/>
+  <path d="M282 60v24M326 60v24" stroke-opacity=".6"/>
+  <!-- estrela -->
+  <path d="M400 30l7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z"/>
+  <!-- mão levantada (Libras / participação) -->
+  <path d="M40 220v-40a7 7 0 0 1 14 0v34M54 214v-52a7 7 0 0 1 14 0v52M68 214v-46a7 7 0 0 1 14 0v46M82 214v-34a7 7 0 0 1 14 0v46c0 24-14 40-34 40s-30-14-38-30l-10-20a7 7 0 0 1 12-8l12 16"/>
+  <!-- infinito (neurodiversidade) -->
+  <path d="M150 190c-16-22-48-18-48 6s32 28 48 6 48-28 48-6-32 28-48-6z"/>
+  <!-- óculos -->
+  <circle cx="262" cy="190" r="16"/><circle cx="306" cy="190" r="16"/>
+  <path d="M278 190h12M246 186l-12-6M322 186l12-6"/>
+  <!-- célula braille -->
+  <g fill="#233a55" stroke="none" fill-opacity=".9">
+    <circle cx="380" cy="160" r="5"/><circle cx="404" cy="160" r="5"/>
+    <circle cx="380" cy="184" r="5"/><circle cx="404" cy="184" r="5" fill-opacity=".25"/>
+    <circle cx="380" cy="208" r="5" fill-opacity=".25"/><circle cx="404" cy="208" r="5"/>
+  </g>
+  <!-- lápis -->
+  <path d="M30 330l70-70 18 18-70 70-24 6zM88 268l18 18" transform="rotate(-8 70 300)"/>
+  <!-- balão de fala -->
+  <path d="M170 280h70a12 12 0 0 1 12 12v30a12 12 0 0 1-12 12h-40l-20 16v-16h-10a12 12 0 0 1-12-12v-30a12 12 0 0 1 12-12z"/>
+  <circle cx="190" cy="307" r="3" fill="#233a55" stroke="none"/><circle cx="206" cy="307" r="3" fill="#233a55" stroke="none"/><circle cx="222" cy="307" r="3" fill="#233a55" stroke="none"/>
+  <!-- pipa -->
+  <path d="M300 250l30 40-30 60-30-60zM300 250v100M270 290h60"/>
+  <path d="M300 350c-8 16 8 24 0 40s8 24 0 36" stroke-opacity=".7"/>
+  <!-- símbolo de acessibilidade (cadeira de rodas) -->
+  <circle cx="400" cy="270" r="4" fill="#233a55" stroke="none"/>
+  <path d="M400 280v24h20l10 20M384 296a18 18 0 1 0 26 20"/>
+  <!-- sol pequeno -->
+  <circle cx="60" cy="410" r="12"/>
+  <path d="M60 390v-6M60 436v-6M40 410h-6M86 410h-6"/>
+  <!-- nota musical -->
+  <path d="M190 400v-40l28-8v40"/>
+  <circle cx="183" cy="402" r="7"/><circle cx="211" cy="394" r="7"/>
+  <!-- avião de papel -->
+  <path d="M250 410l70-30-20 60-14-22zM300 380l-30 38" transform="rotate(-10 285 410)"/>
+  <!-- maçã -->
+  <path d="M420 400c14 0 18 20 8 34-6 8-10 8-16 6-6 2-10 2-16-6-10-14-6-34 8-34 6 0 8 2 8 2s2-2 8-2zM412 396c0-8 4-14 10-16"/>
+</svg>

@@ -74,12 +74,17 @@ export default function Entrar() {
       </aside>
 
       <main className="relative grid place-items-center p-6 overflow-hidden">
-        {/* ilustração de inclusão quase transparente, só na parte branca */}
+        {/* fundo da parte branca: padrão de rabiscos de inclusão cobrindo tudo + cena das pessoas com balões */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-[0.09]"
+          style={{ backgroundImage: "url(/padrao-inclusao.svg)", backgroundSize: "480px 480px" }}
+        />
         <img
           src="/ilustracao-inclusao.svg"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute right-0 bottom-0 w-[92%] max-w-3xl opacity-[0.07]"
+          className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-full w-full object-contain object-bottom opacity-[0.17]"
         />
         <form onSubmit={enviar} className="relative card w-full max-w-md p-7 sm:p-9 bg-white/95">
           <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-10 mb-7 lg:hidden" />

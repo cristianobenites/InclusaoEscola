@@ -1,39 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" fill="none" stroke="#233a55" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Pessoas de mãos dadas, uma delas em cadeira de rodas e uma criança">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1000" fill="none" stroke="#233a55" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Pessoas de mãos dadas, uma delas em cadeira de rodas e uma criança segurando balões">
+  <!-- balões subindo (cores do logo, bem suaves) -->
+  <g stroke-width="5">
+    <path d="M312 700c-30-120-70-240-50-420" stroke-opacity=".7"/>
+    <ellipse cx="262" cy="230" rx="48" ry="60" fill="#d63a5a" fill-opacity=".35"/>
+    <path d="M256 292l6 10 6-10" />
+    <path d="M312 700c20-150 60-280 130-460" stroke-opacity=".7"/>
+    <ellipse cx="442" cy="190" rx="46" ry="58" fill="#ffc803" fill-opacity=".45"/>
+    <path d="M436 250l6 10 6-10"/>
+    <path d="M312 700c-10-160-40-330 40-560" stroke-opacity=".7"/>
+    <ellipse cx="352" cy="90" rx="42" ry="54" fill="#2b5cd2" fill-opacity=".35"/>
+    <path d="M346 146l6 10 6-10"/>
+    <path d="M312 700c60-120 130-240 250-380" stroke-opacity=".7"/>
+    <ellipse cx="562" cy="270" rx="44" ry="56" fill="#47c249" fill-opacity=".4"/>
+    <path d="M556 328l6 10 6-10"/>
+  </g>
+  <!-- pássaros e sol -->
+  <path d="M700 120c10-10 20-10 30 0M730 120c10-10 20-10 30 0M640 180c8-8 16-8 24 0M664 180c8-8 16-8 24 0" stroke-width="5"/>
+  <circle cx="820" cy="90" r="36" stroke-width="5"/>
+  <path d="M820 30v-14M820 164v-14M760 90h-14M894 90h-14M778 48l-10-10M872 132l-10-10M862 48l10-10M778 132l-10 10" stroke-width="5"/>
+  <!-- nuvens -->
+  <path d="M90 200c0-20 16-34 34-34 6-22 34-30 50-14 18-6 36 8 36 26 0 4 0 8-2 12H98c-6 0-8-4-8-10z" stroke-width="5"/>
+  <path d="M600 60c0-14 12-24 24-24 4-16 24-22 36-10 12-4 26 6 26 18 0 4 0 6-2 8H606c-4 0-6-2-6-8z" stroke-width="5"/>
+
   <!-- pessoa 1: adulto -->
-  <circle cx="150" cy="140" r="42"/>
-  <path d="M150 182v150"/>
-  <path d="M96 300c0-60 24-100 54-100s54 40 54 100"/>
-  <path d="M150 332l-34 130M150 332l34 130"/>
-  <path d="M110 240l-40 60"/>
-  <!-- pessoa 2: criança -->
-  <circle cx="290" cy="240" r="32"/>
-  <path d="M290 272v96"/>
-  <path d="M254 356c0-42 16-72 36-72s36 30 36 72"/>
-  <path d="M290 368l-22 94M290 368l22 94"/>
+  <circle cx="150" cy="620" r="42"/>
+  <path d="M150 662v150"/>
+  <path d="M96 780c0-60 24-100 54-100s54 40 54 100"/>
+  <path d="M150 812l-34 130M150 812l34 130"/>
+  <path d="M110 720l-40 60"/>
+  <!-- pessoa 2: criança com os balões -->
+  <circle cx="290" cy="720" r="32"/>
+  <path d="M290 752v96"/>
+  <path d="M254 836c0-42 16-72 36-72s36 30 36 72"/>
+  <path d="M290 848l-22 94M290 848l22 94"/>
+  <path d="M300 780l12-80"/>
   <!-- mãos dadas 1-2 -->
-  <path d="M204 300c22 18 40 26 50 26"/>
+  <path d="M204 780c22 18 40 26 50 26"/>
   <!-- pessoa 3: cadeira de rodas -->
-  <circle cx="470" cy="150" r="42"/>
-  <path d="M470 192v130"/>
-  <path d="M424 300c0-52 20-90 46-90s46 38 46 90"/>
-  <path d="M470 322h78l30 70"/>
-  <circle cx="452" cy="410" r="52"/>
-  <circle cx="452" cy="410" r="12"/>
-  <circle cx="576" cy="430" r="22"/>
-  <path d="M424 322v40M580 392h24"/>
+  <circle cx="470" cy="630" r="42"/>
+  <path d="M470 672v130"/>
+  <path d="M424 780c0-52 20-90 46-90s46 38 46 90"/>
+  <path d="M470 802h78l30 70"/>
+  <circle cx="452" cy="890" r="52"/>
+  <circle cx="452" cy="890" r="12"/>
+  <circle cx="576" cy="910" r="22"/>
+  <path d="M424 802v40M580 872h24"/>
   <!-- mãos dadas 2-3 -->
-  <path d="M326 300c32-12 60-16 98-8"/>
+  <path d="M326 780c32-12 60-16 98-8"/>
   <!-- pessoa 4: adulto -->
-  <circle cx="690" cy="130" r="42"/>
-  <path d="M690 172v160"/>
-  <path d="M636 290c0-60 24-100 54-100s54 40 54 100"/>
-  <path d="M690 332l-34 130M690 332l34 130"/>
+  <circle cx="690" cy="610" r="42"/>
+  <path d="M690 652v160"/>
+  <path d="M636 770c0-60 24-100 54-100s54 40 54 100"/>
+  <path d="M690 812l-34 130M690 812l34 130"/>
   <!-- mãos dadas 3-4 -->
-  <path d="M516 250c40-8 80-8 120 0"/>
-  <path d="M744 240l40 54"/>
+  <path d="M516 730c40-8 80-8 120 0"/>
+  <path d="M744 720l40 54"/>
   <!-- chão -->
-  <path d="M60 470h780" stroke-width="5" opacity=".5"/>
-  <!-- detalhes: sol e folhas -->
-  <circle cx="820" cy="80" r="34" stroke-width="5"/>
-  <path d="M820 24v-14M820 150v-14M764 80h-14M890 80h-14" stroke-width="5"/>
+  <path d="M60 950h780" stroke-width="5" opacity=".5"/>
 </svg>
