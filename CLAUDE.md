@@ -11,10 +11,10 @@
 
 ## Banco de dados (decisão 2026-09-14)
 
-- Supabase, organização **cristiano.terrazul@gmail.com** (slug `zumkdorzldecnzisddtw`). Ela tem 0 projetos ativos (benites-academico, newsletter-stefani e Sinaly-homologacao estão PAUSADOS), então cabe um projeto novo no plano gratuito.
-- A organização **cristianobenites's Org** está CHEIA (sinaly + prospect ativos, limite de 2 do plano gratuito). Não criar projeto nela.
-- Região: `sa-east-1` (São Paulo), como os demais.
-- O CLI do Supabase (`npx supabase`) está logado e enxerga as duas organizações. Migrações: preferir a Management API / CLI, nunca editar o banco na mão.
+- Supabase CRIADO em 2026-09-14: projeto **inclusao-escola**, ref `cmuynbifmywajjtbktpw`, URL `https://cmuynbifmywajjtbktpw.supabase.co`, região `sa-east-1` (São Paulo), plano gratuito, RLS automático ligado em tabelas novas.
+- Fica na organização **cristiano.terrazul@gmail.com** (slug `zumkdorzldecnzisddtw`), cuja dona é a conta cristiano.terrazul@gmail.com. A conta benites_silva@hotmail.com (a do CLI `npx supabase`) é só Developer nessa org: consegue migrar e publicar funções, mas não cria nem apaga projetos.
+- A senha do banco foi gerada pelo painel e NÃO está guardada; se precisar, redefinir em Project Settings → Database. Chaves anon/service ficam no painel (API Keys).
+- Migrações: pela Management API / CLI (`supabase link --project-ref cmuynbifmywajjtbktpw`), nunca editar o banco na mão.
 
 ## Regras
 
