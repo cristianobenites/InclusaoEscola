@@ -78,13 +78,18 @@ export default function Entrar() {
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.09]"
-          style={{ backgroundImage: "url(/padrao-inclusao.svg)", backgroundSize: "480px 480px" }}
+          style={{
+            backgroundImage: "url(/padrao-inclusao.svg)",
+            backgroundSize: "480px 480px",
+            maskImage: "linear-gradient(to bottom, black 0%, black 34%, transparent 50%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 34%, transparent 50%)",
+          }}
         />
         <img
           src="/ilustracao-inclusao.svg"
           alt=""
           aria-hidden="true"
-          className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-full w-full object-contain object-bottom opacity-[0.17]"
+          className="pointer-events-none select-none absolute inset-x-0 bottom-0 max-h-[52%] w-full object-contain object-bottom opacity-[0.17]"
         />
         <form onSubmit={enviar} className="relative card w-full max-w-md p-7 sm:p-9 bg-white/95">
           <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-10 mb-7 lg:hidden" />
