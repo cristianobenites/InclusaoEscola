@@ -9,6 +9,7 @@ import type { Respostas } from "@/formularios/tipos";
 import type { Resposta } from "@/lib/tipos";
 import FormularioGuiado, { preenchida } from "@/components/FormularioGuiado";
 import Aviso from "@/components/Aviso";
+import Toast from "@/components/Toast";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -19,6 +20,7 @@ export default function Preencher() {
   const [sujo, setSujo] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const [idAtual, setIdAtual] = useState<string | undefined>(respostaId);
 
   const equipe = perfil?.papel !== "professor_regente";
@@ -97,7 +99,7 @@ export default function Preencher() {
       setSujo(false);
       qc.invalidateQueries({ queryKey: ["respostas", estudanteId] });
       if (status === "concluido") navegar(`/estudantes/${estudanteId}`);
-      else setAviso("Rascunho salvo.");
+      else setToast("Rascunho salvo");
     } catch (err) {
       setAviso("Não foi possível salvar: " + (err as Error).message);
     } finally {
@@ -167,6 +169,7 @@ export default function Preencher() {
         </div>
       )}
       <Aviso mensagem={aviso} aoFechar={() => setAviso(null)} />
+      <Toast mensagem={toast} aoSumir={() => setToast(null)} />
     </div>
   );
 }

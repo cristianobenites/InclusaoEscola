@@ -23,8 +23,8 @@ export default function FormularioGuiado({ formulario, valores, aoMudar, somente
   }, [formulario, valores]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-      <aside className="no-print lg:sticky lg:top-24 self-start">
+    <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <aside className="no-print lg:sticky lg:top-24 self-start min-w-0">
         <div className="card p-3">
           <div className="px-2 pb-2 text-xs font-semibold text-tinta-fraca uppercase tracking-wide">Seções</div>
           <ol className="flex lg:flex-col gap-1 overflow-x-auto">
@@ -235,7 +235,7 @@ function Campo({
           {ajuda}
           <div className="mt-2 divide-y divide-papel-borda rounded-xl border border-papel-borda overflow-hidden">
             {p.linhas?.map((linha) => (
-              <div key={linha} className="grid gap-2 px-3.5 py-3 md:grid-cols-[1fr_auto] md:items-center bg-white">
+              <div key={linha} className="grid gap-2 px-3.5 py-3 md:grid-cols-[minmax(240px,2fr)_3fr] md:items-center bg-white">
                 <div className="text-sm font-medium">{linha}</div>
                 <div className="flex flex-wrap gap-1.5">
                   {p.opcoes?.map((o) => (
@@ -265,7 +265,7 @@ function Campo({
           <div className="mt-2 divide-y divide-papel-borda rounded-xl border border-papel-borda overflow-hidden">
             {p.linhas?.map((linha) => (
               <div key={linha} className="px-3.5 py-3 bg-white">
-                <div className="grid gap-2 md:grid-cols-[1fr_auto] md:items-center">
+                <div className="grid gap-2 md:grid-cols-[minmax(240px,2fr)_3fr] md:items-center">
                   <div className="text-sm font-medium">{linha}</div>
                   <div className="flex gap-1.5">
                     {p.opcoes?.map((o) => (
