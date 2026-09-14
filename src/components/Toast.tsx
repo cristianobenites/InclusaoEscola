@@ -11,7 +11,7 @@ export default function Toast({ mensagem, aoSumir }: { mensagem: string | null; 
   if (!mensagem) return null;
   return (
     <div className="no-print fixed bottom-5 left-1/2 -translate-x-1/2 z-50" role="status" aria-live="polite">
-      <div className="flex items-center gap-2 rounded-xl bg-tinta text-white px-4 py-2.5 text-sm font-semibold shadow-card">
+      <div className="flex items-center gap-2 rounded-xl bg-tinta text-white px-4 py-2.5 text-sm font-medium shadow-card">
         <CheckCircle2 size={16} className="text-marca-suave" /> {mensagem}
       </div>
     </div>

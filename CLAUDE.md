@@ -34,3 +34,12 @@ Ler `docs/visao-do-sistema.md` antes de qualquer trabalho. Resumo: app para o Pr
 - Conta de teste (fictícia, só no protótipo): coordenacao@teste.inclusao.local / Piloto-2026-teste (papel coordenação). Estudante de exemplo EST-393FC7. Apagar antes de qualquer piloto real.
 - Confirmação de e-mail do Auth está DESLIGADA (protótipo sem SMTP). Religar antes do piloto.
 - Prints de aprovação em `reports/prints/`.
+
+## Identidade visual (REGRA, pedido de 2026-09-14)
+
+O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extraído do site em 14/09:
+- **Fonte**: Ubuntu (Medium 500 nos títulos, Regular no corpo). Google Fonts no index.html. Poppins aparece pouco no site; não usar.
+- **Cores**: texto e títulos azul-marinho `#233a55`; ação azul `#125dda` (botões em pílula, raio total); logo em azul `#2b5cd2`, verde `#47c249`, amarelo `#ffc803`; pastéis de bloco rosa `#ffd8d9`, amarelo `#ffe26c`, verde `#d0f7d9`, azul-claro `#d5e5ff`; fundo `#f6f8fc`; cinza de apoio `#5a6b80`. Tokens em `tailwind.config.js` (tinta, marca, verde, sol, rosa, papel).
+- **Logo**: `public/logo-instituto.svg` (completo, extraído do SVG do site) e `public/marca-instituto.svg` (só o símbolo, usado como favicon e no celular).
+- **Formas**: cantos bem arredondados (cards `rounded-3xl`, campos `rounded-2xl`), bolinhas coloridas como decoração de fundo (classe `.bolha`), cabeçalho branco com o logo à esquerda.
+- Pesos: usar `font-medium`, nunca `font-bold`/`font-extrabold` (o site é leve).

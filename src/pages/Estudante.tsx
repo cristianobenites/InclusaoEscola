@@ -9,6 +9,10 @@ const ICONE: Record<string, typeof ClipboardList> = {
   "ficha-observacao": ClipboardList,
   "entrevista-familia": MessageCircleHeart,
 };
+const COR_ICONE: Record<string, string> = {
+  "ficha-observacao": "bg-marca-suave text-marca",
+  "entrevista-familia": "bg-rosa-suave text-rosa",
+};
 const ROTULO_NOVO: Record<string, string> = {
   "ficha-observacao": "Nova observação",
   "entrevista-familia": "Nova conversa",
@@ -75,7 +79,7 @@ export default function Estudante() {
           return (
             <section key={f.id} className="card p-5 sm:p-6">
               <div className="flex items-start gap-3">
-                <span className="grid place-items-center w-10 h-10 rounded-xl bg-marca-fundo text-marca-forte shrink-0">
+                <span className={`grid place-items-center w-10 h-10 rounded-2xl shrink-0 ${COR_ICONE[f.id] ?? "bg-marca-suave text-marca"}`}>
                   <Icone size={20} />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -91,12 +95,12 @@ export default function Estudante() {
                 {doForm.map((r) => (
                   <li key={r.id} className="py-3 flex items-center gap-3">
                     {r.status === "concluido" ? (
-                      <FileCheck2 size={18} className="text-marca shrink-0" />
+                      <FileCheck2 size={18} className="text-verde shrink-0" />
                     ) : (
                       <PencilLine size={18} className="text-sol shrink-0" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-semibold">
+                      <div className="text-sm font-medium">
                         {r.status === "concluido" ? "Concluído" : "Rascunho"}
                         <span className="text-tinta-fraca font-normal"> · {formatarDataHora(r.atualizado_em)}</span>
                       </div>
@@ -116,7 +120,7 @@ export default function Estudante() {
 
         <section className="card p-5 sm:p-6 lg:col-span-2 border-dashed">
           <div className="flex items-start gap-3">
-            <span className="grid place-items-center w-10 h-10 rounded-xl bg-sol-suave text-sol shrink-0">
+            <span className="grid place-items-center w-10 h-10 rounded-2xl bg-sol-suave text-sol shrink-0">
               <Sparkles size={20} />
             </span>
             <div className="flex-1">
@@ -142,7 +146,7 @@ export default function Estudante() {
 
 function Requisito({ ok, texto }: { ok: boolean; texto: string }) {
   return (
-    <li className={ok ? "text-marca-forte" : "text-tinta-fraca"}>
+    <li className={ok ? "text-verde" : "text-tinta-fraca"}>
       {ok ? "✓" : "○"} {texto}
     </li>
   );

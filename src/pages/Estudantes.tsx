@@ -70,7 +70,7 @@ export default function Estudantes() {
         <p className="text-sm text-tinta-fraca">Carregando…</p>
       ) : lista.length === 0 ? (
         <div className="card p-10 text-center">
-          <p className="font-semibold">Nenhum estudante ainda.</p>
+          <p className="font-medium">Nenhum estudante ainda.</p>
           <p className="text-sm text-tinta-suave mt-1">Cadastre o primeiro para começar a Ficha de Observação.</p>
         </div>
       ) : (

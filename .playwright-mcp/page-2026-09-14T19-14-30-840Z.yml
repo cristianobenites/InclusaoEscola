@@ -1,0 +1,18 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - img "Instituto Inclusão na Escola" [ref=e5]
+    - generic [ref=e6]:
+      - heading "Ajudando escolas a incluir quem pensa e aprende diferente." [level=1] [ref=e7]
+      - paragraph [ref=e8]: Ficha de Observação, Conversa com a Família e síntese com apoio de IA, seguindo os Cadernos Pedagógicos da Política Nacional de Educação Especial Inclusiva.
+    - paragraph [ref=e9]: Programa Decola AEE · protótipo
+  - main [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - button "Entrar" [ref=e13] [cursor=pointer]
+        - button "Criar conta" [ref=e14] [cursor=pointer]
+      - generic [ref=e15]: E-mail
+      - textbox [ref=e16]
+      - generic [ref=e17]: Senha
+      - textbox [ref=e18]
+      - button "Entrar" [ref=e19] [cursor=pointer]
+      - paragraph [ref=e20]: Dados de estudantes são sensíveis. Use apenas a conta institucional e não compartilhe a senha.

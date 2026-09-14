@@ -135,7 +135,7 @@ export default function Preencher() {
         <h1 className="text-2xl sm:text-3xl">{formulario.titulo}</h1>
         <p className="text-sm text-tinta-suave mt-2 max-w-3xl">{formulario.finalidade}</p>
         <details className="mt-3 text-sm">
-          <summary className="cursor-pointer font-semibold text-marca-forte">Instruções rápidas de preenchimento</summary>
+          <summary className="cursor-pointer font-medium text-marca">Instruções rápidas de preenchimento</summary>
           <ul className="mt-2 list-disc pl-5 text-tinta-suave space-y-1">
             {formulario.instrucoes.map((i) => (
               <li key={i}>{i}</li>
@@ -143,7 +143,7 @@ export default function Preencher() {
           </ul>
         </details>
         {concluido && (
-          <p className="mt-3 chip bg-marca-suave text-marca-forte">Concluído. Registro fechado para edição.</p>
+          <p className="mt-3 chip bg-verde-suave text-tinta">Concluído. Registro fechado para edição.</p>
         )}
       </header>
 

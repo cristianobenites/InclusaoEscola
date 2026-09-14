@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { School } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { NOME_PAPEL, type Papel } from "@/lib/tipos";
@@ -51,40 +50,35 @@ export default function Entrar() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      <aside className="hidden lg:flex flex-col justify-between bg-marca-forte text-white p-12">
-        <div className="flex items-center gap-3 font-extrabold text-lg">
-          <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/15">
-            <School size={20} />
-          </span>
-          Inclusão na Escola
-        </div>
-        <div className="max-w-md">
-          <h1 className="text-3xl leading-tight">Do registro em sala ao Estudo de Caso, com a equipe no comando.</h1>
-          <p className="mt-4 text-white/80 text-sm leading-relaxed">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-white">
+      {/* Painel no estilo do site do Instituto: fundo claro, bolinhas coloridas, título azul-marinho */}
+      <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-papel p-12">
+        <span className="bolha w-56 h-56 bg-verde/80 -left-20 top-48" />
+        <span className="bolha w-24 h-24 bg-sol-vivo right-20 top-40" />
+        <span className="bolha w-40 h-40 bg-rosa/70 -right-10 bottom-40" />
+        <span className="bolha w-16 h-16 bg-marca left-1/2 bottom-24" />
+        <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="relative h-12 self-start" />
+        <div className="relative max-w-md">
+          <h1 className="text-4xl leading-tight">Ajudando escolas a incluir quem pensa e aprende diferente.</h1>
+          <p className="mt-5 text-tinta-suave leading-relaxed">
             Ficha de Observação, Conversa com a Família e síntese com apoio de IA, seguindo os Cadernos Pedagógicos da
             Política Nacional de Educação Especial Inclusiva.
           </p>
         </div>
-        <p className="text-xs text-white/60">Programa Decola AEE · protótipo</p>
+        <p className="relative text-xs text-tinta-fraca">Programa Decola AEE · protótipo</p>
       </aside>
 
       <main className="grid place-items-center p-6">
         <form onSubmit={enviar} className="card w-full max-w-md p-7 sm:p-9">
-          <div className="lg:hidden flex items-center gap-2 font-extrabold mb-6">
-            <span className="grid place-items-center w-9 h-9 rounded-xl bg-marca text-white">
-              <School size={18} />
-            </span>
-            Inclusão na Escola
-          </div>
-          <div className="flex rounded-xl bg-papel p-1 mb-6">
+          <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-10 mb-7 lg:hidden" />
+          <div className="flex rounded-full bg-papel p-1 mb-6">
             {(["entrar", "criar"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setModo(m)}
                 className={clsx(
-                  "flex-1 rounded-lg py-2 text-sm font-semibold transition-colors",
+                  "flex-1 rounded-full py-2 text-sm font-medium transition-colors",
                   modo === m ? "bg-white shadow-card text-tinta" : "text-tinta-fraca",
                 )}
               >

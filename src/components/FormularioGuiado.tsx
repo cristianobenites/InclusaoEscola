@@ -26,7 +26,7 @@ export default function FormularioGuiado({ formulario, valores, aoMudar, somente
     <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
       <aside className="no-print lg:sticky lg:top-24 self-start min-w-0">
         <div className="card p-3">
-          <div className="px-2 pb-2 text-xs font-semibold text-tinta-fraca uppercase tracking-wide">Seções</div>
+          <div className="px-2 pb-2 text-xs font-medium text-tinta-fraca uppercase tracking-wide">Seções</div>
           <ol className="flex lg:flex-col gap-1 overflow-x-auto">
             {formulario.secoes.map((s, i) => {
               const bloqueada = s.somente_equipe && !equipe;
@@ -38,13 +38,13 @@ export default function FormularioGuiado({ formulario, valores, aoMudar, somente
                     onClick={() => setSecaoAtiva(s.id)}
                     className={clsx(
                       "flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm",
-                      secaoAtiva === s.id ? "bg-marca-fundo text-marca-forte font-semibold" : "text-tinta-suave hover:bg-papel",
+                      secaoAtiva === s.id ? "bg-marca-fundo text-marca font-medium" : "text-tinta-suave hover:bg-papel",
                     )}
                   >
                     <span
                       className={clsx(
                         "grid place-items-center w-5 h-5 rounded-full text-[11px] font-bold shrink-0",
-                        completa ? "bg-marca text-white" : "bg-papel-borda text-tinta-suave",
+                        completa ? "bg-verde text-white" : "bg-papel-borda text-tinta-suave",
                       )}
                     >
                       {completa ? <Check size={12} /> : i + 1}
@@ -65,7 +65,7 @@ export default function FormularioGuiado({ formulario, valores, aoMudar, somente
             </div>
             <div className="h-1.5 rounded-full bg-papel-borda overflow-hidden">
               <div
-                className="h-full bg-marca transition-all"
+                className="h-full bg-verde transition-all"
                 style={{ width: `${progresso.total ? (100 * progresso.feitas) / progresso.total : 0}%` }}
               />
             </div>
@@ -107,7 +107,7 @@ function SecaoCard({
       <h2 className="text-lg sm:text-xl">{secao.titulo}</h2>
       {secao.descricao && <p className="text-sm text-tinta-suave mt-1">{secao.descricao}</p>}
       {motivo && (
-        <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-sol-suave text-sol px-3 py-1.5 text-xs font-semibold">
+        <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-sol-suave text-sol px-3 py-1.5 text-xs font-medium">
           <Lock size={12} /> {motivo}
         </p>
       )}
@@ -233,7 +233,7 @@ function Campo({
         <div>
           {rotulo}
           {ajuda}
-          <div className="mt-2 divide-y divide-papel-borda rounded-xl border border-papel-borda overflow-hidden">
+          <div className="mt-2 divide-y divide-papel-borda rounded-2xl border border-papel-borda overflow-hidden">
             {p.linhas?.map((linha) => (
               <div key={linha} className="grid gap-2 px-3.5 py-3 md:grid-cols-[minmax(240px,2fr)_3fr] md:items-center bg-white">
                 <div className="text-sm font-medium">{linha}</div>
@@ -262,7 +262,7 @@ function Campo({
         <div>
           {rotulo}
           {ajuda}
-          <div className="mt-2 divide-y divide-papel-borda rounded-xl border border-papel-borda overflow-hidden">
+          <div className="mt-2 divide-y divide-papel-borda rounded-2xl border border-papel-borda overflow-hidden">
             {p.linhas?.map((linha) => (
               <div key={linha} className="px-3.5 py-3 bg-white">
                 <div className="grid gap-2 md:grid-cols-[minmax(240px,2fr)_3fr] md:items-center">
@@ -319,9 +319,9 @@ function Pilula({
       disabled={disabled}
       aria-pressed={ativa}
       className={clsx(
-        "rounded-full border font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-70",
+        "rounded-full border font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-70",
         pequena ? "px-2.5 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
-        ativa ? "border-marca bg-marca text-white" : "border-papel-borda bg-white text-tinta-suave hover:border-marca hover:text-marca-forte",
+        ativa ? "border-marca bg-marca text-white" : "border-papel-borda bg-white text-tinta-suave hover:border-marca hover:text-marca",
       )}
     >
       {children}

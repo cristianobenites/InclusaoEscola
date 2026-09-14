@@ -21,8 +21,8 @@ export default function Formularios() {
             key={x.id}
             onClick={() => setAtivo(x.id)}
             className={clsx(
-              "rounded-xl border px-4 py-2 text-sm font-semibold",
-              ativo === x.id ? "border-marca bg-marca-fundo text-marca-forte" : "border-papel-borda bg-white text-tinta-suave",
+              "rounded-full border px-4 py-2 text-sm font-medium",
+              ativo === x.id ? "border-marca bg-marca-fundo text-marca" : "border-papel-borda bg-white text-tinta-suave",
             )}
           >
             {x.titulo} <span className="text-xs font-normal opacity-70">v{x.versao}</span>
