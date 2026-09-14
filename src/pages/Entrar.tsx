@@ -54,25 +54,34 @@ export default function Entrar() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-white">
-      {/* Painel no estilo do site do Instituto: fundo claro, bolinhas coloridas, título azul-marinho */}
-      <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-papel p-12">
-        <span className="bolha w-56 h-56 bg-verde/80 -left-20 top-48" />
-        <span className="bolha w-24 h-24 bg-sol-vivo right-20 top-40" />
-        <span className="bolha w-40 h-40 bg-rosa/70 -right-10 bottom-40" />
-        <span className="bolha w-16 h-16 bg-marca left-1/2 bottom-24" />
+      {/* Painel no estilo do site do Instituto: fundo claro, bolinhas nos cantos, texto centralizado e livre */}
+      <aside className="relative hidden lg:flex flex-col overflow-hidden bg-papel p-12">
+        <span className="bolha w-48 h-48 bg-verde/80 -left-24 top-[42%]" />
+        <span className="bolha w-24 h-24 bg-sol-vivo right-12 top-24" />
+        <span className="bolha w-56 h-56 bg-rosa/70 -right-24 -bottom-20" />
+        <span className="bolha w-16 h-16 bg-marca left-16 bottom-16" />
         <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="relative h-12 self-start" />
-        <div className="relative max-w-md">
-          <h1 className="text-4xl leading-tight">Ajudando escolas a incluir quem pensa e aprende diferente.</h1>
-          <p className="mt-5 text-tinta-suave leading-relaxed">
-            Ficha de Observação, Conversa com a Família e síntese com apoio de IA, seguindo os Cadernos Pedagógicos da
-            Política Nacional de Educação Especial Inclusiva.
-          </p>
+        <div className="relative flex-1 flex flex-col items-center justify-center text-center px-10">
+          <div className="max-w-md">
+            <h1 className="text-4xl leading-tight">Ajudando escolas a incluir quem pensa e aprende diferente.</h1>
+            <p className="mt-5 text-tinta-suave leading-relaxed">
+              Ficha de Observação, Conversa com a Família e síntese com apoio de IA, seguindo os Cadernos Pedagógicos da
+              Política Nacional de Educação Especial Inclusiva.
+            </p>
+          </div>
         </div>
-        <p className="relative text-xs text-tinta-fraca">Programa Decola AEE · protótipo</p>
+        <p className="relative text-xs text-tinta-fraca text-center">Programa Decola AEE · protótipo</p>
       </aside>
 
-      <main className="grid place-items-center p-6">
-        <form onSubmit={enviar} className="card w-full max-w-md p-7 sm:p-9">
+      <main className="relative grid place-items-center p-6 overflow-hidden">
+        {/* ilustração de inclusão quase transparente, só na parte branca */}
+        <img
+          src="/ilustracao-inclusao.svg"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none select-none absolute right-0 bottom-0 w-[92%] max-w-3xl opacity-[0.07]"
+        />
+        <form onSubmit={enviar} className="relative card w-full max-w-md p-7 sm:p-9 bg-white/95">
           <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-10 mb-7 lg:hidden" />
           <div className="flex rounded-full bg-papel p-1 mb-6">
             {(["entrar", "criar"] as const).map((m) => (

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" fill="none" stroke="#233a55" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Pessoas de mãos dadas, uma delas em cadeira de rodas e uma criança">
+  <!-- pessoa 1: adulto -->
+  <circle cx="150" cy="140" r="42"/>
+  <path d="M150 182v150"/>
+  <path d="M96 300c0-60 24-100 54-100s54 40 54 100"/>
+  <path d="M150 332l-34 130M150 332l34 130"/>
+  <path d="M110 240l-40 60"/>
+  <!-- pessoa 2: criança -->
+  <circle cx="290" cy="240" r="32"/>
+  <path d="M290 272v96"/>
+  <path d="M254 356c0-42 16-72 36-72s36 30 36 72"/>
+  <path d="M290 368l-22 94M290 368l22 94"/>
+  <!-- mãos dadas 1-2 -->
+  <path d="M204 300c22 18 40 26 50 26"/>
+  <!-- pessoa 3: cadeira de rodas -->
+  <circle cx="470" cy="150" r="42"/>
+  <path d="M470 192v130"/>
+  <path d="M424 300c0-52 20-90 46-90s46 38 46 90"/>
+  <path d="M470 322h78l30 70"/>
+  <circle cx="452" cy="410" r="52"/>
+  <circle cx="452" cy="410" r="12"/>
+  <circle cx="576" cy="430" r="22"/>
+  <path d="M424 322v40M580 392h24"/>
+  <!-- mãos dadas 2-3 -->
+  <path d="M326 300c32-12 60-16 98-8"/>
+  <!-- pessoa 4: adulto -->
+  <circle cx="690" cy="130" r="42"/>
+  <path d="M690 172v160"/>
+  <path d="M636 290c0-60 24-100 54-100s54 40 54 100"/>
+  <path d="M690 332l-34 130M690 332l34 130"/>
+  <!-- mãos dadas 3-4 -->
+  <path d="M516 250c40-8 80-8 120 0"/>
+  <path d="M744 240l40 54"/>
+  <!-- chão -->
+  <path d="M60 470h780" stroke-width="5" opacity=".5"/>
+  <!-- detalhes: sol e folhas -->
+  <circle cx="820" cy="80" r="34" stroke-width="5"/>
+  <path d="M820 24v-14M820 150v-14M764 80h-14M890 80h-14" stroke-width="5"/>
+</svg>
