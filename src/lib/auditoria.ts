@@ -16,6 +16,7 @@ export async function registrar(acao: string, alvo?: string, detalhe?: Record<st
 export function rotuloAcao(acao: string): string {
   const fixos: Record<string, string> = {
     "acesso.login": "Entrou no sistema",
+    "acesso.sessao": "Entrou no sistema",
     "acesso.logout": "Saiu do sistema",
     "acesso.user_signedup": "Criou a própria conta",
     "acesso.user_recovery_requested": "Pediu recuperação de senha",

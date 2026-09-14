@@ -646,7 +646,7 @@ function AtividadeLinha({ a, aberto, alternar }: { a: Atividade; aberto: boolean
 
 function resumoDetalhe(a: Atividade): string {
   const d = a.detalhe ?? {};
-  if (a.origem === "auth") return (d.ip as string) ?? "";
+  if (a.origem === "auth") return [d.navegador, d.ip].filter(Boolean).join(" · ") as string;
   const depois = (d.depois ?? d.antes) as Record<string, unknown> | undefined;
   if (!depois) return a.alvo ?? "";
   const partes: string[] = [];
