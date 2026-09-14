@@ -1,11 +1,15 @@
-export type Papel = "gestao" | "coordenacao" | "professor_aee" | "professor_regente";
+export type Papel = "superadmin" | "gestao" | "coordenacao" | "professor_aee" | "professor_regente";
 
 export const NOME_PAPEL: Record<Papel, string> = {
+  superadmin: "Administrador da plataforma",
   gestao: "Gestão municipal",
   coordenacao: "Coordenação pedagógica",
   professor_aee: "Professor(a) de AEE",
   professor_regente: "Professor(a) regente",
 };
+
+// papéis que uma pessoa pode escolher ao criar conta (superadmin só por convite)
+export const PAPEIS_ABERTOS: Papel[] = ["gestao", "coordenacao", "professor_aee", "professor_regente"];
 
 export interface Perfil {
   id: string;

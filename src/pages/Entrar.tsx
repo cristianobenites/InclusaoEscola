@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
-import { NOME_PAPEL, type Papel } from "@/lib/tipos";
+import { NOME_PAPEL, PAPEIS_ABERTOS, type Papel } from "@/lib/tipos";
 import Aviso from "@/components/Aviso";
 import clsx from "clsx";
 
@@ -93,7 +93,7 @@ export default function Entrar() {
               <input className="campo mb-4" value={nome} onChange={(e) => setNome(e.target.value)} autoComplete="name" />
               <label className="rotulo">Seu papel na rede</label>
               <select className="campo mb-4" value={papel} onChange={(e) => setPapel(e.target.value as Papel)}>
-                {(Object.keys(NOME_PAPEL) as Papel[]).map((p) => (
+                {PAPEIS_ABERTOS.map((p) => (
                   <option key={p} value={p}>
                     {NOME_PAPEL[p]}
                   </option>
