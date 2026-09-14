@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-papel text-tinta font-sans antialiased; }
+  h1, h2, h3 { @apply font-bold tracking-tight; }
+  input, textarea, select { @apply bg-white; }
+}
+
+@layer components {
+  .card { @apply bg-papel-card rounded-2xl border border-papel-borda shadow-card; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primario { @apply btn bg-marca text-white hover:bg-marca-forte; }
+  .btn-secundario { @apply btn bg-white border border-papel-borda text-tinta hover:bg-papel; }
+  .btn-fantasma { @apply btn text-marca hover:bg-marca-fundo; }
+  .campo { @apply w-full rounded-xl border border-papel-borda px-3.5 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/20 placeholder:text-tinta-fraca; }
+  .rotulo { @apply block text-sm font-semibold text-tinta mb-1.5; }
+  .ajuda { @apply text-xs text-tinta-fraca mt-1; }
+  .chip { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .card { box-shadow: none; border-color: #ccc; }
+}

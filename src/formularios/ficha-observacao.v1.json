@@ -1,0 +1,129 @@
+{
+  "id": "ficha-observacao",
+  "versao": 1,
+  "titulo": "Ficha de Observação Pedagógica do Estudante",
+  "finalidade": "Registrar informações reais sobre o dia a dia do estudante na escola. Este registro identifica pontos fortes, barreiras e necessidades de apoio para orientar o Plano de Atendimento Educacional Especializado (PAEE) e o Plano Educacional Individualizado (PEI).",
+  "instrucoes": [
+    "Preencha com base em situações reais observadas na rotina escolar.",
+    "Marque a intensidade de apoio necessária em cada atividade listada.",
+    "Descreva fatos observados com clareza e objetividade, sem usar rótulos.",
+    "Atualize sempre que o estudante apresentar novos progressos ou novas demandas."
+  ],
+  "secoes": [
+    {
+      "id": "contexto",
+      "titulo": "1. Identificação e contexto da observação",
+      "perguntas": [
+        { "id": "data", "rotulo": "Data da observação", "tipo": "data", "obrigatoria": true },
+        { "id": "profissional", "rotulo": "Profissional responsável pelo registro", "tipo": "texto", "obrigatoria": true },
+        { "id": "cargo", "rotulo": "Cargo ou função", "tipo": "texto" },
+        {
+          "id": "ambientes",
+          "rotulo": "Ambiente escolar observado",
+          "ajuda": "Marque quantos forem necessários.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Sala de aula comum",
+            "Sala de Recursos / Atendimento Educacional Especializado (AEE)",
+            "Recreio e pátio",
+            "Horário da refeição",
+            "Entrada e saída da escola"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apoio",
+      "titulo": "2. Nível de apoio na rotina escolar",
+      "descricao": "Marque o nível de suporte que o estudante utiliza em cada situação observada.",
+      "perguntas": [
+        {
+          "id": "nivel_apoio",
+          "rotulo": "Atividade observada",
+          "tipo": "escala",
+          "opcoes": ["Sem apoio", "Com apoio esporádico", "Com apoio frequente", "Com apoio contínuo", "Não observado"],
+          "linhas": [
+            "Convive com os colegas da turma",
+            "Convive com professores e equipes da escola",
+            "Participa das atividades escolares em grupo",
+            "Conclui as tarefas pedagógicas propostas",
+            "Participa das brincadeiras e conversas no recreio",
+            "Expressa sentimentos, gostos ou incômodos",
+            "Compreende regras, pedidos e instruções simples",
+            "Circula pelos espaços da escola",
+            "Alimenta-se nos momentos de lanche ou refeição",
+            "Cuida da própria higiene e usa o banheiro"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acessibilidade",
+      "titulo": "3. Necessidades práticas de acessibilidade e cuidados",
+      "descricao": "Assinale a situação observada e anote detalhes.",
+      "perguntas": [
+        {
+          "id": "verificacoes",
+          "rotulo": "Pergunta de verificação",
+          "tipo": "verificacao",
+          "opcoes": ["Sim", "Parcial", "Não"],
+          "linhas": [
+            "Tem restrição ou seletividade alimentar?",
+            "Já usa recursos de tecnologia acessível?",
+            "Precisa de mediação direta para realizar tarefas?",
+            "Precisa de materiais visuais, táteis ou concretos?",
+            "Precisa de ajuda física para comer e beber?",
+            "Precisa de ajuda física para se locomover?",
+            "Precisa de ajuda física nos cuidados pessoais?",
+            "Recebe apoio espontâneo dos colegas de turma?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "descritivo",
+      "titulo": "4. Registro descritivo da observação",
+      "perguntas": [
+        { "id": "relacao_colegas", "rotulo": "A. Como o estudante se relaciona com os colegas e que apoios recebe deles?", "tipo": "texto_longo" },
+        { "id": "relacao_adultos", "rotulo": "Como ele interage com professores e funcionários da escola?", "tipo": "texto_longo" },
+        { "id": "lugar_sala", "rotulo": "Onde o estudante senta na sala de aula? O ambiente ajuda ou dificulta sua participação?", "tipo": "texto_longo" },
+        { "id": "interesses", "rotulo": "B. Quais são os principais gostos, preferências e temas que engajam o estudante?", "tipo": "texto_longo" },
+        { "id": "ja_aprendeu", "rotulo": "O que o estudante já aprendeu e consegue fazer na sala de aula?", "tipo": "texto_longo" },
+        { "id": "prioridades", "rotulo": "Quais habilidades o estudante precisa desenvolver com prioridade?", "tipo": "texto_longo" },
+        { "id": "impede_participacao", "rotulo": "C. O que impede ou atrapalha a participação do estudante nas tarefas?", "tipo": "texto_longo" },
+        {
+          "id": "barreiras",
+          "rotulo": "Quais barreiras existem na escola hoje?",
+          "ajuda": "Marque todas as opções observadas.",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "De comunicação: dificuldade para falar, ouvir, ler avisos ou entender instruções",
+            "Metodológicas: aulas e tarefas sem materiais concretos, visuais ou adaptados",
+            "Tecnológicas: falta de computadores, aplicativos de fala ou aparelhos acessíveis",
+            "Atitudinais: preconceito, descrença na capacidade de aprender ou isolamento social",
+            "Arquitetônicas: degraus, portas estreitas ou banheiros inacessíveis no prédio escolar",
+            "Urbanísticas: calçadas sem rampas e obstáculos no pátio ou portão",
+            "No transporte: condução escolar inexistente, insegura ou sem adaptação"
+          ]
+        },
+        { "id": "barreiras_descricao", "rotulo": "Descreva as barreiras marcadas acima", "tipo": "texto_longo" },
+        { "id": "pontos_fortes", "rotulo": "D. Quais pontos fortes e habilidades você identificou no estudante?", "tipo": "texto_longo" },
+        { "id": "facilitadores", "rotulo": "Quais materiais, apoios e métodos facilitam a aprendizagem dele?", "tipo": "texto_longo" },
+        { "id": "outras", "rotulo": "Outras informações relevantes", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "resumo",
+      "titulo": "5. Resumo da observação e encaminhamentos",
+      "descricao": "Preenchimento obrigatório da equipe pedagógica após o período de observação.",
+      "somente_equipe": true,
+      "perguntas": [
+        { "id": "sintese_fortes", "rotulo": "Pontos fortes observados", "tipo": "texto_longo" },
+        { "id": "sintese_barreiras", "rotulo": "Barreiras identificadas na escola", "tipo": "texto_longo" },
+        { "id": "sintese_apoios", "rotulo": "Apoios pedagógicos e humanos necessários", "tipo": "texto_longo" },
+        { "id": "proximas_acoes", "rotulo": "Próximas ações para o Estudo de Caso, PAEE ou PEI", "tipo": "texto_longo" }
+      ]
+    }
+  ]
+}

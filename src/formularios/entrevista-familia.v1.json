@@ -1,0 +1,107 @@
+{
+  "id": "entrevista-familia",
+  "versao": 1,
+  "titulo": "Roteiro de Conversa com a Família",
+  "finalidade": "Conhecer o estudante para planejar os apoios escolares e construir o seu Plano Individual de Atendimento.",
+  "instrucoes": [
+    "Realize esta conversa em clima de acolhimento, escuta atenta e respeito.",
+    "Não use este momento para avaliar ou julgar a família.",
+    "Use as respostas para planejar recursos acessíveis e eliminar barreiras de aprendizagem."
+  ],
+  "secoes": [
+    {
+      "id": "encontro",
+      "titulo": "1. Identificação do encontro",
+      "perguntas": [
+        { "id": "data", "rotulo": "Data da conversa", "tipo": "data", "obrigatoria": true },
+        { "id": "local", "rotulo": "Local", "tipo": "texto" },
+        { "id": "familiar", "rotulo": "Nome do familiar ou responsável", "tipo": "texto", "obrigatoria": true },
+        { "id": "vinculo", "rotulo": "Parentesco ou vínculo com o estudante", "tipo": "texto" },
+        { "id": "profissionais", "rotulo": "Profissionais da escola presentes", "tipo": "texto" }
+      ]
+    },
+    {
+      "id": "rotina",
+      "titulo": "2. Rotina e autonomia no dia a dia",
+      "perguntas": [
+        { "id": "rotina_casa", "rotulo": "Como é a rotina do estudante em casa e na comunidade?", "tipo": "texto_longo" },
+        { "id": "faz_sozinho", "rotulo": "Quais atividades ele realiza sozinho e com segurança?", "tipo": "texto_longo" },
+        { "id": "precisa_ajuda", "rotulo": "Em quais atividades ele precisa de ajuda? Que tipo de ajuda você oferece?", "tipo": "texto_longo" },
+        { "id": "cuidados", "rotulo": "A escola precisa saber de algum cuidado específico?", "ajuda": "Alimentação, sono, locomoção, uso do banheiro, saúde ou segurança.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "comunicacao",
+      "titulo": "3. Comunicação, interesses e convivência",
+      "perguntas": [
+        {
+          "id": "formas_comunicacao",
+          "rotulo": "Como o estudante costuma se comunicar no dia a dia?",
+          "ajuda": "Marque todas as opções utilizadas.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Fala",
+            "Gestos",
+            "Expressões faciais e corporais",
+            "Aponta objetos ou imagens",
+            "Libras (Língua Brasileira de Sinais)",
+            "Pranchas de imagens, símbolos ou aplicativos (Comunicação Alternativa)",
+            "Escrita ou desenhos"
+          ]
+        },
+        { "id": "expressa", "rotulo": "Como ele expressa o que gosta, o que não quer, dores ou incômodos?", "tipo": "texto_longo" },
+        { "id": "interesses", "rotulo": "Quais são os principais interesses, brinquedos e atividades preferidas dele?", "tipo": "texto_longo" },
+        { "id": "relacoes", "rotulo": "Como ele se relaciona com colegas, familiares e pessoas fora de casa?", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "escola",
+      "titulo": "4. Experiência na escola",
+      "perguntas": [
+        { "id": "sente_escola", "rotulo": "O estudante demonstra ou comenta o que sente em relação à escola? O que ele diz?", "tipo": "texto_longo" },
+        { "id": "participa_melhor", "rotulo": "Em quais momentos ou atividades ele participa melhor?", "tipo": "texto_longo" },
+        { "id": "dificuldades", "rotulo": "Quais dificuldades ou barreiras ele encontra hoje na escola?", "tipo": "texto_longo" },
+        { "id": "estrategias_anteriores", "rotulo": "Que estratégias ou combinados anteriores já ajudaram na aprendizagem dele?", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "habilidades",
+      "titulo": "5. Habilidades, recursos e atendimentos externos",
+      "perguntas": [
+        { "id": "pontos_fortes", "rotulo": "Quais são as principais habilidades e pontos fortes do estudante?", "tipo": "texto_longo" },
+        { "id": "recursos", "rotulo": "Ele já utiliza materiais adaptados ou tecnologias acessíveis no dia a dia?", "ajuda": "Exemplos: engrossador de lápis, cadeira adaptada, computador, leitor de tela, Braille.", "tipo": "texto_longo" },
+        { "id": "terapias", "rotulo": "Ele faz terapias ou tratamentos de saúde fora da escola? Quais?", "ajuda": "Exemplos: fonoaudiologia, psicologia, terapia ocupacional, fisioterapia, neuropediatria.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "parceria",
+      "titulo": "6. Parceria entre escola e família",
+      "perguntas": [
+        { "id": "expectativas", "rotulo": "Quais são as suas expectativas para a vida escolar do estudante este ano?", "tipo": "texto_longo" },
+        { "id": "apoios_essenciais", "rotulo": "Quais apoios da escola você considera essenciais para o progresso dele?", "tipo": "texto_longo" },
+        {
+          "id": "canal",
+          "rotulo": "Como você prefere acompanhar o plano de atendimento individual do estudante?",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Reuniões presenciais", "Mensagens por aplicativo", "Caderno de recados", "Ligações telefônicas"]
+        },
+        { "id": "mais_info", "rotulo": "Deseja compartilhar mais alguma informação importante com a escola?", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "registro",
+      "titulo": "7. Registro e próximos passos",
+      "descricao": "Espaço exclusivo para o preenchimento da equipe pedagógica.",
+      "somente_equipe": true,
+      "perguntas": [
+        { "id": "sintese_fortes", "rotulo": "Pontos fortes e habilidades", "tipo": "texto_longo" },
+        { "id": "sintese_apoios", "rotulo": "Apoios necessários", "tipo": "texto_longo" },
+        { "id": "sintese_barreiras", "rotulo": "Barreiras a serem superadas", "tipo": "texto_longo" },
+        { "id": "sintese_recursos", "rotulo": "Recursos e estratégias que funcionam", "tipo": "texto_longo" },
+        { "id": "proximas_acoes", "rotulo": "Próximas ações e encaminhamentos", "tipo": "texto_longo" }
+      ]
+    }
+  ]
+}
