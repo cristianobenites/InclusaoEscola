@@ -51,3 +51,5 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - Auditoria: gatilhos em todas as tabelas de dados gravam em `auditoria` (quem, ação `tabela.insert|update|delete`, antes/depois). Ações de tela (abriu estudante, abriu formulário, imprimiu, login, logout) são gravadas pelo app via `registrar()` em `src/lib/auditoria.ts`. O log do Auth (`auth.audit_log_entries`) está VAZIO neste projeto, por isso login/logout são registrados pelo app.
 - Rótulos em pt-BR das ações em `rotuloAcao()`.
 - Usuário de teste criado pelo painel: professora.teste@teste.inclusao.local / Teste-2026-aee (apagar antes do piloto).
+- Página `/perfil` (botão com o nome da pessoa no cabeçalho, ao lado do Sair): edita o próprio nome, mostra e-mail/papel/município/escola e troca a senha conferindo a senha atual (re-login) antes de `auth.updateUser`. Registra `acesso.user_updated_password` na auditoria.
+- Usuário do parceiro: vinicius@inclusaoescola.com.br (coordenação, Município Piloto), senha fraca escolhida por ele; criado direto no banco em 14/09.

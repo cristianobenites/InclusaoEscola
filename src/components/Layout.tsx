@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Users, FileText, LogOut, Settings } from "lucide-react";
+import { Users, FileText, LogOut, Settings, UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/Auth";
 import { NOME_PAPEL } from "@/lib/tipos";
 import { registrar } from "@/lib/auditoria";
@@ -42,10 +42,24 @@ export default function Layout() {
           </nav>
           <div className="ml-auto flex items-center gap-3">
             {perfil && (
-              <div className="text-right leading-tight hidden sm:block">
-                <div className="text-sm font-medium">{perfil.nome}</div>
-                <div className="text-xs text-tinta-fraca">{NOME_PAPEL[perfil.papel]}</div>
-              </div>
+              <NavLink
+                to="/perfil"
+                title="Meu perfil"
+                className={({ isActive }) =>
+                  clsx(
+                    "flex items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3 transition-colors",
+                    isActive ? "bg-marca-fundo" : "hover:bg-papel",
+                  )
+                }
+              >
+                <span className="grid place-items-center w-8 h-8 rounded-full bg-marca-suave text-marca">
+                  <UserRound size={16} />
+                </span>
+                <span className="text-right leading-tight hidden sm:block">
+                  <span className="block text-sm font-medium">{perfil.nome}</span>
+                  <span className="block text-xs text-tinta-fraca">{NOME_PAPEL[perfil.papel]}</span>
+                </span>
+              </NavLink>
             )}
             <button
               className="btn-secundario !px-3"
