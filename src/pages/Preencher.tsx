@@ -10,6 +10,7 @@ import type { Resposta } from "@/lib/tipos";
 import FormularioGuiado, { preenchida } from "@/components/FormularioGuiado";
 import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
+import { registrar } from "@/lib/auditoria";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -46,6 +47,11 @@ export default function Preencher() {
     () => acharFormulario(formularioId!, existente.data?.formulario_versao),
     [formularioId, existente.data?.formulario_versao],
   );
+
+  useEffect(() => {
+    registrar("tela.abriu_formulario", `respostas:${respostaId ?? "nova"}`, { formulario: formularioId, estudante: estudanteId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [respostaId, formularioId]);
 
   useEffect(() => {
     if (existente.data) {
@@ -115,7 +121,14 @@ export default function Preencher() {
         </Link>
         <span className="chip bg-papel font-mono">{estudante.data?.codigo}</span>
         <div className="ml-auto flex gap-2">
-          <button className="btn-secundario" onClick={() => window.print()} title="Imprimir ou salvar em PDF">
+          <button
+            className="btn-secundario"
+            onClick={() => {
+              registrar("tela.imprimiu", `respostas:${idAtual ?? "nova"}`, { formulario: formulario.id, estudante: estudanteId });
+              window.print();
+            }}
+            title="Imprimir ou salvar em PDF"
+          >
             <Printer size={16} /> <span className="hidden sm:inline">Imprimir</span>
           </button>
           {!concluido && (

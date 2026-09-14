@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { NOME_PAPEL, PAPEIS_ABERTOS, type Papel } from "@/lib/tipos";
 import Aviso from "@/components/Aviso";
+import { registrar } from "@/lib/auditoria";
 import clsx from "clsx";
 
 export default function Entrar() {
@@ -28,6 +29,7 @@ export default function Entrar() {
       if (modo === "entrar") {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
         if (error) throw error;
+        await registrar("acesso.login", undefined, { navegador: navigator.userAgent.slice(0, 120) });
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
@@ -40,6 +42,7 @@ export default function Entrar() {
           setModo("entrar");
           return;
         }
+        await registrar("acesso.user_signedup", undefined, { papel });
       }
       navegar("/estudantes", { replace: true });
     } catch (err) {

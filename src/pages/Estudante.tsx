@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ClipboardList, MessageCircleHeart, Sparkles, Plus, FileCheck2, PencilLine } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Estudante as TEstudante, Resposta } from "@/lib/tipos";
 import { FORMULARIOS } from "@/formularios";
+import { registrar } from "@/lib/auditoria";
 
 const ICONE: Record<string, typeof ClipboardList> = {
   "ficha-observacao": ClipboardList,
@@ -46,6 +48,10 @@ export default function Estudante() {
       return data as Resposta[];
     },
   });
+
+  useEffect(() => {
+    if (estudante.data) registrar("tela.abriu_estudante", "estudantes:" + estudante.data.id, { codigo: estudante.data.codigo });
+  }, [estudante.data]);
 
   if (estudante.isLoading) return <p className="text-sm text-tinta-fraca">Carregando…</p>;
   if (!estudante.data) return <p className="text-sm text-erro">Estudante não encontrado.</p>;

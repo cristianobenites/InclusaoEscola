@@ -43,3 +43,11 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - **Logo**: `public/logo-instituto.svg` (completo, extraído do SVG do site) e `public/marca-instituto.svg` (só o símbolo, usado como favicon e no celular).
 - **Formas**: cantos bem arredondados (cards `rounded-3xl`, campos `rounded-2xl`), bolinhas coloridas como decoração de fundo (classe `.bolha`), cabeçalho branco com o logo à esquerda.
 - Pesos: usar `font-medium`, nunca `font-bold`/`font-extrabold` (o site é leve).
+
+## Administração e auditoria (2026-09-14)
+
+- Rota `/admin` (só superadmin e gestão). Abas: Usuários (criar, editar, redefinir senha, bloquear), Atividade (tudo que cada pessoa fez, com filtro por período e pessoa, detalhe abre em sanfona na própria linha), Municípios e escolas (estrutura).
+- Criação de usuário é por RPC `admin_cria_usuario` (SECURITY DEFINER, grava direto em auth.users + auth.identities com bcrypt, igual ao GoTrue). Não usa service_role nem edge function. Gestão só cria no próprio município; superadmin em qualquer um.
+- Auditoria: gatilhos em todas as tabelas de dados gravam em `auditoria` (quem, ação `tabela.insert|update|delete`, antes/depois). Ações de tela (abriu estudante, abriu formulário, imprimiu, login, logout) são gravadas pelo app via `registrar()` em `src/lib/auditoria.ts`. O log do Auth (`auth.audit_log_entries`) está VAZIO neste projeto, por isso login/logout são registrados pelo app.
+- Rótulos em pt-BR das ações em `rotuloAcao()`.
+- Usuário de teste criado pelo painel: professora.teste@teste.inclusao.local / Teste-2026-aee (apagar antes do piloto).

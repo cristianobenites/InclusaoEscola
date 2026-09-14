@@ -1,12 +1,14 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Users, FileText, LogOut } from "lucide-react";
+import { Users, FileText, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/Auth";
 import { NOME_PAPEL } from "@/lib/tipos";
+import { registrar } from "@/lib/auditoria";
 import clsx from "clsx";
 
 const itens = [
   { para: "/estudantes", rotulo: "Estudantes", Icone: Users },
   { para: "/formularios", rotulo: "Formulários", Icone: FileText },
+  { para: "/admin", rotulo: "Administração", Icone: Settings, soAdmin: true },
 ];
 
 export default function Layout() {
@@ -22,7 +24,7 @@ export default function Layout() {
             <img src="/marca-instituto.svg" alt="Instituto Inclusão na Escola" className="h-9 sm:hidden" />
           </NavLink>
           <nav className="flex items-center gap-1 ml-2">
-            {itens.map(({ para, rotulo, Icone }) => (
+            {itens.filter((i) => !i.soAdmin || perfil?.papel === "superadmin" || perfil?.papel === "gestao").map(({ para, rotulo, Icone }) => (
               <NavLink
                 key={para}
                 to={para}
@@ -49,6 +51,7 @@ export default function Layout() {
               className="btn-secundario !px-3"
               title="Sair"
               onClick={async () => {
+                await registrar("acesso.logout");
                 navegar("/entrar", { replace: true });
                 await sair();
               }}
