@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, KeyRound, Ban, CircleCheck, Pencil, RefreshCw, ChevronDown, ChevronUp, Building2 } from "lucide-react";
+import { Plus, KeyRound, Ban, CircleCheck, Pencil, RefreshCw, ChevronDown, ChevronUp, Building2, History } from "lucide-react";
 import clsx from "clsx";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
@@ -370,6 +370,7 @@ function UsuarioLinha({
                 </button>
               </div>
             </form>
+            <HistoricoDoUsuario id={u.id} />
           </td>
         </tr>
       )}
@@ -502,6 +503,57 @@ function NovoUsuario({
   );
 }
 
+/* ---------------- Histórico de uma pessoa (dentro do usuário aberto) ---------------- */
+
+function HistoricoDoUsuario({ id }: { id: string }) {
+  const [dias, setDias] = useState(30);
+  const [aberto, setAberto] = useState<number | null>(null);
+  const historico = useQuery({
+    queryKey: ["admin-historico", id, dias],
+    queryFn: async () => {
+      const desde = new Date(Date.now() - dias * 864e5).toISOString();
+      const { data, error } = await supabase.rpc("admin_atividade", { p_desde: desde, p_quem: id, p_limite: 300 });
+      if (error) throw error;
+      return data as Atividade[];
+    },
+  });
+  const lista = historico.data ?? [];
+  const entradas = lista.filter((a) => a.acao === "acesso.login" || a.acao === "acesso.sessao");
+  const acoes = lista.filter((a) => !a.acao.startsWith("acesso."));
+
+  return (
+    <div className="mt-5 border-t border-papel-borda pt-4">
+      <div className="flex flex-wrap items-center gap-3 mb-3">
+        <h4 className="font-medium flex items-center gap-2">
+          <History size={16} className="text-marca" /> Histórico desta pessoa
+        </h4>
+        <select className="campo !w-auto !py-1.5 text-xs" value={dias} onChange={(e) => setDias(Number(e.target.value))}>
+          <option value={7}>Últimos 7 dias</option>
+          <option value={30}>Últimos 30 dias</option>
+          <option value={365}>Último ano</option>
+        </select>
+        <span className="text-xs text-tinta-fraca ml-auto">
+          {entradas.length} entrada(s) · {acoes.length} ação(ões)
+          {entradas[0] && <> · último acesso {formatarDataHora(entradas[0].quando)}</>}
+        </span>
+      </div>
+      {historico.isLoading && <p className="text-sm text-tinta-fraca">Carregando…</p>}
+      {!historico.isLoading && lista.length === 0 && <p className="text-sm text-tinta-fraca">Nada registrado neste período.</p>}
+      {lista.length > 0 && (
+        <div className="rounded-2xl border border-papel-borda bg-white overflow-hidden">
+          <table className="w-full text-sm">
+            <tbody className="divide-y divide-papel-borda">
+              {lista.map((a, i) => (
+                <AtividadeLinha key={i} a={a} aberto={aberto === i} alternar={() => setAberto(aberto === i ? null : i)} semQuem />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ---------------- Atividade ---------------- */
 
 function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
@@ -611,15 +663,17 @@ function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
   );
 }
 
-function AtividadeLinha({ a, aberto, alternar }: { a: Atividade; aberto: boolean; alternar: () => void }) {
+function AtividadeLinha({ a, aberto, alternar, semQuem }: { a: Atividade; aberto: boolean; alternar: () => void; semQuem?: boolean }) {
   const temDetalhe = !!a.detalhe && Object.keys(a.detalhe).length > 0;
   return (
     <>
       <tr className="hover:bg-papel/60 cursor-pointer" onClick={temDetalhe ? alternar : undefined}>
         <td className="px-4 py-2.5 whitespace-nowrap text-tinta-suave">{formatarDataHora(a.quando)}</td>
-        <td className="px-4 py-2.5">
-          <div className="font-medium">{a.quem_nome ?? a.quem_email ?? "sistema"}</div>
-        </td>
+        {!semQuem && (
+          <td className="px-4 py-2.5">
+            <div className="font-medium">{a.quem_nome ?? a.quem_email ?? "sistema"}</div>
+          </td>
+        )}
         <td className="px-4 py-2.5">
           <span
             className={clsx(
@@ -635,7 +689,7 @@ function AtividadeLinha({ a, aberto, alternar }: { a: Atividade; aberto: boolean
       </tr>
       {aberto && temDetalhe && (
         <tr className="bg-papel/50">
-          <td colSpan={5} className="px-4 py-3">
+          <td colSpan={semQuem ? 4 : 5} className="px-4 py-3">
             <pre className="text-xs whitespace-pre-wrap break-all max-h-80 overflow-auto">{JSON.stringify(a.detalhe, null, 2)}</pre>
           </td>
         </tr>
@@ -644,15 +698,27 @@ function AtividadeLinha({ a, aberto, alternar }: { a: Atividade; aberto: boolean
   );
 }
 
+const NOME_FORMULARIO: Record<string, string> = {
+  "ficha-observacao": "Ficha de Observação",
+  "entrevista-familia": "Conversa com a Família",
+};
+
 function resumoDetalhe(a: Atividade): string {
   const d = a.detalhe ?? {};
   if (a.origem === "auth") return [d.navegador, d.ip].filter(Boolean).join(" · ") as string;
+  if (a.acao.startsWith("tela.") || a.acao.startsWith("acesso.")) {
+    const partes: string[] = [];
+    if (typeof d.formulario === "string") partes.push(NOME_FORMULARIO[d.formulario] ?? d.formulario);
+    if (typeof d.codigo === "string") partes.push("estudante " + d.codigo);
+    if (typeof d.navegador === "string") partes.push(d.navegador.includes("iPhone") ? "iPhone" : d.navegador.includes("Android") ? "Android" : "computador");
+    return partes.join(" · ");
+  }
   const depois = (d.depois ?? d.antes) as Record<string, unknown> | undefined;
   if (!depois) return a.alvo ?? "";
   const partes: string[] = [];
   if (typeof depois.codigo === "string") partes.push(depois.codigo);
   if (typeof depois.nome === "string") partes.push(depois.nome);
-  if (typeof depois.formulario_id === "string") partes.push(depois.formulario_id);
+  if (typeof depois.formulario_id === "string") partes.push(NOME_FORMULARIO[depois.formulario_id as string] ?? (depois.formulario_id as string));
   if (typeof depois.status === "string") partes.push(depois.status);
   if (typeof depois.email === "string") partes.push(depois.email);
   return partes.join(" · ") || (a.alvo ?? "");

@@ -53,3 +53,4 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - Usuário de teste criado pelo painel: professora.teste@teste.inclusao.local / Teste-2026-aee (apagar antes do piloto).
 - Página `/perfil` (botão com o nome da pessoa no cabeçalho, ao lado do Sair): edita o próprio nome, mostra e-mail/papel/município/escola e troca a senha conferindo a senha atual (re-login) antes de `auth.updateUser`. Registra `acesso.user_updated_password` na auditoria.
 - Usuário do parceiro: vinicius@inclusaoescola.com.br (coordenação, Município Piloto), senha fraca escolhida por ele; criado direto no banco em 14/09.
+- Ao abrir um usuário na aba Usuários, aparece "Histórico desta pessoa": entradas/saídas e ações com horário (RPC `admin_atividade` com `p_quem`). As entradas vêm do `acesso.login` do app e também de `auth.sessions` (migração 0005), sem duplicar.
