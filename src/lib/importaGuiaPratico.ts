@@ -40,12 +40,22 @@ export function importarGuiaPratico(texto: string): ResultadoImportacao {
   const form = acharFormulario("estudo-de-caso", 2)!;
   const perguntas = form.secoes.flatMap((s) => s.perguntas);
   const opcoesDe = (id: string) => perguntas.find((p) => p.id === id)?.opcoes ?? [];
+  // casa pelo texto normalizado; se não bater exato, aceita a opção com mais palavras em comum (>= 70%)
   const casar = (id: string, item: string) => {
     const n = norm(item);
-    return opcoesDe(id).find((o) => {
-      const on = norm(o);
-      return on === n || on.startsWith(n.slice(0, 40)) || n.startsWith(on.slice(0, 40));
-    });
+    const ops = opcoesDe(id);
+    const exata = ops.find((o) => norm(o) === n);
+    if (exata) return exata;
+    const tokens = new Set(n.split(" ").filter((w) => w.length > 2));
+    let melhor: string | undefined;
+    let melhorNota = 0;
+    for (const o of ops) {
+      const ot = new Set(norm(o).split(" ").filter((w) => w.length > 2));
+      const comuns = [...tokens].filter((w) => ot.has(w)).length;
+      const nota = comuns / Math.max(tokens.size, ot.size, 1);
+      if (nota > melhorNota) { melhorNota = nota; melhor = o; }
+    }
+    return melhorNota >= 0.7 ? melhor : undefined;
   };
 
   const r: Respostas = {};
