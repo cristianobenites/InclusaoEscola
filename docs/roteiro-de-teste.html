@@ -1,0 +1,162 @@
+<title>Roteiro de Teste Inclusão na Escola</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap">
+<style>
+  /* Layout: uma coluna de leitura (65ch), bandas de cor só nos passos numerados; identidade do Instituto */
+  :root{
+    --bg:#f6f8fc; --card:#ffffff; --fg:#233a55; --fg-2:#5a6b80; --fg-3:#8494a8; --line:#dfe4ec;
+    --acao:#125dda; --acao-fundo:#eef4ff; --verde:#47c249; --verde-fundo:#d0f7d9; --sol:#c98f00; --sol-fundo:#fff6cc; --rosa:#d63a5a; --rosa-fundo:#ffd8d9;
+    --display:"Ubuntu",system-ui,sans-serif; --body:"Ubuntu",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#121a26; --card:#1a2535; --fg:#eaf0f8; --fg-2:#aab8cb; --fg-3:#7b8a9e; --line:#2a3748; --acao:#5b9cff; --acao-fundo:#1c2b45; --verde:#5fd962; --verde-fundo:#173a22; --sol:#ffcf4d; --sol-fundo:#3b3010; --rosa:#ff7b94; --rosa-fundo:#3f1c25; color-scheme:dark } }
+  :root[data-theme="dark"]{ --bg:#121a26; --card:#1a2535; --fg:#eaf0f8; --fg-2:#aab8cb; --fg-3:#7b8a9e; --line:#2a3748; --acao:#5b9cff; --acao-fundo:#1c2b45; --verde:#5fd962; --verde-fundo:#173a22; --sol:#ffcf4d; --sol-fundo:#3b3010; --rosa:#ff7b94; --rosa-fundo:#3f1c25; color-scheme:dark }
+  body{ background:var(--bg); color:var(--fg); font-family:var(--body); font-size:16px; line-height:1.55; padding-block:32px 64px; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); }
+  main{ max-width:68ch; margin:0 auto; display:grid; gap:28px; }
+  h1,h2,h3{ font-family:var(--display); font-weight:500; line-height:1.2; text-wrap:balance; margin:0; }
+  h1{ font-size:2rem } h2{ font-size:1.35rem } h3{ font-size:1.05rem }
+  p{ margin:0 } .muted{ color:var(--fg-2) } .small{ font-size:.9rem }
+  .eyebrow{ font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-3); font-weight:500 }
+  header{ display:grid; gap:12px }
+  .logo{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.05rem }
+  .logo svg{ width:34px; height:34px }
+  .link{ display:inline-flex; align-items:center; gap:8px; background:var(--acao); color:#fff; text-decoration:none; padding:11px 18px; border-radius:999px; font-weight:500; width:fit-content }
+  .link:focus-visible,button:focus-visible{ outline:3px solid var(--sol); outline-offset:2px }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px 22px; display:grid; gap:12px }
+  .aviso{ border-left:4px solid var(--sol); background:var(--sol-fundo); border-radius:14px; padding:12px 16px; color:var(--fg) }
+  ol.passos{ list-style:none; padding:0; margin:0; display:grid; gap:14px; counter-reset:p }
+  ol.passos li{ counter-increment:p; display:grid; grid-template-columns:40px 1fr; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:18px 20px }
+  ol.passos li::before{ content:counter(p); width:36px; height:36px; border-radius:50%; background:var(--acao-fundo); color:var(--acao); display:grid; place-items:center; font-weight:700; font-size:1rem }
+  ol.passos li>div{ min-width:0; display:grid; gap:6px }
+  kbd{ font:inherit; font-weight:500; background:var(--acao-fundo); color:var(--acao); padding:1px 8px; border-radius:999px; white-space:nowrap }
+  ul{ margin:0; padding-left:20px; display:grid; gap:4px }
+  .duas{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px }
+  .tag{ display:inline-block; font-size:.75rem; font-weight:500; padding:2px 10px; border-radius:999px }
+  .tag.a{ background:var(--acao-fundo); color:var(--acao) } .tag.b{ background:var(--verde-fundo); color:var(--fg) }
+  textarea,input[type=text]{ width:100%; box-sizing:border-box; font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:10px 12px }
+  textarea{ min-height:72px; resize:vertical }
+  label.q{ display:grid; gap:6px; font-weight:500 } label.q span.d{ font-weight:400; color:var(--fg-2); font-size:.9rem }
+  .nota{ display:flex; gap:8px; flex-wrap:wrap } .nota button{ font:inherit; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:999px; padding:6px 14px; cursor:pointer } .nota button[aria-pressed=true]{ background:var(--acao); border-color:var(--acao); color:#fff }
+  button.primario{ font:inherit; font-weight:500; background:var(--acao); color:#fff; border:0; border-radius:999px; padding:11px 18px; cursor:pointer; width:fit-content }
+  pre{ white-space:pre-wrap; word-break:break-word; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:12px; font-size:.85rem; margin:0 }
+  .ok{ color:var(--fg-2); font-size:.9rem; min-height:1.2em }
+  @media (prefers-reduced-motion:no-preference){ .nota button{ transition:background .15s } }
+</style>
+
+<main>
+  <header>
+    <div class="logo">
+      <svg viewBox="55 55 470 470" aria-hidden="true"><path d="M233.62 451.1c-17.79 0-32.22-14.42-32.22-32.22 0-17.79 14.43-32.22 32.22-32.22 5.95 0 11.52 1.61 16.3 4.43 3.48 2.05 7.86-.43 7.86-4.46v-54.49c0-5.48-4.44-9.91-9.91-9.91h-54.49c-4.04 0-6.51 4.38-4.46 7.86a32.06 32.06 0 0 1 4.43 16.3c0 17.79-14.43 32.22-32.22 32.22s-32.22-14.42-32.22-32.22c0-5.95 1.61-11.52 4.43-16.3 2.05-3.48-.43-7.86-4.46-7.86H74.39c-5.48 0-9.91 4.44-9.91 9.91 0 101.29 82.11 183.4 183.4 183.4 5.48 0 9.91-4.44 9.91-9.91v-54.49c0-4.04-4.38-6.51-7.86-4.46a32.06 32.06 0 0 1-16.3 4.43Z" fill="#2b5cd2"/><path d="M233.62 193.34c5.95 0 11.52 1.61 16.3 4.43 3.48 2.05 7.87-.43 7.87-4.46v-54.49c0-5.48-4.44-9.91-9.91-9.91-101.29 0-183.4 82.11-183.4 183.4 0 5.48 4.44 9.91 9.91 9.91h54.49c4.04 0 6.51 4.39 4.46 7.87a32.06 32.06 0 0 0-4.43 16.3c0 17.79 14.43 32.22 32.22 32.22s32.22-14.43 32.22-32.22c0-5.95-1.61-11.52-4.43-16.3-2.05-3.48.43-7.87 4.46-7.87h54.49c5.48 0 9.91-4.44 9.91-9.91v-54.49c0-4.04-4.39-6.51-7.87-4.46a32.06 32.06 0 0 1-16.3 4.43c-17.79 0-32.22-14.42-32.22-32.22 0-17.79 14.43-32.22 32.22-32.22Z" fill="#47c249"/><path d="M482.24 188.17c-2.15-3.71-7.54-3.33-9.25.61a39.6 39.6 0 0 1-10.88 14.57c-16.78 14.08-41.79 11.89-55.87-4.88-14.08-16.78-11.89-41.79 4.88-55.87 5.03-4.22 10.8-6.97 16.79-8.31 4.22-.94 5.61-6.21 2.35-9.04C386.74 87.4 329.9 64.48 267.69 64.48c-5.48 0-9.91 4.44-9.91 9.91v118.92c0 4.04-4.39 6.51-7.87 4.46a32.06 32.06 0 0 0-16.3-4.43c-17.79 0-32.22 14.42-32.22 32.22 0 17.79 14.43 32.22 32.22 32.22 5.95 0 11.52-1.61 16.3-4.43 3.48-2.05 7.87.43 7.87 4.46v54.49c0 5.48 4.44 9.91 9.91 9.91h237.93c5.48 0 9.91-4.44 9.91-9.91 0-45.23-12.12-87.63-33.29-124.14Z" fill="#ffc803"/></svg>
+      Inclusão na Escola
+    </div>
+    <p class="eyebrow">Programa Decola AEE · versão de teste</p>
+    <h1>Roteiro de teste para a equipe</h1>
+    <p class="muted">Este é um protótipo. Pedimos que você o use com um estudante fictício, siga os passos abaixo e nos conte o que achou. Leva de 20 a 30 minutos.</p>
+    <a class="link" href="https://inclusao-escola.vercel.app/entrar">Abrir o sistema de teste</a>
+  </header>
+
+  <section class="aviso">
+    <strong>Antes de começar.</strong> Não use dados de um estudante real. Invente um nome ou use só as iniciais, e escreva situações fictícias. Nesta fase o sistema ainda está em teste, e a proteção de dados de crianças é regra.
+  </section>
+
+  <section class="card">
+    <h2>Sua conta</h2>
+    <p>Na tela de entrada, escolha <kbd>Criar conta</kbd>, informe seu nome, seu papel na rede (professor regente, professor de AEE, coordenação ou gestão), um e-mail e uma senha. Não há confirmação por e-mail: a conta já funciona.</p>
+    <p class="muted small">Se você recebeu usuário e senha de quem organizou o teste, use <kbd>Entrar</kbd>. Depois é possível trocar a senha em "Meu perfil", no seu nome, no alto da tela.</p>
+  </section>
+
+  <section>
+    <h2 style="margin-bottom:14px">O percurso</h2>
+    <ol class="passos">
+      <li><div>
+        <h3>Cadastre um estudante fictício</h3>
+        <p class="muted">Em <kbd>Estudantes</kbd>, clique em <kbd>Novo estudante</kbd>. Nome inventado, data de nascimento qualquer, escola "EMEF Piloto", turma "3º ano A". O sistema cria um código (EST-XXXXXX); é com ele que a análise trabalha, nunca com o nome.</p>
+      </div></li>
+      <li><div>
+        <h3>Preencha a Ficha de Observação</h3>
+        <p class="muted">Abra o estudante e clique em <kbd>Nova observação</kbd>. Marque o nível de apoio, responda as perguntas abertas com fatos, sem rótulos. Cada campo traz exemplos. Clique em <kbd>Salvar rascunho</kbd>.</p>
+      </div></li>
+      <li><div>
+        <h3>Peça o feedback</h3>
+        <p class="muted">Depois de salvar, aparece o painel <kbd>Receber feedback</kbd>. O sistema lê o que você escreveu e mostra o que os Cadernos Pedagógicos do MEC e os guias do Instituto dizem sobre cada parte, com a fonte e a página. Leia com atenção: é isso que queremos avaliar.</p>
+      </div></li>
+      <li><div>
+        <h3>Faça o Estudo de Caso</h3>
+        <p class="muted">Volte ao estudante e clique em <kbd>Novo estudo</kbd>. Dois caminhos:</p>
+        <div class="duas">
+          <div><span class="tag a">Caminho A</span><p class="muted small">Preencha as 4 etapas direto no sistema. As opções são as mesmas do guia passo a passo do Instituto.</p></div>
+          <div><span class="tag b">Caminho B</span><p class="muted small">Se você fez o exercício no Guia Prático "Estudo de Caso na Prática", clique em <kbd>Copiar texto</kbd> lá, depois em <kbd>Colar do Guia Prático</kbd> aqui. O formulário se preenche sozinho. Confira e salve.</p></div>
+        </div>
+        <p class="muted">Salve o rascunho e peça o feedback de novo.</p>
+      </div></li>
+      <li><div>
+        <h3>Conclua</h3>
+        <p class="muted">Quando estiver satisfeita, clique em <kbd>Concluir</kbd>. O registro fecha para edição. Teste também o botão <kbd>Imprimir</kbd>, que gera o PDF do formulário.</p>
+      </div></li>
+      <li><div>
+        <h3>Se puder, repita no celular</h3>
+        <p class="muted">O mesmo endereço funciona no telefone. Queremos saber se preencher pelo celular é confortável.</p>
+      </div></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>O que nos contar</h2>
+    <p class="muted">Responda abaixo e clique em <kbd>Copiar meu relato</kbd>. Cole o texto no grupo de WhatsApp do teste ou mande para quem te convidou. Nada daqui é enviado automaticamente.</p>
+    <label class="q" for="r-nome">Seu nome e papel <span class="d">Ex.: Maria, professora de AEE</span><input type="text" id="r-nome"></label>
+    <div class="q"><span>O feedback foi útil para o seu trabalho?</span><div class="nota" id="r-util" role="group" aria-label="Utilidade do feedback"><button type="button" data-v="Não ajudou">Não ajudou</button><button type="button" data-v="Ajudou um pouco">Ajudou um pouco</button><button type="button" data-v="Ajudou bastante">Ajudou bastante</button></div></div>
+    <label class="q" for="r-fonte">As fontes citadas (caderno e página) fizeram sentido para o que você escreveu? <span class="d">Diga um exemplo que acertou e um que errou, se houver.</span><textarea id="r-fonte"></textarea></label>
+    <label class="q" for="r-faltou">O que faltou no feedback, ou o que você esperava ver e não viu?<textarea id="r-faltou"></textarea></label>
+    <label class="q" for="r-form">Alguma pergunta dos formulários ficou confusa, repetida ou fora da sua realidade?<textarea id="r-form"></textarea></label>
+    <div class="q"><span>Onde você testou?</span><div class="nota" id="r-onde" role="group" aria-label="Aparelho"><button type="button" data-v="Computador">Computador</button><button type="button" data-v="Celular">Celular</button><button type="button" data-v="Os dois">Os dois</button></div></div>
+    <label class="q" for="r-bug">Algo travou, deu erro ou não funcionou? <span class="d">Conte o que você fez antes e o que apareceu na tela.</span><textarea id="r-bug"></textarea></label>
+    <label class="q" for="r-livre">Qualquer outra observação<textarea id="r-livre"></textarea></label>
+    <button class="primario" type="button" id="copiar">Copiar meu relato</button>
+    <div class="ok" id="ok" aria-live="polite"></div>
+    <pre id="previa" hidden></pre>
+  </section>
+
+  <section class="card">
+    <h2>Perguntas frequentes</h2>
+    <ul class="muted">
+      <li><strong>O feedback é uma decisão?</strong> Não. É apoio para a equipe, que decide. Ele aponta trechos dos materiais e, quando a IA estiver ligada, redige sugestões por campo.</li>
+      <li><strong>Posso ver as versões antigas?</strong> Sim. Rascunhos e registros concluídos ficam listados na página do estudante.</li>
+      <li><strong>Quem vê o que eu preencho?</strong> Só pessoas do mesmo município no sistema, e a coordenação do teste.</li>
+      <li><strong>Esqueci a senha.</strong> Avise quem organizou o teste; a administração redefine na hora.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function(){
+  var escolhas = {};
+  document.querySelectorAll('.nota').forEach(function(g){
+    g.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if(!b) return;
+      g.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', x===b ? 'true' : 'false'); });
+      escolhas[g.id] = b.dataset.v; salvar();
+    });
+  });
+  var campos = ['r-nome','r-fonte','r-faltou','r-form','r-bug','r-livre'];
+  function salvar(){ try{ var d={escolhas:escolhas}; campos.forEach(function(id){ d[id]=document.getElementById(id).value; }); localStorage.setItem('iie-relato', JSON.stringify(d)); }catch(e){} }
+  try{ var s = JSON.parse(localStorage.getItem('iie-relato')||'null'); if(s){ campos.forEach(function(id){ if(s[id]) document.getElementById(id).value=s[id]; }); escolhas=s.escolhas||{}; Object.keys(escolhas).forEach(function(gid){ var g=document.getElementById(gid); g&&g.querySelectorAll('button').forEach(function(x){ x.setAttribute('aria-pressed', x.dataset.v===escolhas[gid]?'true':'false'); }); }); } }catch(e){}
+  campos.forEach(function(id){ document.getElementById(id).addEventListener('input', salvar); });
+  function v(id){ return (document.getElementById(id).value||'').trim() || '-'; }
+  function relato(){
+    return ['RELATO DE TESTE · Inclusão na Escola',
+      'Quem: '+v('r-nome'),
+      'Feedback foi útil? '+(escolhas['r-util']||'-'),
+      'Fontes citadas fizeram sentido? '+v('r-fonte'),
+      'O que faltou: '+v('r-faltou'),
+      'Perguntas confusas: '+v('r-form'),
+      'Onde testou: '+(escolhas['r-onde']||'-'),
+      'Erros: '+v('r-bug'),
+      'Outras observações: '+v('r-livre')].join('\n');
+  }
+  document.getElementById('copiar').addEventListener('click', function(){
+    var t = relato(), ok = document.getElementById('ok'), pre = document.getElementById('previa');
+    pre.textContent = t; pre.hidden = false;
+    function fallback(){ var r=document.createRange(); r.selectNodeContents(pre); var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); ok.textContent='Não consegui copiar sozinho. O texto está selecionado abaixo: copie e cole no WhatsApp.'; }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ ok.textContent='Relato copiado. Cole no WhatsApp do teste.'; }, fallback); } else fallback();
+  });
+})();
+</script>
