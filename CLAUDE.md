@@ -63,3 +63,9 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - REGRA: toda resposta da IA cita fonte e página; regras do Instituto > Cadernos MEC > exemplos > artigos. Nunca linguagem clínica.
 - ARMADILHA: o plano gratuito PAUSA o projeto após 7 dias sem uso (aconteceu entre 14/09 e 30/10; religar exige login como terrazul no painel, o token do CLI é Developer e não pode). Falta um ping periódico para evitar; decidir com o usuário.
 - Formulários v2 (30/10): Ficha de Observação v2 e Entrevista com a Família v2 reescritos a partir dos guias passo a passo do Instituto (checklists, exemplos em cada campo, "apoio permanente", 5 barreiras); NOVOS: `estudo-de-caso.v1.json` (4 etapas + validação) e `documento-unificado.v1.json` (PAEE + PEI, 6 seções). Versões antigas continuam no `TODAS_VERSOES` para abrir respostas já feitas.
+
+## Feedback ao professor (2026-10-30)
+
+- Edge function `supabase/functions/feedback` (deploy: `npx supabase functions deploy feedback --project-ref cmuynbifmywajjtbktpw`). Recebe `resposta_id`, roda com o JWT de quem pediu (RLS vale), pseudonimiza (troca o nome do estudante por "o estudante"), resume as respostas por seção, chama `busca_conhecimento` por seção (cadernos, exemplos, artigos) e lê `regras_do_instituto()`.
+- Sem `GEMINI_API_KEY` nos segredos da função: modo **busca** (trechos relevantes por seção, com fonte e página). Com a chave: modo **ia** (gemini-2.5-flash, JSON com resumo, pontos fortes, alertas, sugestões e perguntas, cada item com fonte/página; regras: barreira é do contexto, nunca linguagem clínica, indicadores observáveis). Trocar modelo com `GEMINI_MODELO`.
+- Resultado gravado em `feedbacks` (migração 0007) e mostrado pelo `PainelFeedback` na tela de preenchimento (aparece depois de salvar o rascunho). Ação auditada como `feedback.gerou`.

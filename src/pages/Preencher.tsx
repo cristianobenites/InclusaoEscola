@@ -11,6 +11,7 @@ import FormularioGuiado, { preenchida } from "@/components/FormularioGuiado";
 import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
 import { registrar } from "@/lib/auditoria";
+import PainelFeedback from "@/components/PainelFeedback";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -170,6 +171,11 @@ export default function Preencher() {
           setSujo(true);
         }}
       />
+
+      {idAtual && !sujo && <PainelFeedback respostaId={idAtual} aoErro={setAviso} />}
+      {idAtual && sujo && (
+        <p className="no-print mt-6 text-sm text-tinta-fraca">Salve o rascunho para pedir o feedback sobre o que preencheu.</p>
+      )}
 
       {!concluido && (
         <div className="no-print mt-6 flex justify-end gap-2">

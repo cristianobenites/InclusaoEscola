@@ -29,6 +29,7 @@ export function rotuloAcao(acao: string): string {
     "tela.abriu_estudante": "Abriu a página do estudante",
     "tela.imprimiu": "Imprimiu ou salvou em PDF",
     "tela.abriu_formulario": "Abriu um formulário",
+    "feedback.gerou": "Pediu feedback dos materiais",
   };
   if (fixos[acao]) return fixos[acao];
   const [tabela, op] = acao.split(".");
