@@ -1,0 +1,135 @@
+{
+  "id": "estudo-de-caso",
+  "versao": 2,
+  "titulo": "Estudo de Caso",
+  "finalidade": "Reunir o que foi observado na escola e relatado pela família, analisar as barreiras do contexto escolar, identificar potencialidades e apoios, e definir estratégias e recursos de acessibilidade. Alinhado ao Guia Prático \"Estudo de Caso na Prática\" do Instituto: quem fez o exercício no guia pode colar o texto gerado aqui.",
+  "instrucoes": [
+    "Observe a rotina do estudante em diferentes contextos (em sala, nos momentos livres e na interação com os colegas) e marque os pontos correspondentes.",
+    "Barreira é o que está no contexto escolar e impede a participação, não uma característica do estudante.",
+    "O foco não é a limitação, e sim a potencialidade: mapeie interesses e habilidades para construir as intervenções."
+  ],
+  "secoes": [
+    {
+      "id": "etapa1",
+      "titulo": "Etapa 1. Identificação das demandas e barreiras individuais",
+      "descricao": "A observação inicial é o alicerce do Estudo de Caso.",
+      "perguntas": [
+        { "id": "data", "rotulo": "Data da observação", "tipo": "data", "obrigatoria": true },
+        { "id": "profissional", "rotulo": "Profissional responsável", "tipo": "texto", "obrigatoria": true },
+        {
+          "id": "participacao",
+          "rotulo": "1. Interação e participação: atitudes nas aulas e momentos livres",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Participa com autonomia total",
+            "Precisa de apoio visual ou incentivo verbal",
+            "Exige mediação individual para iniciar ou concluir",
+            "Atividades adaptadas com linguagem simplificada",
+            "Brinca e interage em grupo espontaneamente",
+            "Prefere brincar sozinho, mas tolera aproximação",
+            "Resistência ou isolamento social ativo"
+          ]
+        },
+        { "id": "participacao_obs", "rotulo": "Observações sobre interação e participação", "tipo": "texto_longo" },
+        {
+          "id": "desempenho",
+          "rotulo": "2. Desempenho pedagógico: situação atual frente aos conteúdos",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Acompanha o ano regular sem grandes adaptações",
+            "Acompanha com suporte de material simplificado",
+            "Realiza conteúdos do ciclo anterior (alfabetização)",
+            "Mantém foco por curtos períodos (5 a 10 minutos)",
+            "As propostas pedagógicas não fazem sentido para o estudante"
+          ]
+        },
+        { "id": "desempenho_obs", "rotulo": "Observações sobre desempenho pedagógico", "tipo": "texto_longo" },
+        {
+          "id": "registro",
+          "rotulo": "3. Registro e escrita: como o estudante registra o que aprende",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Escrita cursiva ou de imprensa autônoma",
+            "Uso de apoio físico (lápis engrossado, guia)",
+            "Digitação em computador, tablet ou teclado adaptado",
+            "Comunicação Alternativa (pranchas, símbolos)",
+            "Resposta oral, desenho ou colagem"
+          ]
+        },
+        { "id": "registro_obs", "rotulo": "Observações sobre registro e escrita", "tipo": "texto_longo" },
+        {
+          "id": "autonomia",
+          "rotulo": "4. Autonomia e rotina familiar: rotina, cuidados e acompanhamentos",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Alimentação autônoma",
+            "Precisa de auxílio na alimentação",
+            "Higiene autônoma",
+            "Precisa de auxílio na higiene",
+            "Locomoção independente pela escola",
+            "Organização autônoma de pertences e mochila",
+            "Uso de medicação no horário escolar",
+            "Terapias externas (fono, TO, psicologia)"
+          ]
+        },
+        { "id": "autonomia_obs", "rotulo": "Observações sobre autonomia e rotina familiar", "ajuda": "Horário da medicação, quais terapias, o que a família relata sobre gostos e rotina em casa.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "etapa2",
+      "titulo": "Etapa 2. Análise do contexto escolar e tradução de barreiras",
+      "descricao": "Identifique as barreiras reais vivenciadas pelo estudante com a nomenclatura adequada. Marque as presentes e descreva como aparecem no dia a dia.",
+      "perguntas": [
+        {
+          "id": "barreiras",
+          "rotulo": "Barreiras presentes para o estudante",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Arquitetônica / Ambiental: ruído, iluminação inadequada, ausência de rampas ou mobiliário desconfortável",
+            "Comunicação: ausência de fala, dificuldade com comandos verbais extensos, falta de Comunicação Alternativa",
+            "Pedagógica: textos extensos sem imagens, avaliações idênticas às da turma, tempo rígido, estratégias que ignoram as potencialidades",
+            "Tecnológica: falta de leitores de tela, acionadores, softwares acessíveis, apoios visuais ou intérprete de Libras",
+            "Atitudinal: baixas expectativas, superproteção ou isolamento do estudante pelos pares"
+          ]
+        },
+        { "id": "b_arquitetonica", "rotulo": "Como a barreira arquitetônica/ambiental aparece no dia a dia", "ajuda": "Impacto típico: sobrecarga sensorial, fadiga precoce, agitação e perda de autonomia de locomoção.", "tipo": "texto_longo" },
+        { "id": "b_comunicacao", "rotulo": "Como a barreira de comunicação aparece no dia a dia", "ajuda": "Impacto típico: impede a expressão de dúvidas, desejos e sentimentos, isolando o estudante nas trocas sociais.", "tipo": "texto_longo" },
+        { "id": "b_pedagogica", "rotulo": "Como a barreira pedagógica aparece no dia a dia", "ajuda": "Impacto típico: frustração, desinteresse, não conclusão das tarefas e bloqueio no desenvolvimento.", "tipo": "texto_longo" },
+        { "id": "b_tecnologica", "rotulo": "Como a barreira tecnológica aparece no dia a dia", "ajuda": "Impacto típico: inibe a realização independente de pesquisas, leituras e produções.", "tipo": "texto_longo" },
+        { "id": "b_atitudinal", "rotulo": "Como a barreira atitudinal aparece no dia a dia", "ajuda": "Impacto típico: fortalece a dependência extrema e impacta a autoimagem do estudante.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "etapa3",
+      "titulo": "Etapa 3. Potencialidades e suportes necessários",
+      "perguntas": [
+        { "id": "hiperfocos", "rotulo": "Hiperfocos e interesses do estudante", "ajuda": "Ex.: dinossauros, jogos, música, desenho, animais, números. Separe por vírgula.", "tipo": "texto" },
+        { "id": "habilidades", "rotulo": "Habilidades observadas", "ajuda": "Ex.: memória visual, organização, afeto, raciocínio lógico, expressão artística. Separe por vírgula.", "tipo": "texto" },
+        { "id": "apoio_humano", "rotulo": "Apoios obrigatórios: humano", "tipo": "escolha_multipla", "opcoes": ["Profissional de apoio", "Acompanhante terapêutico", "Intérprete de Libras"] },
+        { "id": "apoio_comunicacao", "rotulo": "Apoios obrigatórios: comunicação", "tipo": "escolha_multipla", "opcoes": ["Cartões de rotina", "Apoios visuais", "Pictogramas para Comunicação Alternativa Aumentativa"] },
+        { "id": "apoio_material", "rotulo": "Apoios obrigatórios: material", "tipo": "escolha_multipla", "opcoes": ["Fontes ampliadas", "Adaptadores de escrita (engrossadores)", "Tesouras adaptadas", "Plano inclinado"] },
+        { "id": "apoio_tempo", "rotulo": "Apoios obrigatórios: tempo e ambiente", "tipo": "escolha_multipla", "opcoes": ["Avaliações fracionadas", "Pausas programadas", "Canto de autorregulação"] }
+      ]
+    },
+    {
+      "id": "etapa4",
+      "titulo": "Etapa 4. Estratégias e recursos de acessibilidade",
+      "descricao": "Escolha as estratégias que você vai aplicar.",
+      "perguntas": [
+        { "id": "logistica", "rotulo": "Adequação logística", "tipo": "escolha_multipla", "opcoes": ["Posicionar a carteira nas primeiras fileiras, longe de portas e janelas", "Permitir pausas de 5 minutos a cada 20 minutos de foco contínuo", "Criar um cantinho da regulação na sala"] },
+        { "id": "pedagogica", "rotulo": "Adequação pedagógica", "tipo": "escolha_multipla", "opcoes": ["Reduzir a extensão dos textos (Arial 14 ou maior)", "Usar frases diretas com imagens de apoio", "Substituir provas longas por avaliações orais, por imagens ou divididas em blocos"] },
+        { "id": "outras_estrategias", "rotulo": "Outras estratégias que você vai usar", "tipo": "texto_longo" },
+        { "id": "responsaveis_prazos", "rotulo": "Responsáveis e prazos", "ajuda": "Para cada estratégia: quem faz e até quando. Revisão em 30, 60 e 90 dias.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "validacao",
+      "titulo": "Validação da equipe",
+      "somente_equipe": true,
+      "perguntas": [
+        { "id": "checklist", "rotulo": "Checklist antes de fechar o Estudo de Caso", "tipo": "escolha_multipla", "opcoes": ["Todas as informações coletadas (observação e família)", "Evidências registradas", "Barreiras classificadas por tipo", "Estratégias vinculadas às necessidades", "Plano de acompanhamento definido (30, 60, 90 dias)", "Aprovação da equipe técnica"] },
+        { "id": "encaminhamentos", "rotulo": "Encaminhamentos para o PAEE e o PEI", "tipo": "texto_longo" }
+      ]
+    }
+  ]
+}

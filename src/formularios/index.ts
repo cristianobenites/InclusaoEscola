@@ -4,12 +4,13 @@ import fichaV2 from "./ficha-observacao.v2.json";
 import entrevistaV1 from "./entrevista-familia.v1.json";
 import entrevistaV2 from "./entrevista-familia.v2.json";
 import estudoV1 from "./estudo-de-caso.v1.json";
+import estudoV2 from "./estudo-de-caso.v2.json";
 import unificadoV1 from "./documento-unificado.v1.json";
 
 // Todas as versões ficam disponíveis (respostas antigas abrem na versão em que foram feitas);
 // a lista de preenchimento usa sempre a versão mais nova de cada formulário.
 export const TODAS_VERSOES: Formulario[] = [
-  fichaV1, fichaV2, entrevistaV1, entrevistaV2, estudoV1, unificadoV1,
+  fichaV1, fichaV2, entrevistaV1, entrevistaV2, estudoV1, estudoV2, unificadoV1,
 ] as Formulario[];
 
 const ORDEM = ["ficha-observacao", "entrevista-familia", "estudo-de-caso", "documento-unificado"];

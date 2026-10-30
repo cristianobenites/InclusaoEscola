@@ -12,6 +12,7 @@ import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
 import { registrar } from "@/lib/auditoria";
 import PainelFeedback from "@/components/PainelFeedback";
+import ImportarGuia from "@/components/ImportarGuia";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -132,6 +133,16 @@ export default function Preencher() {
           >
             <Printer size={16} /> <span className="hidden sm:inline">Imprimir</span>
           </button>
+          {!concluido && formulario.id === "estudo-de-caso" && formulario.versao >= 2 && (
+            <ImportarGuia
+              aoImportar={(r) => {
+                setValores((atual) => ({ ...atual, ...r }));
+                setSujo(true);
+                setToast("Formulário preenchido com o texto do guia. Confira e salve.");
+              }}
+              aoErro={setAviso}
+            />
+          )}
           {!concluido && (
             <>
               <button className="btn-secundario" disabled={ocupado} onClick={() => salvar("rascunho")}>
