@@ -31,12 +31,17 @@ Deno.serve(async (req) => {
     // 1. Respostas em texto, por seção, sem o nome do estudante (pseudonimização)
     const secoes = resumirRespostas(esquema, r.dados as Record<string, unknown>, ident?.nome ?? null);
 
-    // 2. Busca dos trechos relevantes (cadernos, exemplos, artigos) por seção
+    // 2. Busca dos trechos relevantes (cadernos, exemplos, artigos): uma consulta curta por item respondido
+    //    (consultas longas com muitas palavras comuns trazem trechos genéricos)
     const trechos = new Map<number, Trecho & { secao: string }>();
     for (const s of secoes) {
-      if (!s.texto.trim()) continue;
-      const { data } = await sb.rpc("busca_conhecimento", { p_consulta: s.texto.slice(0, 600), p_limite: 4, p_grupos: ["caderno", "exemplo", "artigo"] });
-      for (const t of (data ?? []) as Trecho[]) if (!trechos.has(t.trecho_id)) trechos.set(t.trecho_id, { ...t, secao: s.titulo });
+      for (const item of s.itens.filter((i) => i.length >= 12).slice(0, 10)) {
+        const { data } = await sb.rpc("busca_conhecimento", { p_consulta: item.slice(0, 300), p_limite: 2, p_grupos: ["caderno", "exemplo", "artigo"] });
+        for (const t of (data ?? []) as Trecho[]) {
+          const atual = trechos.get(t.trecho_id);
+          if (!atual || atual.relevancia < t.relevancia) trechos.set(t.trecho_id, { ...t, secao: s.titulo });
+        }
+      }
     }
     const lista = [...trechos.values()].sort((a, b) => b.relevancia - a.relevancia).slice(0, 12);
 
@@ -74,28 +79,38 @@ type Esquema = { titulo: string; secoes: { id: string; titulo: string; perguntas
 
 function resumirRespostas(esquema: Esquema, dados: Record<string, unknown>, nome: string | null) {
   const anon = (s: string) => (nome && nome.length > 2 ? s.replaceAll(new RegExp(escapar(nome), "gi"), "o estudante") : s);
+  const ignorar = new Set(["data", "profissional", "cargo", "equipe", "familiar", "vinculo", "profissionais", "local", "professor_aee", "professores_regentes"]);
   return esquema.secoes.map((s) => {
     const partes: string[] = [];
+    const itens: string[] = []; // cada resposta ou opção marcada, separada, para a busca
     for (const p of s.perguntas) {
       const v = dados[p.id];
-      if (v == null || v === "") continue;
-      if (typeof v === "string") partes.push(`${p.rotulo}: ${anon(v)}`);
-      else if (Array.isArray(v)) partes.push(`${p.rotulo}: ${v.map((x) => anon(String(x))).join("; ")}`);
-      else if (typeof v === "object") {
-        const itens = Object.entries(v as Record<string, unknown>)
+      if (v == null || v === "" || p.tipo === "data") continue;
+      const buscavel = !ignorar.has(p.id);
+      if (typeof v === "string") {
+        partes.push(`${p.rotulo}: ${anon(v)}`);
+        if (buscavel) itens.push(anon(v));
+      } else if (Array.isArray(v)) {
+        partes.push(`${p.rotulo}: ${v.map((x) => anon(String(x))).join("; ")}`);
+        if (buscavel) for (const x of v) itens.push(anon(String(x)));
+      } else if (typeof v === "object") {
+        const ents = Object.entries(v as Record<string, unknown>)
           .map(([k, x]) => (typeof x === "string" ? `${k} = ${x}` : x && typeof x === "object" ? `${k} = ${(x as { opcao?: string }).opcao ?? ""}${(x as { detalhe?: string }).detalhe ? " (" + anon((x as { detalhe: string }).detalhe) + ")" : ""}` : ""))
           .filter((x) => x && !x.endsWith("= "));
-        if (itens.length) partes.push(`${p.rotulo}: ${itens.join("; ")}`);
+        if (ents.length) {
+          partes.push(`${p.rotulo}: ${ents.join("; ")}`);
+          if (buscavel) for (const e of ents) if (!/= (Não|Sem apoio|Não observado)$/.test(e)) itens.push(e.replace(" = ", ": "));
+        }
       }
     }
-    return { id: s.id, titulo: s.titulo, texto: partes.join("\n") };
+    return { id: s.id, titulo: s.titulo, texto: partes.join("\n"), itens };
   });
 }
 const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /* ---------- modo busca (sem IA) ---------- */
 
-function feedbackPorBusca(titulo: string, secoes: { titulo: string; texto: string }[], trechos: (Trecho & { secao: string })[]) {
+function feedbackPorBusca(titulo: string, secoes: { titulo: string; texto: string; itens: string[] }[], trechos: (Trecho & { secao: string })[]) {
   const vazias = secoes.filter((s) => !s.texto.trim()).map((s) => s.titulo);
   return {
     resumo: `Leitura automática de "${titulo}". Abaixo, o que os Cadernos do MEC, os exemplos e os artigos dizem sobre cada parte do que você preencheu. Quando a IA estiver ligada, este feedback vira um texto com sugestões por campo.`,
@@ -112,7 +127,7 @@ function feedbackPorBusca(titulo: string, secoes: { titulo: string; texto: strin
 
 /* ---------- modo IA (Gemini) ---------- */
 
-async function gerarComGemini(chave: string, modelo: string, titulo: string, secoes: { titulo: string; texto: string }[], trechos: (Trecho & { secao: string })[], regras: string) {
+async function gerarComGemini(chave: string, modelo: string, titulo: string, secoes: { titulo: string; texto: string; itens: string[] }[], trechos: (Trecho & { secao: string })[], regras: string) {
   const sistema = `Você apoia professores da rede pública brasileira na educação especial inclusiva, dentro do Programa Decola AEE do Instituto Inclusão na Escola.
 Você recebe um formulário preenchido por um professor sobre um estudante (sem nome) e devolve um FEEDBACK em português do Brasil, em Linguagem Simples (frases curtas, sem jargão), acolhedor e prático.
 REGRAS OBRIGATÓRIAS:
