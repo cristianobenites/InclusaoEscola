@@ -108,10 +108,16 @@ def main():
     total = 0
     for arq in sorted(PASTA_TEXTO.glob("*__*.txt")):
         grupo, titulo = arq.stem.split("__", 1)
+        if grupo in ("regra", "referencia"):
+            continue  # as regras entram pelos .md de conhecimento/regras (versão canônica)
+        if "implante coclear" in titulo.lower():
+            continue  # arquivo recebido é cópia idêntica de "CAA escola TEA" (aviso dado em 30/10)
         if so and grupo != so:
             continue
         total += carregar(tok, grupo, titulo, arq.name, arq.read_text(encoding="utf-8"), chave)
     for arq in sorted(PASTA_MD.rglob("*.md")):
+        if arq.name.lower() == "readme.md":
+            continue
         grupo = "regra" if "regras" in arq.parts else "exemplo"
         if so and grupo != so:
             continue

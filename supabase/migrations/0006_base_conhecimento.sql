@@ -2,8 +2,14 @@
 -- e exemplos reais. Busca por texto completo em português já funciona sem IA; a coluna embedding
 -- fica pronta para busca semântica quando houver chave de embeddings.
 
-create extension if not exists unaccent;
-create extension if not exists vector;
+create extension if not exists unaccent with schema extensions;
+create extension if not exists vector with schema extensions;
+
+-- unaccent não é IMMUTABLE; este envelope fixa o dicionário e permite usar em coluna gerada e índice.
+create or replace function sem_acento(t text) returns text
+language sql immutable parallel safe strict as $$
+  select extensions.unaccent('extensions.unaccent'::regdictionary, t)
+$$;
 
 create table if not exists conhecimento_fontes (
   id uuid primary key default gen_random_uuid(),
@@ -26,8 +32,8 @@ create table if not exists conhecimento_trechos (
   pagina int,
   secao text,
   texto text not null,
-  tsv tsvector generated always as (to_tsvector('portuguese', unaccent(texto))) stored,
-  embedding vector(768),
+  tsv tsvector generated always as (to_tsvector('portuguese', sem_acento(texto))) stored,
+  embedding extensions.vector(768),
   criado_em timestamptz not null default now(),
   unique (fonte_id, ordem)
 );
@@ -49,28 +55,32 @@ create policy trechos_gerir on conhecimento_trechos for all to authenticated usi
 create or replace function busca_conhecimento(p_consulta text, p_limite int default 8, p_grupos text[] default null)
 returns table (trecho_id bigint, fonte_id uuid, grupo text, titulo text, pagina int, secao text, texto text, relevancia real)
 language sql stable security definer set search_path = public as $$
-  with q as (select websearch_to_tsquery('portuguese', unaccent(p_consulta)) as tsq)
+  -- qualquer palavra da consulta pode casar (OU); o ranking privilegia quem casa mais palavras
+  with q as (
+    select to_tsquery('portuguese', coalesce(string_agg(lexeme, ' | '), '')) as tsq
+    from unnest(to_tsvector('portuguese', sem_acento(p_consulta)))
+  )
   select t.id, f.id, f.grupo, f.titulo, t.pagina, t.secao, t.texto,
-         (ts_rank_cd(t.tsv, q.tsq) * (100.0 / f.prioridade))::real as relevancia
+         (ts_rank_cd(t.tsv, q.tsq, 1) * (100.0 / f.prioridade))::real as relevancia
   from conhecimento_trechos t
   join conhecimento_fontes f on f.id = t.fonte_id
   cross join q
-  where f.ativo and t.tsv @@ q.tsq
+  where f.ativo and q.tsq::text <> '' and t.tsv @@ q.tsq
     and (p_grupos is null or f.grupo = any(p_grupos))
   order by relevancia desc
   limit p_limite
 $$;
 
 -- Busca semântica (quando os embeddings estiverem preenchidos).
-create or replace function busca_conhecimento_vetor(p_vetor vector(768), p_limite int default 8, p_grupos text[] default null)
+create or replace function busca_conhecimento_vetor(p_vetor extensions.vector(768), p_limite int default 8, p_grupos text[] default null)
 returns table (trecho_id bigint, fonte_id uuid, grupo text, titulo text, pagina int, secao text, texto text, similaridade real)
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = public, extensions as $$
   select t.id, f.id, f.grupo, f.titulo, t.pagina, t.secao, t.texto,
-         (1 - (t.embedding <=> p_vetor))::real as similaridade
+         (1 - (t.embedding operator(extensions.<=>) p_vetor))::real as similaridade
   from conhecimento_trechos t
   join conhecimento_fontes f on f.id = t.fonte_id
   where f.ativo and t.embedding is not null
     and (p_grupos is null or f.grupo = any(p_grupos))
-  order by t.embedding <=> p_vetor
+  order by t.embedding operator(extensions.<=>) p_vetor
   limit p_limite
 $$;
