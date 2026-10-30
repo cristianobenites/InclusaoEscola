@@ -7,3 +7,11 @@ dist/
 .DS_Store
 supabase/.temp/
 .playwright-mcp/
+
+# acervo bruto fica fora do git (Vinicius/base-conhecimento); só regras e exemplos em markdown entram
+conhecimento/texto/
+
+# material do Instituto (guias e respostas de professores) NAO vai para o GitHub publico; fica local e no banco
+conhecimento/regras/
+conhecimento/exemplos-professores/
+conhecimento/texto/

@@ -54,3 +54,11 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - Página `/perfil` (botão com o nome da pessoa no cabeçalho, ao lado do Sair): edita o próprio nome, mostra e-mail/papel/município/escola e troca a senha conferindo a senha atual (re-login) antes de `auth.updateUser`. Registra `acesso.user_updated_password` na auditoria.
 - Usuário do parceiro: vinicius@inclusaoescola.com.br (coordenação, Município Piloto), senha fraca escolhida por ele; criado direto no banco em 14/09.
 - Ao abrir um usuário na aba Usuários, aparece "Histórico desta pessoa": entradas/saídas e ações com horário (RPC `admin_atividade` com `p_quem`). As entradas vêm do `acesso.login` do app e também de `auth.sessions` (migração 0005), sem duplicar.
+
+## Base de conhecimento da IA (2026-10-30)
+
+- Acervo recebido do Vinicius (14 Cadernos MEC, 14 artigos, 4 guias passo a passo, 25 fotos de respostas de professores). Original fica FORA do git em `C:\Users\Benites\Desktop\Vinicius\base-conhecimento`; texto extraído em `texto-extraido/` ali.
+- Local (ignorado pelo git, porque o repositório é PÚBLICO e o material é do Instituto): `conhecimento/regras/*.md` (os 4 guias = REGRAS DE NEGÓCIO, prioridade máxima) e `conhecimento/exemplos-professores/*.md` (transcrições das fotos). No git só `conhecimento/README.md`, scripts e migração.
+- Banco: migração 0006 (`conhecimento_fontes`, `conhecimento_trechos` com tsvector pt-BR + coluna `embedding vector(768)`), RPCs `busca_conhecimento` (texto) e `busca_conhecimento_vetor` (semântica). Carga: `python scripts/ingere-conhecimento.py` (com `GEMINI_API_KEY` no ambiente gera embeddings via gemini-embedding-001).
+- REGRA: toda resposta da IA cita fonte e página; regras do Instituto > Cadernos MEC > exemplos > artigos. Nunca linguagem clínica.
+- ARMADILHA: o plano gratuito PAUSA o projeto após 7 dias sem uso (aconteceu entre 14/09 e 30/10; religar exige login como terrazul no painel, o token do CLI é Developer e não pode). Falta um ping periódico para evitar; decidir com o usuário.
