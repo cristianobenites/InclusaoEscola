@@ -1,0 +1,183 @@
+{
+  "id": "estudo-de-caso",
+  "versao": 1,
+  "titulo": "Estudo de Caso",
+  "finalidade": "Reunir o que foi observado na escola e relatado pela família, analisar as barreiras do contexto escolar, identificar potencialidades e demandas de apoio, e definir estratégias e recursos para eliminar as barreiras. É a base do PAEE e do PEI.",
+  "instrucoes": [
+    "Use a Ficha de Observação e a Entrevista com a Família já preenchidas como fonte.",
+    "Se tiver dúvidas, assinale as alternativas que correspondem à realidade do estudante ou copie e adapte os exemplos.",
+    "Barreira é o que está no contexto escolar e impede a participação, não uma característica do estudante."
+  ],
+  "secoes": [
+    {
+      "id": "etapa1",
+      "titulo": "Etapa 1. Identificação das demandas individuais e barreiras",
+      "perguntas": [
+        { "id": "data", "rotulo": "Data de elaboração", "tipo": "data", "obrigatoria": true },
+        { "id": "equipe", "rotulo": "Equipe que elaborou", "ajuda": "Nomes e funções (professor de AEE, professor regente, coordenação).", "tipo": "texto" },
+        {
+          "id": "participacao",
+          "rotulo": "1. Interação e participação: como é a participação nas atividades?",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Participa de forma autônoma, sem necessidade de adaptação",
+            "Participa com incentivo verbal ou apoio visual (rotina ilustrada, imagens)",
+            "Necessita de mediação individual para iniciar ou concluir a tarefa",
+            "Realiza apenas atividades adaptadas com linguagem simples e objetivos reduzidos"
+          ]
+        },
+        {
+          "id": "interacao",
+          "rotulo": "Como interage e brinca com os colegas?",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Brinca e interage em grupo de forma espontânea",
+            "Prefere brincar ou ficar sozinho, mas aceita a aproximação de colegas",
+            "Precisa que o professor ou mediador proporcione e estruture a brincadeira em grupo",
+            "Demonstra resistência à aproximação ou às interações sociais"
+          ]
+        },
+        {
+          "id": "desempenho",
+          "rotulo": "2. Desempenho pedagógico: situação atual em relação aos conteúdos",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Compreende os conceitos da sua série/ano sem adaptações significativas",
+            "Acompanha o conteúdo da série desde que use material visual ou simplificado",
+            "Realiza atividades de nível do ciclo anterior (ex.: em fase de alfabetização ou conceitos básicos)",
+            "Mantém o foco na tarefa por curtos períodos (ex.: de 5 a 10 minutos por vez)"
+          ]
+        },
+        {
+          "id": "registro",
+          "rotulo": "3. Escrita e registro: como o estudante registra o conhecimento?",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Escrita cursiva ou de imprensa autônoma",
+            "Escrita com apoio de recursos (lápis engrossado, pauta ampliada, guia de linha)",
+            "Digitação em computador ou tablet, ou teclado adaptado",
+            "Comunicação alternativa (apontar imagens, pranchas, cartões)",
+            "Resposta oral, desenho ou colagem"
+          ]
+        },
+        {
+          "id": "autonomia",
+          "rotulo": "4. Autonomia e cuidados pessoais",
+          "tipo": "verificacao",
+          "opcoes": ["Autônomo", "Com apoio parcial", "Com apoio total"],
+          "linhas": [
+            "Alimentação (precisa de ajuda física ou estímulo? usa utensílios adaptados?)",
+            "Higiene e banheiro (precisa de lembretes? de auxílio completo?)",
+            "Locomoção (anda sozinho pela escola? usa cadeira de rodas, bengala ou apoio de pessoa?)",
+            "Material (organiza a própria mochila e carteira? precisa que o professor organize?)"
+          ]
+        },
+        { "id": "medicacao", "rotulo": "5. Entrevista com a família: há uso de medicação no horário escolar?", "ajuda": "Se sim, informe o horário.", "tipo": "texto" },
+        { "id": "terapias", "rotulo": "Terapias que o estudante realiza fora da escola", "ajuda": "Ex.: fonoaudiologia, terapia ocupacional, psicologia.", "tipo": "texto" },
+        { "id": "familia_relato", "rotulo": "O que a família relata sobre gostos e rotina em casa", "ajuda": "Ex.: gosta de música, tem sensibilidade a barulho, prefere certas rotinas.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "etapa2",
+      "titulo": "Etapa 2. Análise das barreiras e do contexto escolar",
+      "descricao": "Assinale as situações observadas em cada tipo de barreira. O impacto típico está indicado em cada grupo; descreva o impacto real no campo seguinte.",
+      "perguntas": [
+        {
+          "id": "b_arquitetonicas",
+          "rotulo": "Arquitetônicas e ambientais",
+          "ajuda": "Impacto típico: estresse, cansaço, perda de foco, agitação motora, demora para chegar aos espaços ou impossibilidade de se locomover com autonomia.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Excesso de ruídos na sala", "Sala muito iluminada ou abafada", "Falta de rampa, elevador ou banheiro adaptado", "Carteira ou mesa desconfortável ou inadequada para o tamanho e a postura"]
+        },
+        {
+          "id": "b_comunicacao",
+          "rotulo": "Comunicação",
+          "ajuda": "Impacto típico: dificulta a expressão de dúvidas, desejos, dores e a interação com colegas e professores.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Não fala ou tem fala de difícil compreensão", "Dificuldade para entender instruções verbais longas", "Não utiliza ou não possui prancha de comunicação"]
+        },
+        {
+          "id": "b_pedagogicas",
+          "rotulo": "Pedagógicas",
+          "ajuda": "Impacto típico: desinteresse, não conclusão das tarefas, frustração e bloqueio na aprendizagem.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Textos longos sem apoio de imagens", "Provas e tarefas no mesmo formato da turma", "Tempo de execução insuficiente para o ritmo do estudante"]
+        },
+        {
+          "id": "b_tecnologicas",
+          "rotulo": "Tecnológicas",
+          "ajuda": "Impacto típico: impede a realização independente de pesquisas, leitura e escrita de materiais digitais.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Ausência de computador ou tablet adaptado", "Falta de acionadores, leitores de tela ou softwares acessíveis", "Falta de recursos de comunicação alternativa ou apoios visuais"]
+        },
+        {
+          "id": "b_atitudinais",
+          "rotulo": "Atitudinais",
+          "ajuda": "Impacto típico: isolamento social, dependência excessiva e baixa autoimagem do estudante.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": ["Recusa ou distanciamento de colegas em trabalhos em grupo", "Falta de estratégias para garantir a participação do estudante", "Expectativas muito baixas ou excesso de proteção por parte da comunidade escolar"]
+        },
+        { "id": "impactos", "rotulo": "Implicações e impactos reais na aprendizagem", "ajuda": "Descreva o que acontece com este estudante por causa das barreiras marcadas.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "etapa3",
+      "titulo": "Etapa 3. Potencialidades e demandas de apoio",
+      "perguntas": [
+        { "id": "potencialidades", "rotulo": "Potencialidades: o que o estudante gosta ou faz bem, para usar como gancho de aprendizagem", "ajuda": "Ex. de interesses: dinossauros, carros, jogos, músicas, desenhos animados, números, artes. Ex. de habilidades: excelente memória visual, monta quebra-cabeças, afetuoso, pontual, organizado, bom com tarefas no computador.", "tipo": "texto_longo" },
+        {
+          "id": "demandas",
+          "rotulo": "Demandas de apoio: suporte necessário para participar das aulas",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Apoio humano: profissional de apoio, acompanhante terapêutico, intérprete de Libras, colegas",
+            "Apoio de comunicação: prancha de Comunicação Alternativa, cartões visuais com a rotina do dia",
+            "Apoio de material: atividades adaptadas com fontes maiores ou conteúdo flexibilizado, suporte de leitura inclinado, tesoura adaptada, lápis com engrossador",
+            "Apoio de tempo e ambiente: tempo estendido, local reservado para pausas de autorregulação, atividades fracionadas"
+          ]
+        },
+        { "id": "demandas_detalhe", "rotulo": "Detalhe das demandas de apoio", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "etapa4",
+      "titulo": "Etapa 4. Estratégias e recursos para eliminar as barreiras",
+      "perguntas": [
+        { "id": "adequacao_ambiente", "rotulo": "1. Adequação estrutural e logística", "ajuda": "Ex.: carteira nas primeiras fileiras, perto do professor e longe de porta e janela. / Pausas de 5 minutos a cada 20 de atividade. / Canto do sossego com almofadas ou materiais sensoriais.", "tipo": "texto_longo" },
+        { "id": "tecnologia_assistiva", "rotulo": "2. Tecnologia assistiva e adaptação pedagógica", "ajuda": "Ex.: textos reduzidos, fonte legível (Arial 14), frases curtas com apoio visual. / Tablet com aplicativo de comunicação alternativa, leitores de texto em áudio. / Provas longas substituídas por avaliação oral, com imagens, múltipla escolha ou em partes ao longo da semana.", "tipo": "texto_longo" },
+        { "id": "responsaveis_prazos", "rotulo": "Responsáveis e prazos", "ajuda": "Para cada estratégia: quem faz e até quando. Revisão prevista em 30, 60 e 90 dias.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "validacao",
+      "titulo": "Validação da equipe",
+      "somente_equipe": true,
+      "perguntas": [
+        {
+          "id": "checklist",
+          "rotulo": "Checklist antes de fechar o Estudo de Caso",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Todas as informações coletadas (observação e família)",
+            "Evidências registradas",
+            "Barreiras classificadas por tipo",
+            "Estratégias vinculadas às necessidades",
+            "Plano de acompanhamento definido (30, 60, 90 dias)",
+            "Aprovação da equipe técnica"
+          ]
+        },
+        { "id": "encaminhamentos", "rotulo": "Encaminhamentos para o PAEE e o PEI", "tipo": "texto_longo" }
+      ]
+    }
+  ]
+}

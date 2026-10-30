@@ -1,0 +1,132 @@
+{
+  "id": "ficha-observacao",
+  "versao": 2,
+  "titulo": "Ficha de Observação Pedagógica do Estudante",
+  "finalidade": "Registrar o que você observa na prática, no dia a dia do estudante, antes de elaborar o Estudo de Caso. Não é preciso usar linguagem clínica ou diagnóstica: focar no que o estudante faz, como interage e do que precisa é suficiente.",
+  "instrucoes": [
+    "Preencha com base em situações reais observadas na rotina escolar.",
+    "Marque a intensidade de apoio necessária em cada atividade listada.",
+    "Descreva fatos observados com clareza e objetividade, sem rótulos. Em caso de dúvida, use os exemplos de cada campo e adapte à realidade do estudante.",
+    "Atualize sempre que o estudante apresentar novos progressos ou novas demandas."
+  ],
+  "secoes": [
+    {
+      "id": "contexto",
+      "titulo": "1. Identificação e contexto da observação",
+      "perguntas": [
+        { "id": "data", "rotulo": "Data da observação", "tipo": "data", "obrigatoria": true },
+        { "id": "profissional", "rotulo": "Profissional responsável pelo registro", "tipo": "texto", "obrigatoria": true },
+        { "id": "cargo", "rotulo": "Cargo ou função", "tipo": "texto" },
+        {
+          "id": "ambientes",
+          "rotulo": "Contexto observado",
+          "ajuda": "Marque todos os locais em que você observou o estudante.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Sala de aula comum",
+            "Recreio / Pátio",
+            "Atendimento Educacional Especializado (AEE)",
+            "Momento de alimentação / Refeitório",
+            "Entrada / Saída",
+            "Educação Física",
+            "Biblioteca",
+            "Informática"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apoio",
+      "titulo": "2. Indicadores observáveis: nível de apoio",
+      "descricao": "Sem apoio: faz sozinho, com autonomia. Apoio esporádico: precisa de ajuda ou lembrete de vez em quando. Apoio frequente: precisa de ajuda quase sempre. Apoio permanente: só faz com um adulto ou recurso ajudando do início ao fim. Não observado: você não teve oportunidade de observar.",
+      "perguntas": [
+        {
+          "id": "nivel_apoio",
+          "rotulo": "Aspecto observado",
+          "tipo": "escala",
+          "opcoes": ["Sem apoio", "Com apoio esporádico", "Com apoio frequente", "Com apoio permanente", "Não observado"],
+          "linhas": [
+            "Interage com os colegas da turma",
+            "Interage com professores e demais profissionais da escola",
+            "Participa das atividades escolares coletivas",
+            "Realiza as tarefas propostas",
+            "Participa das brincadeiras ou interações no recreio",
+            "Expressa sentimentos, preferências ou desconfortos",
+            "Compreende orientações, combinados e comandos cotidianos",
+            "Locomove-se pelos espaços da escola",
+            "Alimenta-se no contexto escolar",
+            "Realiza cuidados pessoais, como ida ao banheiro e higiene"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acessibilidade",
+      "titulo": "3. Questões fechadas",
+      "descricao": "Assinale Sim, Parcialmente ou Não e acrescente observações curtas quando achar necessário.",
+      "perguntas": [
+        {
+          "id": "verificacoes",
+          "rotulo": "Pergunta de verificação",
+          "tipo": "verificacao",
+          "opcoes": ["Sim", "Parcial", "Não"],
+          "linhas": [
+            "Apresenta seletividade alimentar? (recusa certos alimentos por cor, textura ou cheiro)",
+            "Faz uso de algum recurso de Tecnologia Assistiva? (cadeira de rodas, engrossador de lápis, prancha de comunicação, abafador de ruído)",
+            "Necessita de mediação para participar das atividades escolares? (precisa do professor ou profissional de apoio ao lado para incentivar ou orientar)",
+            "Demanda recursos concretos, visuais, táteis ou manipuláveis para compreender os conceitos? (material dourado, jogos, imagens, letras móveis)",
+            "Necessita de apoio para alimentar-se?",
+            "Necessita de apoio para locomover-se?",
+            "Necessita de apoio para cuidados pessoais? (ir ao banheiro, lavar as mãos, organizar a mochila)",
+            "Os colegas oferecem algum tipo de apoio no cotidiano escolar? (ajudam a pegar o material, chamam para brincar, explicam tarefas)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "descritivo",
+      "titulo": "4. Questões abertas",
+      "descricao": "Se estiver em dúvida sobre o que escrever, escolha uma das sugestões de cada campo e adapte para a realidade do estudante.",
+      "perguntas": [
+        { "id": "relacao_colegas", "rotulo": "Interação com colegas", "ajuda": "Ex.: Interage bem com a turma de forma espontânea. / Prefere brincar ou ficar sozinho, mas aceita quando os colegas se aproximam. / Apresenta dificuldade de interação e precisa da mediação do professor.", "tipo": "texto_longo" },
+        { "id": "apoio_pares", "rotulo": "Apoio dos colegas", "ajuda": "Ex.: Os colegas ajudam na organização do material e explicam tarefas. / Os colegas o incluem nas brincadeiras no recreio. / Os colegas ainda interagem pouco com o estudante.", "tipo": "texto_longo" },
+        { "id": "relacao_adultos", "rotulo": "Interação com a equipe", "ajuda": "Ex.: Atende aos comandos e conversa com professores e funcionários. / Busca auxílio da equipe apenas quando precisa de algo específico.", "tipo": "texto_longo" },
+        { "id": "lugar_sala", "rotulo": "Espaço físico: onde senta e como isso afeta a participação", "ajuda": "Ex.: Senta na primeira fileira, perto do professor, o que facilita a atenção. / Senta no fundo ou perto da janela, o que causa distrações frequentes.", "tipo": "texto_longo" },
+        { "id": "interesses", "rotulo": "Interesses", "ajuda": "Ex.: Demonstra grande interesse por dinossauros, jogos no celular, músicas, desenhos para colorir ou blocos de montar.", "tipo": "texto_longo" },
+        { "id": "ja_aprendeu", "rotulo": "Conhecimentos prévios: o que já sabe?", "ajuda": "Ex.: Reconhece vogais, escreve o primeiro nome e identifica cores básicas. / Faz contagem oral até 10 e reconhece formas geométricas.", "tipo": "texto_longo" },
+        { "id": "prioridades", "rotulo": "Demandas de aprendizagem: o que precisa aprender?", "ajuda": "Ex.: Desenvolver a alfabetização e a concentração em tarefas escritas. / Compreender instruções verbais passo a passo e ampliar o vocabulário.", "tipo": "texto_longo" },
+        { "id": "impede_participacao", "rotulo": "Fatores limitadores", "ajuda": "Ex.: Barulhos excessivos na sala provocam irritação e perda do foco. / Dificuldade em manter a atenção por mais de 10 minutos na mesma atividade.", "tipo": "texto_longo" },
+        {
+          "id": "barreiras",
+          "rotulo": "Mapeamento de barreiras observadas",
+          "ajuda": "Barreira é o que está no contexto escolar e impede a participação, não uma característica do estudante. Marque o tipo e descreva abaixo.",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Comunicacionais: dificuldade para falar ou entender ordens verbais",
+            "Metodológicas: falta de material visual ou adaptado",
+            "Tecnológicas: falta de computador, tablet ou prancha de comunicação",
+            "Atitudinais: dificuldade dos colegas ou da equipe na inclusão",
+            "Arquitetônicas, urbanísticas ou de transporte: rampas, barulho, espaço físico"
+          ]
+        },
+        { "id": "barreiras_descricao", "rotulo": "Descreva brevemente as barreiras marcadas", "tipo": "texto_longo" },
+        { "id": "pontos_fortes", "rotulo": "Potencialidades", "ajuda": "Ex.: Boa memória visual, persistência ao realizar tarefas do seu interesse, carinhoso, organizado com pertences.", "tipo": "texto_longo" },
+        { "id": "facilitadores", "rotulo": "Estratégias positivas: o que já funciona", "ajuda": "Ex.: Imagens junto com os textos, rotina visual no quadro e pausas curtas de descanso.", "tipo": "texto_longo" },
+        { "id": "outras", "rotulo": "Outras informações relevantes", "ajuda": "Ex.: O estudante demonstra estar mais disposto no período da manhã do que no fim do dia.", "tipo": "texto_longo" }
+      ]
+    },
+    {
+      "id": "resumo",
+      "titulo": "5. Síntese da observação",
+      "descricao": "Resuma em poucas palavras os quatro pontos principais. Preenchimento da equipe pedagógica.",
+      "somente_equipe": true,
+      "perguntas": [
+        { "id": "sintese_fortes", "rotulo": "Principais potencialidades identificadas", "ajuda": "Ex.: Boa memória visual, interesse por tecnologia, carinhoso e receptivo.", "tipo": "texto_longo" },
+        { "id": "sintese_barreiras", "rotulo": "Principais barreiras identificadas", "ajuda": "Ex.: Textos longos sem imagens, instruções verbais longas, sensibilidade a barulhos.", "tipo": "texto_longo" },
+        { "id": "sintese_apoios", "rotulo": "Apoios necessários", "ajuda": "Ex.: Prancha de comunicação, profissional de apoio, uso de imagens para facilitar a compreensão.", "tipo": "texto_longo" },
+        { "id": "proximas_acoes", "rotulo": "Encaminhamentos para o Estudo de Caso, PAEE ou PEI", "ajuda": "Ex.: Encaminhar a ficha para a reunião de elaboração do Estudo de Caso e definição de adequações no PEI.", "tipo": "texto_longo" }
+      ]
+    }
+  ]
+}

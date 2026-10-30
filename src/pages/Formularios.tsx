@@ -30,7 +30,7 @@ export default function Formularios() {
         ))}
       </div>
       <p className="text-xs text-tinta-fraca mb-4">
-        {f.secoes.length} seções · {perguntas} perguntas · fonte: Caderno Pedagógico 3, reescrito em Linguagem Simples (ISO
+        {f.secoes.length} seções · {perguntas} perguntas · fonte: Caderno Pedagógico 3 do MEC e guias passo a passo do Instituto, em Linguagem Simples (ISO
         24495-1)
       </p>
       <FormularioGuiado formulario={f} valores={{}} aoMudar={() => {}} somenteLeitura equipe />

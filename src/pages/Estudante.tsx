@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ClipboardList, MessageCircleHeart, Sparkles, Plus, FileCheck2, PencilLine } from "lucide-react";
+import { ArrowLeft, ClipboardList, MessageCircleHeart, Sparkles, Plus, FileCheck2, PencilLine, FolderSearch, FileSignature } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Estudante as TEstudante, Resposta } from "@/lib/tipos";
 import { FORMULARIOS } from "@/formularios";
@@ -10,14 +10,20 @@ import { registrar } from "@/lib/auditoria";
 const ICONE: Record<string, typeof ClipboardList> = {
   "ficha-observacao": ClipboardList,
   "entrevista-familia": MessageCircleHeart,
+  "estudo-de-caso": FolderSearch,
+  "documento-unificado": FileSignature,
 };
 const COR_ICONE: Record<string, string> = {
   "ficha-observacao": "bg-marca-suave text-marca",
   "entrevista-familia": "bg-rosa-suave text-rosa",
+  "estudo-de-caso": "bg-verde-suave text-verde",
+  "documento-unificado": "bg-sol-fundo text-sol",
 };
 const ROTULO_NOVO: Record<string, string> = {
   "ficha-observacao": "Nova observação",
   "entrevista-familia": "Nova conversa",
+  "estudo-de-caso": "Novo estudo",
+  "documento-unificado": "Novo plano",
 };
 
 export default function Estudante() {

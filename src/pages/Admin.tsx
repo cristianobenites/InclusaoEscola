@@ -701,6 +701,8 @@ function AtividadeLinha({ a, aberto, alternar, semQuem }: { a: Atividade; aberto
 const NOME_FORMULARIO: Record<string, string> = {
   "ficha-observacao": "Ficha de Observação",
   "entrevista-familia": "Conversa com a Família",
+  "estudo-de-caso": "Estudo de Caso",
+  "documento-unificado": "Documento Unificado (PAEE e PEI)",
 };
 
 function resumoDetalhe(a: Atividade): string {

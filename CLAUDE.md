@@ -30,7 +30,7 @@ Ler `docs/visao-do-sistema.md` antes de qualquer trabalho. Resumo: app para o Pr
 
 - `npm run dev` sobe em http://localhost:8090 (no painel de preview do Claude, o servidor `inclusao-dev` usa a porta 8140).
 - `.env` local tem VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY (chave anon é pública; nunca colocar service_role no front).
-- Migrações: `python scripts/migra.py` aplica `supabase/migrations/*.sql` pela Management API com o token do CLI; `--sql "select ..."` faz consulta avulsa. Formulários novos também precisam ser inseridos na tabela `formularios` (ver script no histórico do commit ae22fa5).
+- Migrações: `python scripts/migra.py` aplica `supabase/migrations/*.sql` pela Management API com o token do CLI; `--sql "select ..."` faz consulta avulsa. Formulários novos ou versões novas: rodar `python scripts/cadastra-formularios.py` (a tabela `respostas` tem FK para formularios(id, versao)).
 - Conta de teste (fictícia, só no protótipo): coordenacao@teste.inclusao.local / Piloto-2026-teste (papel coordenação). Estudante de exemplo EST-393FC7. Apagar antes de qualquer piloto real.
 - Confirmação de e-mail do Auth está DESLIGADA (protótipo sem SMTP). Religar antes do piloto.
 - Prints de aprovação em `reports/prints/`.
@@ -62,3 +62,4 @@ O app segue o site do cliente, https://www.inclusaonaescola.com.br/ (Wix). Extra
 - Banco: migração 0006 (`conhecimento_fontes`, `conhecimento_trechos` com tsvector pt-BR + coluna `embedding vector(768)`), RPCs `busca_conhecimento` (texto) e `busca_conhecimento_vetor` (semântica). Carga: `python scripts/ingere-conhecimento.py` (com `GEMINI_API_KEY` no ambiente gera embeddings via gemini-embedding-001).
 - REGRA: toda resposta da IA cita fonte e página; regras do Instituto > Cadernos MEC > exemplos > artigos. Nunca linguagem clínica.
 - ARMADILHA: o plano gratuito PAUSA o projeto após 7 dias sem uso (aconteceu entre 14/09 e 30/10; religar exige login como terrazul no painel, o token do CLI é Developer e não pode). Falta um ping periódico para evitar; decidir com o usuário.
+- Formulários v2 (30/10): Ficha de Observação v2 e Entrevista com a Família v2 reescritos a partir dos guias passo a passo do Instituto (checklists, exemplos em cada campo, "apoio permanente", 5 barreiras); NOVOS: `estudo-de-caso.v1.json` (4 etapas + validação) e `documento-unificado.v1.json` (PAEE + PEI, 6 seções). Versões antigas continuam no `TODAS_VERSOES` para abrir respostas já feitas.
