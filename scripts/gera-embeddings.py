@@ -19,14 +19,15 @@ def embeddings(textos, chave):
     corpo = {"requests": [{"model": "models/gemini-embedding-001", "content": {"parts": [{"text": t}]}, "taskType": "RETRIEVAL_DOCUMENT", "outputDimensionality": 768} for t in textos]}
     req = urllib.request.Request("https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents",
                                  data=json.dumps(corpo).encode("utf-8"), headers={"Content-Type": "application/json", "x-goog-api-key": chave})
-    for tentativa in range(5):
+    for tentativa in range(8):
         try:
             r = json.loads(urllib.request.urlopen(req, timeout=120).read().decode("utf-8"))
             return [e["values"] for e in r["embeddings"]]
         except Exception as e:
-            if tentativa == 4:
+            if tentativa == 7:
                 raise
-            print("  espera (cota):", str(e)[:80]); time.sleep(20 * (tentativa + 1))
+            espera = 30 * (tentativa + 1)  # cota por minuto do plano gratuito
+            print(f"  espera {espera}s (cota):", str(e)[:80], flush=True); time.sleep(espera)
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
         migra.q(tok, f"update conhecimento_trechos t set embedding = v.e from (values {valores}) as v(id, e) where t.id = v.id")
         feitos += len(linhas)
         print(f"  {feitos} trechos com embedding", flush=True)
-        time.sleep(1.0)
+        time.sleep(3.0)
     print(migra.q(tok, "select count(*) total, count(embedding) com_embedding from conhecimento_trechos"))
 
 
