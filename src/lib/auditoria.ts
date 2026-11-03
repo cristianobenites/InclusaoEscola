@@ -30,6 +30,7 @@ export function rotuloAcao(acao: string): string {
     "tela.imprimiu": "Imprimiu ou salvou em PDF",
     "tela.abriu_formulario": "Abriu um formulário",
     "feedback.gerou": "Pediu feedback dos materiais",
+    "sintese.gerou": "Gerou a síntese (proposta de PAEE e PEI)",
   };
   if (fixos[acao]) return fixos[acao];
   const [tabela, op] = acao.split(".");

@@ -8,6 +8,7 @@ import Preencher from "@/pages/Preencher";
 import Formularios from "@/pages/Formularios";
 import Admin from "@/pages/Admin";
 import Perfil from "@/pages/Perfil";
+import Comparar from "@/pages/Comparar";
 
 function Protegida({ children }: { children: JSX.Element }) {
   const { sessao, carregando } = useAuth();
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="estudantes/:id" element={<Estudante />} />
         <Route path="estudantes/:id/preencher/:formularioId" element={<Preencher />} />
         <Route path="estudantes/:id/preencher/:formularioId/:respostaId" element={<Preencher />} />
+        <Route path="estudantes/:id/comparar/:sinteseId/:respostaId" element={<Comparar />} />
         <Route path="formularios" element={<Formularios />} />
         <Route path="admin" element={<SoAdmin><Admin /></SoAdmin>} />
         <Route path="perfil" element={<Perfil />} />

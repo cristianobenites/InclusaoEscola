@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ClipboardList, MessageCircleHeart, Sparkles, Plus, FileCheck2, PencilLine, FolderSearch, FileSignature } from "lucide-react";
+import { ArrowLeft, ClipboardList, MessageCircleHeart, Plus, FileCheck2, PencilLine, FolderSearch, FileSignature } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Estudante as TEstudante, Resposta } from "@/lib/tipos";
 import { FORMULARIOS } from "@/formularios";
+import SinteseIA from "@/components/SinteseIA";
+import Aviso from "@/components/Aviso";
+import Toast from "@/components/Toast";
 import { registrar } from "@/lib/auditoria";
 
 const ICONE: Record<string, typeof ClipboardList> = {
@@ -28,6 +31,8 @@ const ROTULO_NOVO: Record<string, string> = {
 
 export default function Estudante() {
   const { id } = useParams();
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const estudante = useQuery({
     queryKey: ["estudante", id],
@@ -62,9 +67,6 @@ export default function Estudante() {
   if (estudante.isLoading) return <p className="text-sm text-tinta-fraca">Carregando…</p>;
   if (!estudante.data) return <p className="text-sm text-erro">Estudante não encontrado.</p>;
   const e = estudante.data;
-  const concluidas = (respostas.data ?? []).filter((r) => r.status === "concluido");
-  const temFicha = concluidas.some((r) => r.formulario_id === "ficha-observacao");
-  const temFamilia = concluidas.some((r) => r.formulario_id === "entrevista-familia");
 
   return (
     <div>
@@ -130,39 +132,14 @@ export default function Estudante() {
           );
         })}
 
-        <section className="card p-5 sm:p-6 lg:col-span-2 border-dashed">
-          <div className="flex items-start gap-3">
-            <span className="grid place-items-center w-10 h-10 rounded-2xl bg-sol-suave text-sol shrink-0">
-              <Sparkles size={20} />
-            </span>
-            <div className="flex-1">
-              <h2 className="text-base sm:text-lg">Síntese com apoio de IA</h2>
-              <p className="text-sm text-tinta-suave mt-1">
-                Cruza a observação da escola com a conversa da família e devolve, em rascunho, potencialidades, barreiras,
-                lacunas e ações sugeridas para a equipe revisar. Nada é decidido pela IA.
-              </p>
-              <ul className="mt-3 text-sm space-y-1">
-                <Requisito ok={temFicha} texto="Ficha de Observação concluída" />
-                <Requisito ok={temFamilia} texto="Conversa com a Família concluída" />
-              </ul>
-              <button className="btn-primario mt-4" disabled title="Próxima etapa do protótipo">
-                <Sparkles size={16} /> Gerar síntese (próxima etapa)
-              </button>
-            </div>
-          </div>
-        </section>
+        <SinteseIA estudanteId={e.id} respostas={respostas.data ?? []} aoErro={setAviso} aoOk={setToast} />
       </div>
+      <Aviso mensagem={aviso} aoFechar={() => setAviso(null)} />
+      <Toast mensagem={toast} aoSumir={() => setToast(null)} />
     </div>
   );
 }
 
-function Requisito({ ok, texto }: { ok: boolean; texto: string }) {
-  return (
-    <li className={ok ? "text-verde" : "text-tinta-fraca"}>
-      {ok ? "✓" : "○"} {texto}
-    </li>
-  );
-}
 
 function resumoResposta(r: Resposta) {
   const d = r.dados as Record<string, unknown>;
