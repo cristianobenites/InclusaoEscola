@@ -55,9 +55,14 @@ Deno.serve(async (req) => {
     let modelo: string | null = null;
     let tentativas: string[] = [];
     if (chave) {
-      modo = "ia";
-      const r = await gerarComGemini(chave, esquema.titulo, secoes, lista, regras ?? "");
-      saida = r.saida; modelo = r.modelo; tentativas = r.tentativas;
+      try {
+        const r = await gerarComGemini(chave, esquema.titulo, secoes, lista, regras ?? "");
+        saida = r.saida; modelo = r.modelo; tentativas = r.tentativas; modo = "ia";
+      } catch (e) {
+        // Google indisponível: entrega o modo busca em vez de falhar
+        saida = feedbackPorBusca(esquema.titulo, secoes, lista);
+        saida.aviso = "A IA estava indisponível neste momento (" + (e as Error).message.slice(0, 160) + "). Este feedback é o do modo busca; peça de novo mais tarde.";
+      }
     } else {
       saida = feedbackPorBusca(esquema.titulo, secoes, lista);
     }

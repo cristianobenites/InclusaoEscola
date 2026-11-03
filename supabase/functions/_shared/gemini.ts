@@ -64,7 +64,7 @@ export async function gerarTexto(
   usuario: string,
   opcoes: { maxOutputTokens?: number; temperature?: number } = {},
 ): Promise<{ texto: string; modelo: string; tentativas: string[] }> {
-  const TEMPO_MAXIMO_MS = 75_000; // por tentativa; a função inteira precisa caber em 150 s
+  const TEMPO_MAXIMO_MS = 60_000; // por tentativa; a função inteira precisa caber em 150 s
   const corpo = {
     systemInstruction: { parts: [{ text: sistema }] },
     contents: [{ role: "user", parts: [{ text: usuario }] }],
@@ -73,8 +73,9 @@ export async function gerarTexto(
   const tentativas: string[] = [];
   const modelos = await modelosParaTentar();
   let ultimoErro = "";
+  // 1ª rodada: todos os modelos; 2ª rodada: só os dois primeiros (a função inteira precisa caber em 150 s)
   for (let rodada = 0; rodada < 2; rodada++) {
-    for (const modelo of modelos) {
+    for (const modelo of rodada === 0 ? modelos : modelos.slice(0, 2)) {
       const inicio = Date.now();
       const dur = () => `${((Date.now() - inicio) / 1000).toFixed(1)}s`;
       let resp: Response;

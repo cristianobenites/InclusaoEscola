@@ -61,21 +61,28 @@ Deno.serve(async (req) => {
       if (t) j.fonte = { titulo: t.titulo, pagina: t.pagina };
     }
 
-    let modo = "regras", modelo: string | null = null, resumo = "", tentativas: string[] = [];
+    let modo = "regras", modelo: string | null = null, resumo = "", tentativas: string[] = [], aviso: string | null = null;
     let saidaCampos = campos, saidaJust = justificativas;
     const chave = await chaveGemini();
     if (chave) {
       modo = "ia";
       const { data: regrasTxt } = await sb.rpc("regras_do_instituto");
       const { data: form } = await sb.from("formularios").select("esquema").eq("id", "documento-unificado").eq("versao", 1).single();
-      const r = await comGemini(chave, form?.esquema, { F, E, C }, campos, regrasTxt ?? "", lista);
-      modelo = r.modelo; tentativas = r.tentativas;
-      if (r.ok) { saidaCampos = { ...campos, ...r.campos }; saidaJust = { ...justificativas, ...r.justificativas }; resumo = r.resumo; }
+      try {
+        const r = await comGemini(chave, form?.esquema, { F, E, C }, campos, regrasTxt ?? "", lista);
+        modelo = r.modelo; tentativas = r.tentativas;
+        if (r.ok) { saidaCampos = { ...campos, ...r.campos }; saidaJust = { ...justificativas, ...r.justificativas }; resumo = r.resumo; }
+        else aviso = "A IA respondeu em um formato que não deu para ler; esta proposta é a do modo regras.";
+      } catch (e) {
+        // Google indisponível (503/429 em todos os modelos): entrega a proposta por regras em vez de falhar
+        modo = "regras"; modelo = null;
+        aviso = "A IA estava indisponível neste momento (" + (e as Error).message.slice(0, 160) + "). Esta proposta é a do modo regras; gere de novo mais tarde para a redação por IA.";
+      }
     }
     if (!resumo) resumo = resumoPorRegras(saidaCampos, !!estudo);
 
     const saida = {
-      resumo, campos: saidaCampos, justificativas: saidaJust,
+      resumo, aviso, campos: saidaCampos, justificativas: saidaJust,
       base: { ficha: ficha.id, entrevista: entrevista.id, estudo: estudo?.id ?? null },
       trechos: lista.map((t) => ({ grupo: t.grupo, titulo: t.titulo, pagina: t.pagina, texto: t.texto })),
     };

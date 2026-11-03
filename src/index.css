@@ -23,8 +23,10 @@
   .bolha { @apply absolute rounded-full pointer-events-none; }
 }
 
+.print-only { display: none; }
 @media print {
   .no-print { display: none !important; }
+  .print-only { display: block; }
   body { background: white; }
   .card { box-shadow: none; border-color: #ccc; }
 }
