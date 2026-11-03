@@ -3,6 +3,7 @@
 // Sem GEMINI_API_KEY: devolve os trechos mais relevantes por seção (modo "busca").
 // Com a chave: o modelo escreve o feedback citando fonte e página (modo "ia").
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { anonimizador, chaveGemini, gerarTexto } from "../_shared/gemini.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -48,14 +49,15 @@ Deno.serve(async (req) => {
     // 3. Regras do Instituto (inteiras)
     const { data: regras } = await sb.rpc("regras_do_instituto");
 
-    const chave = Deno.env.get("GEMINI_API_KEY");
+    const chave = await chaveGemini();
     let saida: Record<string, unknown>;
     let modo = "busca";
     let modelo: string | null = null;
+    let tentativas: string[] = [];
     if (chave) {
       modo = "ia";
-      modelo = Deno.env.get("GEMINI_MODELO") ?? "gemini-2.5-flash";
-      saida = await gerarComGemini(chave, modelo, esquema.titulo, secoes, lista, regras ?? "");
+      const r = await gerarComGemini(chave, esquema.titulo, secoes, lista, regras ?? "");
+      saida = r.saida; modelo = r.modelo; tentativas = r.tentativas;
     } else {
       saida = feedbackPorBusca(esquema.titulo, secoes, lista);
     }
@@ -65,7 +67,7 @@ Deno.serve(async (req) => {
       resposta_id, estudante_id: r.estudante_id, modo, modelo, saida, pedido_por: quem.user.id,
     }).select("id, criado_em").single();
     if (e2) return json({ erro: e2.message }, 500);
-    await sb.from("auditoria").insert({ quem: quem.user.id, acao: "feedback.gerou", alvo: "respostas:" + resposta_id, detalhe: { modo, modelo, trechos: lista.length } });
+    await sb.from("auditoria").insert({ quem: quem.user.id, acao: "feedback.gerou", alvo: "respostas:" + resposta_id, detalhe: { modo, modelo, trechos: lista.length, tentativas } });
     return json({ id: salvo.id, modo, modelo, criado_em: salvo.criado_em, saida });
   } catch (e) {
     return json({ erro: (e as Error).message }, 500);
@@ -78,7 +80,7 @@ type Pergunta = { id: string; rotulo: string; tipo: string; linhas?: string[] };
 type Esquema = { titulo: string; secoes: { id: string; titulo: string; perguntas: Pergunta[] }[] };
 
 function resumirRespostas(esquema: Esquema, dados: Record<string, unknown>, nome: string | null) {
-  const anon = (s: string) => (nome && nome.length > 2 ? s.replaceAll(new RegExp(escapar(nome), "gi"), "o estudante") : s);
+  const anon = anonimizador(nome).texto;
   const ignorar = new Set(["data", "profissional", "cargo", "equipe", "familiar", "vinculo", "profissionais", "local", "professor_aee", "professores_regentes"]);
   return esquema.secoes.map((s) => {
     const partes: string[] = [];
@@ -106,7 +108,6 @@ function resumirRespostas(esquema: Esquema, dados: Record<string, unknown>, nome
     return { id: s.id, titulo: s.titulo, texto: partes.join("\n"), itens };
   });
 }
-const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /* ---------- modo busca (sem IA) ---------- */
 
@@ -127,7 +128,7 @@ function feedbackPorBusca(titulo: string, secoes: { titulo: string; texto: strin
 
 /* ---------- modo IA (Gemini) ---------- */
 
-async function gerarComGemini(chave: string, modelo: string, titulo: string, secoes: { titulo: string; texto: string; itens: string[] }[], trechos: (Trecho & { secao: string })[], regras: string) {
+async function gerarComGemini(chave: string, titulo: string, secoes: { titulo: string; texto: string; itens: string[] }[], trechos: (Trecho & { secao: string })[], regras: string) {
   const sistema = `Você apoia professores da rede pública brasileira na educação especial inclusiva, dentro do Programa Decola AEE do Instituto Inclusão na Escola.
 Você recebe um formulário preenchido por um professor sobre um estudante (sem nome) e devolve um FEEDBACK em português do Brasil, em Linguagem Simples (frases curtas, sem jargão), acolhedor e prático.
 REGRAS OBRIGATÓRIAS:
@@ -135,7 +136,7 @@ REGRAS OBRIGATÓRIAS:
 2. Barreira é do contexto escolar, nunca característica do estudante. Se o professor descreveu a barreira como déficit do aluno ("não compreende", "é agitado", "TDAH"), reoriente para o que na escola impede a participação e explique por quê, citando a fonte.
 3. Nunca use linguagem clínica, diagnóstica ou rótulos. Nunca sugira diagnóstico ou medicação.
 4. Objetivos e indicadores devem ser observáveis e mensuráveis; quando estiverem vagos, proponha a reescrita.
-5. Elogie o que está bem feito antes de apontar o que falta. Nada aqui é decisão: a equipe decide.
+5. Nunca escreva nome de pessoa: diga "o estudante", "a família", "o professor". Elogie o que está bem feito antes de apontar o que falta. Nada aqui é decisão: a equipe decide.
 6. Responda APENAS com JSON no formato: {"resumo": string, "pontos_fortes": string[], "alertas": [{"secao": string, "campo": string, "observacao": string, "fonte": {"titulo": string, "pagina": number|null}}], "sugestoes": [{"acao": string, "porque": string, "fonte": {"titulo": string, "pagina": number|null}}], "perguntas_para_completar": string[]}.`;
 
   const usuario = `FORMULÁRIO: ${titulo}
@@ -149,21 +150,11 @@ ${regras.slice(0, 40000)}
 TRECHOS DA BASE DE CONHECIMENTO (cite "titulo" e "pagina"):
 ${trechos.map((t, i) => `[${i + 1}] ${t.titulo}${t.pagina ? ", página " + t.pagina : ""} (${t.grupo}):\n${t.texto}`).join("\n\n")}`;
 
-  const corpo = {
-    systemInstruction: { parts: [{ text: sistema }] },
-    contents: [{ role: "user", parts: [{ text: usuario }] }],
-    generationConfig: { temperature: 0.3, responseMimeType: "application/json", maxOutputTokens: 4096 },
-  };
-  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${chave}`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo),
-  });
-  if (!resp.ok) throw new Error(`Gemini ${resp.status}: ${(await resp.text()).slice(0, 300)}`);
-  const j = await resp.json();
-  const texto = j.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
+  const { texto, modelo, tentativas } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 4096 });
   try {
-    return JSON.parse(texto);
+    return { saida: JSON.parse(texto) as Record<string, unknown>, modelo, tentativas };
   } catch {
-    return { resumo: texto.slice(0, 2000), pontos_fortes: [], alertas: [], sugestoes: [], perguntas_para_completar: [] };
+    return { saida: { resumo: texto.slice(0, 2000), pontos_fortes: [], alertas: [], sugestoes: [], perguntas_para_completar: [] }, modelo, tentativas };
   }
 }
 
