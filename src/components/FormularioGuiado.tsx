@@ -324,15 +324,15 @@ function Campo({
           {rotulo}
           {ajuda}
           <div className="mt-2 rounded-2xl border border-papel-borda overflow-hidden bg-white">
-            <div className="hidden md:grid gap-2 px-3.5 py-2 bg-papel text-xs uppercase tracking-wide text-tinta-fraca" style={{ gridTemplateColumns: `2fr repeat(${Math.max(colunas.length - 1, 1)}, 1fr) 32px` }}>
+            <div className="tabela-linha !hidden md:!grid gap-2 px-3.5 py-2 bg-papel text-xs uppercase tracking-wide text-tinta-fraca" style={{ "--cols": `2fr repeat(${Math.max(colunas.length - 1, 1)}, 1fr) 32px` } as React.CSSProperties}>
               {colunas.map((c) => <span key={c.id}>{c.rotulo}</span>)}
               <span />
             </div>
             {linhas.length === 0 && <p className="px-3.5 py-3 text-sm text-tinta-fraca">Nenhuma ação ainda. Use "Adicionar linha".</p>}
             <div className="divide-y divide-papel-borda">
               {linhas.map((l, i) => (
-                <div key={i} className="grid gap-2 px-3.5 py-2.5 md:items-center" style={{ gridTemplateColumns: undefined }}>
-                  <div className="grid gap-2 md:gap-2" style={{ gridTemplateColumns: `2fr repeat(${Math.max(colunas.length - 1, 1)}, 1fr) 32px` }}>
+                <div key={i} className="px-3.5 py-2.5">
+                  <div className="tabela-linha gap-2 md:items-center" style={{ "--cols": `2fr repeat(${Math.max(colunas.length - 1, 1)}, 1fr) 32px` } as React.CSSProperties}>
                     {colunas.map((c) =>
                       c.tipo === "escolha" ? (
                         <select key={c.id} className="campo !py-1.5 text-sm" value={l[c.id] ?? ""} onChange={(e) => mudarCelula(i, c.id, e.target.value)} disabled={bloqueada} aria-label={c.rotulo}>

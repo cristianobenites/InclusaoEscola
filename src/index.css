@@ -24,6 +24,9 @@
 }
 
 .print-only { display: none; }
+/* linhas do tipo "tabela": empilhadas no celular, em colunas a partir de 768px */
+.tabela-linha { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .tabela-linha { grid-template-columns: var(--cols); } }
 @media print {
   .no-print { display: none !important; }
   .print-only { display: block; }
