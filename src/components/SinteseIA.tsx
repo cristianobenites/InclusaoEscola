@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Sparkles, FileSignature, Columns2, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, FileSignature, Columns2, BookOpen, ChevronDown, ChevronUp, History } from "lucide-react";
+import clsx from "clsx";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { acharFormulario } from "@/formularios";
@@ -13,8 +14,11 @@ export interface Sintese {
   modelo: string | null;
   prompt_versao: string | null;
   criado_em: string;
+  criado_por?: string | null;
+  perfis?: { nome: string } | null;
   saida: {
     resumo: string;
+    aviso?: string | null;
     campos: Record<string, unknown>;
     justificativas: Record<string, { porque: string; fonte?: { titulo: string; pagina: number | null } }>;
     base: { ficha: string; entrevista: string; estudo: string | null };
@@ -25,7 +29,7 @@ export interface Sintese {
 export function valorEmTexto(v: unknown): string {
   if (v == null || v === "") return "";
   if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v.map(String).join("; ");
+  if (Array.isArray(v)) return v.map((x) => (typeof x === "string" ? x : x && typeof x === "object" ? Object.values(x as Record<string, string>).filter(Boolean).join(" · ") : String(x))).join("; ");
   if (typeof v === "object") {
     return Object.entries(v as Record<string, unknown>)
       .map(([k, x]) => (typeof x === "string" ? `${k}: ${x}` : x && typeof x === "object" ? `${k}: ${(x as { opcao?: string }).opcao ?? ""}${(x as { detalhe?: string }).detalhe ? " (" + (x as { detalhe: string }).detalhe + ")" : ""}` : ""))
@@ -35,13 +39,19 @@ export function valorEmTexto(v: unknown): string {
   return String(v);
 }
 
+export function descricaoModo(s: Sintese) {
+  return s.prompt_versao === "ia" ? `redação por IA (${s.modelo})` : "modo regras, sem redação por IA";
+}
+
 export default function SinteseIA({ estudanteId, respostas, aoErro, aoOk }: { estudanteId: string; respostas: Resposta[]; aoErro: (m: string) => void; aoOk: (m: string) => void }) {
   const qc = useQueryClient();
   const navegar = useNavigate();
   const { perfil } = useAuth();
   const [ocupado, setOcupado] = useState(false);
   const [mostrarTrechos, setMostrarTrechos] = useState(false);
+  const [mostrarVersoes, setMostrarVersoes] = useState(false);
   const [secaoAberta, setSecaoAberta] = useState<string | null>("sintese");
+  const [selecionada, setSelecionada] = useState<string | null>(null);
 
   const concluidas = respostas.filter((r) => r.status === "concluido");
   const temFicha = concluidas.some((r) => r.formulario_id === "ficha-observacao");
@@ -53,12 +63,19 @@ export default function SinteseIA({ estudanteId, respostas, aoErro, aoOk }: { es
   const sinteses = useQuery({
     queryKey: ["sinteses", estudanteId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sinteses_ia").select("*").eq("estudante_id", estudanteId).order("criado_em", { ascending: false }).limit(1);
+      const { data, error } = await supabase.from("sinteses_ia").select("*, perfis:criado_por(nome)").eq("estudante_id", estudanteId).order("criado_em", { ascending: false });
       if (error) throw error;
-      return data as Sintese[];
+      return data as unknown as Sintese[];
     },
   });
-  const s = sinteses.data?.[0];
+  const lista = sinteses.data ?? [];
+  const s = lista.find((x) => x.id === selecionada) ?? lista[0];
+  const eUltima = !!s && s.id === lista[0]?.id;
+
+  useEffect(() => {
+    // ao gerar uma nova, volta para a mais recente
+    if (lista.length && selecionada && !lista.some((x) => x.id === selecionada)) setSelecionada(null);
+  }, [lista, selecionada]);
 
   async function gerar() {
     setOcupado(true);
@@ -66,6 +83,7 @@ export default function SinteseIA({ estudanteId, respostas, aoErro, aoOk }: { es
       const { data, error } = await supabase.functions.invoke("sintese", { body: { estudante_id: estudanteId } });
       if (error) throw new Error(error.message);
       if (data?.erro) throw new Error(data.erro);
+      setSelecionada(null);
       qc.invalidateQueries({ queryKey: ["sinteses", estudanteId] });
       aoOk("Síntese gerada");
     } catch (err) {
@@ -112,15 +130,42 @@ export default function SinteseIA({ estudanteId, respostas, aoErro, aoOk }: { es
           </ul>
         </div>
         <button className="btn-primario shrink-0" onClick={gerar} disabled={ocupado || !temFicha || !temFamilia}>
-          <Sparkles size={16} /> {ocupado ? "Gerando…" : s ? "Gerar de novo" : "Gerar síntese"}
+          <Sparkles size={16} /> {ocupado ? "Gerando…" : lista.length ? "Gerar de novo" : "Gerar síntese"}
         </button>
       </div>
 
       {s && (
         <div className="mt-5 space-y-4">
-          <div className="text-xs text-tinta-fraca">
-            Gerada em {formatarDataHora(s.criado_em)} · {s.prompt_versao === "ia" ? `redação por IA (${s.modelo})` : "modo regras: mapeamento dos guias do Instituto, sem redação por IA"}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-tinta-fraca">
+            <span>
+              {eUltima ? "Versão mais recente" : "Versão anterior"}, gerada em {formatarDataHora(s.criado_em)}
+              {s.perfis?.nome ? ` por ${s.perfis.nome}` : ""} · {descricaoModo(s)}
+            </span>
+            {lista.length > 1 && (
+              <button className="btn-fantasma !px-2 !py-1 text-xs" onClick={() => setMostrarVersoes(!mostrarVersoes)}>
+                <History size={14} /> {lista.length} versões {mostrarVersoes ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+              </button>
+            )}
           </div>
+          {mostrarVersoes && lista.length > 1 && (
+            <ol className="rounded-2xl border border-papel-borda bg-white divide-y divide-papel-borda text-sm">
+              {lista.map((v, i) => (
+                <li key={v.id}>
+                  <button
+                    type="button"
+                    onClick={() => { setSelecionada(v.id); setMostrarVersoes(false); }}
+                    className={clsx("w-full text-left px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 hover:bg-papel", v.id === s.id && "bg-marca-fundo")}
+                  >
+                    <span className="font-medium">Versão {lista.length - i}</span>
+                    <span className="text-tinta-suave">{formatarDataHora(v.criado_em)}{v.perfis?.nome ? ` · ${v.perfis.nome}` : ""}</span>
+                    <span className={clsx("chip", v.prompt_versao === "ia" ? "bg-sol-fundo text-sol" : "bg-papel text-tinta-fraca")}>{v.prompt_versao === "ia" ? `IA · ${v.modelo}` : "regras"}</span>
+                    <span className="text-xs text-tinta-fraca ml-auto">{Object.values(v.saida.campos).filter((x) => valorEmTexto(x)).length} campos</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
+          {s.saida.aviso && <p className="text-xs rounded-2xl bg-sol-fundo text-sol px-3.5 py-2">{s.saida.aviso}</p>}
           <p className="text-sm leading-relaxed">{s.saida.resumo}</p>
           <div className="flex flex-wrap gap-2">
             <button className="btn-primario" onClick={criarRascunho} disabled={ocupado}>

@@ -103,6 +103,7 @@ export default function Estudantes() {
           aoSalvar={() => {
             setAbrirNovo(false);
             qc.invalidateQueries({ queryKey: ["estudantes"] });
+            qc.invalidateQueries({ queryKey: ["turmas"] });
           }}
           aoErro={setAviso}
         />
@@ -132,7 +133,7 @@ function NovoEstudante({
   const [nascimento, setNascimento] = useState("");
   const [responsavel, setResponsavel] = useState("");
   const [escolaId, setEscolaId] = useState(escolaPadrao);
-  const [turmaId, setTurmaId] = useState("");
+  const [turmaNome, setTurmaNome] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const turmasDaEscola = turmas.filter((t) => t.escola_id === escolaId);
 
@@ -142,9 +143,23 @@ function NovoEstudante({
     if (!escolaId) return aoErro("Escolha a escola.");
     setOcupado(true);
     try {
+      // Turma: usa a existente com o mesmo nome; se não houver, tenta criar (gestão e coordenação podem);
+      // se não puder criar, guarda o nome em ano_turma para não travar o cadastro.
+      const nomeTurma = turmaNome.trim();
+      let turmaId: string | null = null;
+      let anoTurma: string | null = null;
+      if (nomeTurma) {
+        const existente = turmasDaEscola.find((t) => t.nome.trim().toLowerCase() === nomeTurma.toLowerCase());
+        if (existente) turmaId = existente.id;
+        else {
+          const { data: nova } = await supabase.from("turmas").insert({ nome: nomeTurma, escola_id: escolaId, ano_letivo: new Date().getFullYear() }).select("id").single();
+          if (nova) turmaId = nova.id;
+          else anoTurma = nomeTurma;
+        }
+      }
       const { data, error } = await supabase
         .from("estudantes")
-        .insert({ escola_id: escolaId, turma_id: turmaId || null, criado_por: perfil?.id })
+        .insert({ escola_id: escolaId, turma_id: turmaId, ano_turma: anoTurma, criado_por: perfil?.id })
         .select("id")
         .single();
       if (error) throw error;
@@ -186,7 +201,7 @@ function NovoEstudante({
               value={escolaId}
               onChange={(e) => {
                 setEscolaId(e.target.value);
-                setTurmaId("");
+                setTurmaNome("");
               }}
             >
               <option value="">Escolha…</option>
@@ -199,14 +214,19 @@ function NovoEstudante({
           </div>
           <div>
             <label className="rotulo">Turma</label>
-            <select className="campo" value={turmaId} onChange={(e) => setTurmaId(e.target.value)}>
-              <option value="">Sem turma</option>
+            <input
+              className="campo"
+              list="lista-turmas"
+              placeholder="Ex.: 5º ano B"
+              value={turmaNome}
+              onChange={(e) => setTurmaNome(e.target.value)}
+            />
+            <datalist id="lista-turmas">
               {turmasDaEscola.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.nome}
-                </option>
+                <option key={t.id} value={t.nome} />
               ))}
-            </select>
+            </datalist>
+            <p className="ajuda">Escolha uma turma da lista ou digite uma nova.</p>
           </div>
         </div>
         <div className="mt-6 flex justify-end gap-2">
