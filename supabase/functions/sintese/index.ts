@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
 /* ---------------- regras: formulários → Documento Unificado ---------------- */
 
 const txt = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-const arr = (v: unknown) => (Array.isArray(v) ? v.map(String) : []);
+const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === "string") as string[] : []);
 const tem = (lista: string[], re: RegExp) => lista.some((x) => re.test(x));
 const esc = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, string>) : {});
 const ver = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, { opcao?: string; detalhe?: string }>) : {});
@@ -114,7 +114,7 @@ function regras(F: Dados, E: Dados, C: Dados) {
   const guiaEC = G("Guia do Instituto: Estudo de Caso");
   const guiaFO = G("Guia do Instituto: Ficha de Observação");
   const guiaEF = G("Guia do Instituto: Entrevista com a Família");
-  const todoTexto = Object.values({ ...F, ...E, ...C }).map((v) => (typeof v === "string" ? v : Array.isArray(v) ? v.join(" ") : "")).join(" \n ").toLowerCase();
+  const todoTexto = Object.values({ ...F, ...E, ...C }).map((v) => (typeof v === "string" ? v : Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x : Object.values(x as Record<string, string>).join(" "))).join(" ") : "")).join(" \n ").toLowerCase();
   const fala = (re: RegExp) => re.test(todoTexto);
 
   // 1. Equipe de apoio presente

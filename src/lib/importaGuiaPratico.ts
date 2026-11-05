@@ -1,5 +1,5 @@
 // Lê o texto gerado pelo "Guia Prático: Estudo de Caso na Prática" (botão "Copiar texto")
-// e devolve as respostas do formulário estudo-de-caso v2.
+// e devolve as respostas do formulário estudo-de-caso (versão mais nova).
 import type { Respostas } from "@/formularios/tipos";
 import { acharFormulario } from "@/formularios";
 
@@ -37,7 +37,7 @@ export interface ResultadoImportacao {
 }
 
 export function importarGuiaPratico(texto: string): ResultadoImportacao {
-  const form = acharFormulario("estudo-de-caso", 2)!;
+  const form = acharFormulario("estudo-de-caso")!; // versão mais nova (as opções do guia são mantidas nas versões seguintes)
   const perguntas = form.secoes.flatMap((s) => s.perguntas);
   const opcoesDe = (id: string) => perguntas.find((p) => p.id === id)?.opcoes ?? [];
   // casa pelo texto normalizado; se não bater exato, aceita a opção com mais palavras em comum (>= 70%)

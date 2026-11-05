@@ -29,7 +29,7 @@ export interface Sintese {
 export function valorEmTexto(v: unknown): string {
   if (v == null || v === "") return "";
   if (typeof v === "string") return v;
-  if (Array.isArray(v)) return v.map(String).join("; ");
+  if (Array.isArray(v)) return v.map((x) => (typeof x === "string" ? x : x && typeof x === "object" ? Object.values(x as Record<string, string>).filter(Boolean).join(" · ") : String(x))).join("; ");
   if (typeof v === "object") {
     return Object.entries(v as Record<string, unknown>)
       .map(([k, x]) => (typeof x === "string" ? `${k}: ${x}` : x && typeof x === "object" ? `${k}: ${(x as { opcao?: string }).opcao ?? ""}${(x as { detalhe?: string }).detalhe ? " (" + (x as { detalhe: string }).detalhe + ")" : ""}` : ""))

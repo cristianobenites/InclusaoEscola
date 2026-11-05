@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save, CheckCircle2, Printer } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle2, Printer, Sparkles, Import } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { acharFormulario } from "@/formularios";
@@ -13,6 +13,8 @@ import Toast from "@/components/Toast";
 import { registrar } from "@/lib/auditoria";
 import PainelFeedback from "@/components/PainelFeedback";
 import ImportarGuia from "@/components/ImportarGuia";
+import { preencherEstudoDeCaso, preencherDocumentoUnificado } from "@/lib/preenche";
+import type { Sintese } from "@/components/SinteseIA";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -27,6 +29,62 @@ export default function Preencher() {
   const [idAtual, setIdAtual] = useState<string | undefined>(respostaId);
 
   const equipe = perfil?.papel !== "professor_regente";
+  const [sugerindo, setSugerindo] = useState<string | null>(null);
+
+  // Fontes para o pré-preenchimento (Ficha e Entrevista concluídas; última síntese)
+  const fontes = useQuery({
+    queryKey: ["fontes-prefill", estudanteId, formularioId],
+    enabled: formularioId === "estudo-de-caso" || formularioId === "documento-unificado",
+    queryFn: async () => {
+      const { data } = await supabase.from("respostas").select("*").eq("estudante_id", estudanteId!).eq("status", "concluido").in("formulario_id", ["ficha-observacao", "entrevista-familia"]).order("atualizado_em", { ascending: false });
+      const lista = (data ?? []) as Resposta[];
+      const { data: sint } = await supabase.from("sinteses_ia").select("*").eq("estudante_id", estudanteId!).order("criado_em", { ascending: false }).limit(1);
+      return { ficha: lista.find((r) => r.formulario_id === "ficha-observacao") ?? null, entrevista: lista.find((r) => r.formulario_id === "entrevista-familia") ?? null, sintese: ((sint ?? []) as Sintese[])[0] ?? null };
+    },
+  });
+
+  function trazerRespostas() {
+    const f = fontes.data;
+    if (!f) return;
+    if (formularioId === "estudo-de-caso") {
+      const { respostas, origem } = preencherEstudoDeCaso((f.ficha?.dados as Respostas) ?? null, (f.entrevista?.dados as Respostas) ?? null, valores);
+      setValores(respostas);
+      setSujo(origem.campos > 0);
+      setToast(origem.campos ? `${origem.campos} campo(s) preenchidos a partir de: ${origem.de.join(" e ")}. Confira e ajuste.` : "Nada novo para trazer: os campos já estão preenchidos.");
+    } else if (formularioId === "documento-unificado" && f.sintese) {
+      const { respostas, origem } = preencherDocumentoUnificado(f.sintese.saida.campos, valores, f.sintese.id);
+      setValores(respostas);
+      setSujo(origem.campos > 0);
+      setToast(origem.campos ? `${origem.campos} campo(s) preenchidos com a proposta da síntese. Confira e ajuste: a decisão é da equipe.` : "Nada novo para trazer: os campos já estão preenchidos.");
+    }
+  }
+
+  async function sugerirSintese(secaoId: string) {
+    setSugerindo(secaoId);
+    try {
+      const { data, error } = await supabase.functions.invoke("feedback", {
+        body: { acao: "sintese_secao", formulario_id: formulario!.id, formulario_versao: formulario!.versao, estudante_id: estudanteId, dados: valores, secao_id: secaoId },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.erro) throw new Error(data.erro);
+      const campos = (data?.campos ?? {}) as Record<string, string>;
+      let n = 0;
+      const novo = { ...valores };
+      for (const [k, v] of Object.entries(campos)) {
+        if (typeof novo[k] === "string" && (novo[k] as string).trim()) continue; // não sobrescreve o que a equipe já escreveu
+        novo[k] = v;
+        n++;
+      }
+      setValores(novo);
+      if (n) setSujo(true);
+      setToast(n ? `Síntese sugerida em ${n} campo(s) (${data.modo === "ia" ? "redação por IA" : "montada a partir das respostas"}). Confira e ajuste antes de concluir.` : "Os campos da síntese já estão preenchidos; apague o que quiser refazer e peça de novo.");
+      if (data?.aviso) setAviso(data.aviso);
+    } catch (err) {
+      setAviso("Não foi possível sugerir a síntese: " + (err as Error).message);
+    } finally {
+      setSugerindo(null);
+    }
+  }
 
   const existente = useQuery({
     queryKey: ["resposta", respostaId],
@@ -172,11 +230,58 @@ export default function Preencher() {
         )}
       </header>
 
+      {!concluido && formulario.id === "estudo-de-caso" && (
+        <div className="no-print card p-4 sm:p-5 mb-6 flex flex-wrap items-center gap-3 bg-marca-fundo/40">
+          <Import size={20} className="text-marca shrink-0" />
+          <div className="flex-1 min-w-[240px] text-sm">
+            <div className="font-medium">Trazer respostas da Ficha de Observação e da Entrevista com a Família</div>
+            <div className="text-xs text-tinta-suave mt-0.5">
+              {fontes.data?.ficha || fontes.data?.entrevista
+                ? `Disponível: ${[fontes.data?.ficha && "Ficha de Observação", fontes.data?.entrevista && "Entrevista com a Família"].filter(Boolean).join(" e ")}. Só completa o que estiver vazio.`
+                : "Conclua a Ficha de Observação ou a Entrevista com a Família para usar este atalho."}
+            </div>
+          </div>
+          <button className="btn-primario !py-2" disabled={!fontes.data?.ficha && !fontes.data?.entrevista} onClick={trazerRespostas}>
+            <Import size={16} /> Trazer respostas
+          </button>
+        </div>
+      )}
+      {!concluido && formulario.id === "documento-unificado" && (
+        <div className="no-print card p-4 sm:p-5 mb-6 flex flex-wrap items-center gap-3 bg-sol-fundo/50">
+          <Sparkles size={20} className="text-sol shrink-0" />
+          <div className="flex-1 min-w-[240px] text-sm">
+            <div className="font-medium">Começar pela proposta da síntese</div>
+            <div className="text-xs text-tinta-suave mt-0.5">
+              {fontes.data?.sintese
+                ? `Última síntese de ${new Date(fontes.data.sintese.criado_em).toLocaleDateString("pt-BR")} (${fontes.data.sintese.prompt_versao === "ia" ? "redação por IA" : "modo regras"}). Preenche só os campos vazios; a decisão é da equipe.`
+                : "Gere a síntese na página do estudante (com a Ficha e a Entrevista concluídas) para usar este atalho."}
+            </div>
+          </div>
+          <button className="btn-primario !py-2" disabled={!fontes.data?.sintese} onClick={trazerRespostas}>
+            <Sparkles size={16} /> Trazer a proposta
+          </button>
+        </div>
+      )}
+
       <FormularioGuiado
         formulario={formulario}
         valores={valores}
         somenteLeitura={concluido}
         equipe={equipe}
+        extras={
+          formulario.id === "ficha-observacao" || formulario.id === "entrevista-familia"
+            ? Object.fromEntries(
+                formulario.secoes
+                  .filter((sec) => sec.perguntas.some((p) => p.id.startsWith("sintese_")))
+                  .map((sec) => [
+                    sec.id,
+                    <button key={sec.id} type="button" className="btn-secundario !py-1.5 text-sm" disabled={!!sugerindo} onClick={() => sugerirSintese(sec.id)}>
+                      <Sparkles size={14} /> {sugerindo === sec.id ? "Montando a síntese…" : "Sugerir síntese a partir das respostas"}
+                    </button>,
+                  ]),
+              )
+            : undefined
+        }
         aoMudar={(k, v) => {
           setValores((atual) => ({ ...atual, [k]: v }));
           setSujo(true);

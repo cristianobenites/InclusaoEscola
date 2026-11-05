@@ -14,32 +14,143 @@
       "titulo": "1. Identificação geral do estudante e equipe responsável",
       "descricao": "Quem preenche: professor de AEE e professor regente em conjunto.",
       "perguntas": [
-        { "id": "data", "rotulo": "Data da elaboração", "tipo": "data", "obrigatoria": true },
-        { "id": "professor_aee", "rotulo": "Professor(a) de AEE responsável", "tipo": "texto", "obrigatoria": true },
-        { "id": "professores_regentes", "rotulo": "Professor(es) regente(s) responsável(is)", "tipo": "texto", "obrigatoria": true },
+        {
+          "id": "data",
+          "rotulo": "Data da elaboração",
+          "tipo": "data",
+          "obrigatoria": true
+        },
+        {
+          "id": "professor_aee",
+          "rotulo": "Professor(a) de AEE responsável",
+          "tipo": "texto",
+          "obrigatoria": true
+        },
+        {
+          "id": "professores_regentes",
+          "rotulo": "Professor(es) regente(s) responsável(is)",
+          "tipo": "texto",
+          "obrigatoria": true
+        },
         {
           "id": "equipe_apoio",
           "rotulo": "Equipe de apoio presente na escola (quem acompanha o estudante)",
           "tipo": "escolha_multipla",
           "permite_outro": true,
-          "opcoes": ["Gestão escolar / Coordenação pedagógica", "Professor do AEE", "Profissional de apoio escolar", "Tradutor/intérprete de Libras ou guia-intérprete", "Outros (fonoaudiólogo, psicólogo, acompanhante terapêutico)"]
+          "opcoes": [
+            "Gestão escolar / Coordenação pedagógica",
+            "Professor do AEE",
+            "Profissional de apoio escolar",
+            "Tradutor/intérprete de Libras ou guia-intérprete",
+            "Outros (fonoaudiólogo, psicólogo, acompanhante terapêutico)"
+          ]
         }
       ]
     },
     {
       "id": "sintese",
       "titulo": "2. Síntese do Estudo de Caso",
-      "descricao": "Quem preenche: professor regente e professor do AEE.",
+      "descricao": "Esta seção pode vir pré-preenchida pela síntese do sistema (botão \"Começar pela proposta da síntese\") ou a partir do Estudo de Caso. Confira e ajuste: a decisão é da equipe.",
       "perguntas": [
-        { "id": "interesses", "rotulo": "2.1 Interesses e engajamento: o que o estudante gosta muito, o que o motiva", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Temas específicos (dinossauros, meios de transporte, jogos, desenhos, músicas)", "Atividades com uso de tecnologia (celular, tablet, computador)", "Tarefas práticas, artísticas, com colagem ou jogos de encaixe"] },
-        { "id": "comunicacao", "rotulo": "Formas de comunicação e expressão", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Fala frases completas e entende ordens diretas", "Usa comunicação não verbal (gestos, olhares, aponta o que quer)", "Usa Comunicação Alternativa (pranchas, cartões/PECS, aplicativos)", "Comunica-se por Libras"] },
-        { "id": "habilidades", "rotulo": "Habilidades cognitivas e acadêmicas: o que já faz sozinho ou com poucos apoios", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Reconhece letras, vogais ou escreve o próprio nome", "Reconhece números, faz contagens concretas ou agrupamentos", "Identifica cores, formas, objetos e animais"] },
-        { "id": "autonomia", "rotulo": "Autonomia e interação social na rotina", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Realiza atividades sozinho e busca ajuda quando precisa", "Brinca e realiza tarefas com os colegas sem conflitos", "Interage melhor em duplas ou com mediação direta de um adulto", "Precisa de muitos apoios nas atividades de vida diária e nas interações", "Não realiza as atividades de vida diária com autonomia e não interage com os colegas"] },
-        { "id": "b_arquitetonicas", "rotulo": "2.2 Barreiras arquitetônicas e ambientais", "ajuda": "Impacto: cansaço, agitação, desconforto físico ou impede o estudante de ir aos espaços da escola sozinho.", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Sala com muito barulho ou iluminação forte", "Falta de rampa, piso tátil ou banheiro adaptado", "Carteira ou mesa inadequada para a altura ou postura"] },
-        { "id": "b_comunicacionais", "rotulo": "Barreiras comunicacionais e tecnológicas", "ajuda": "Impacto: impede tirar dúvidas, expressar o que sente e realizar tarefas de leitura e escrita.", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Dificuldade para entender ordens faladas longas", "O estudante não fala e não possui prancha de comunicação", "Falta de computador adaptado ou leitores de tela"] },
-        { "id": "b_metodologicas", "rotulo": "Barreiras metodológicas e curriculares", "ajuda": "Impacto: desinteresse, não conclui as tarefas e não absorve o conteúdo.", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Atividades e provas iguais para toda a turma, sem adaptação visual ou de texto", "Pouco uso de materiais visuais ou concretos"] },
-        { "id": "b_atitudinais", "rotulo": "Barreiras atitudinais", "ajuda": "Impacto: isolamento social, dependência excessiva de adultos e baixa autoimagem.", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Colegas recusam o estudante em trabalhos em grupo", "Pouca expectativa sobre a capacidade do estudante ou cuidado excessivo da equipe"] },
-        { "id": "barreiras_descricao", "rotulo": "Situação observada e implicações no processo escolar", "ajuda": "Descreva o que acontece na escola e qual o impacto para este estudante.", "tipo": "texto_longo" }
+        {
+          "id": "interesses",
+          "rotulo": "2.1 Interesses e engajamento: o que o estudante gosta muito, o que o motiva",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Temas específicos (dinossauros, meios de transporte, jogos, desenhos, músicas)",
+            "Atividades com uso de tecnologia (celular, tablet, computador)",
+            "Tarefas práticas, artísticas, com colagem ou jogos de encaixe"
+          ]
+        },
+        {
+          "id": "comunicacao",
+          "rotulo": "Formas de comunicação e expressão",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Fala frases completas e entende ordens diretas",
+            "Usa comunicação não verbal (gestos, olhares, aponta o que quer)",
+            "Usa Comunicação Alternativa (pranchas, cartões/PECS, aplicativos)",
+            "Comunica-se por Libras"
+          ]
+        },
+        {
+          "id": "habilidades",
+          "rotulo": "Habilidades cognitivas e acadêmicas: o que já faz sozinho ou com poucos apoios",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Reconhece letras, vogais ou escreve o próprio nome",
+            "Reconhece números, faz contagens concretas ou agrupamentos",
+            "Identifica cores, formas, objetos e animais"
+          ]
+        },
+        {
+          "id": "autonomia",
+          "rotulo": "Autonomia e interação social na rotina",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Realiza atividades sozinho e busca ajuda quando precisa",
+            "Brinca e realiza tarefas com os colegas sem conflitos",
+            "Interage melhor em duplas ou com mediação direta de um adulto",
+            "Precisa de muitos apoios nas atividades de vida diária e nas interações",
+            "Não realiza as atividades de vida diária com autonomia e não interage com os colegas"
+          ]
+        },
+        {
+          "id": "b_arquitetonicas",
+          "rotulo": "2.2 Barreiras arquitetônicas e ambientais",
+          "ajuda": "Impacto: cansaço, agitação, desconforto físico ou impede o estudante de ir aos espaços da escola sozinho.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Sala com muito barulho ou iluminação forte",
+            "Falta de rampa, piso tátil ou banheiro adaptado",
+            "Carteira ou mesa inadequada para a altura ou postura"
+          ]
+        },
+        {
+          "id": "b_comunicacionais",
+          "rotulo": "Barreiras comunicacionais e tecnológicas",
+          "ajuda": "Impacto: impede tirar dúvidas, expressar o que sente e realizar tarefas de leitura e escrita.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Dificuldade para entender ordens faladas longas",
+            "O estudante não fala e não possui prancha de comunicação",
+            "Falta de computador adaptado ou leitores de tela"
+          ]
+        },
+        {
+          "id": "b_metodologicas",
+          "rotulo": "Barreiras metodológicas e curriculares",
+          "ajuda": "Impacto: desinteresse, não conclui as tarefas e não absorve o conteúdo.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Atividades e provas iguais para toda a turma, sem adaptação visual ou de texto",
+            "Pouco uso de materiais visuais ou concretos"
+          ]
+        },
+        {
+          "id": "b_atitudinais",
+          "rotulo": "Barreiras atitudinais",
+          "ajuda": "Impacto: isolamento social, dependência excessiva de adultos e baixa autoimagem.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Colegas recusam o estudante em trabalhos em grupo",
+            "Pouca expectativa sobre a capacidade do estudante ou cuidado excessivo da equipe"
+          ]
+        },
+        {
+          "id": "barreiras_descricao",
+          "rotulo": "Situação observada e implicações no processo escolar",
+          "ajuda": "Descreva o que acontece na escola e qual o impacto para este estudante.",
+          "tipo": "texto_longo"
+        }
       ]
     },
     {
@@ -47,25 +158,86 @@
       "titulo": "3. Dimensão PAEE: Plano de Atendimento Educacional Especializado",
       "descricao": "Responsabilidade principal do professor de AEE.",
       "perguntas": [
-        { "id": "frequencia", "rotulo": "3.1 Frequência e duração do atendimento na Sala de Recursos Multifuncionais", "ajuda": "Ex.: 2 vezes por semana, sessões de 50 minutos.", "tipo": "texto" },
-        { "id": "formato", "rotulo": "Formato de atendimento", "tipo": "escolha_unica", "opcoes": ["Individual", "Coletivo", "Individual e coletivo"] },
-        { "id": "colaborativo", "rotulo": "Atuação colaborativa na sala comum", "ajuda": "Ex.: o professor de AEE acompanhará o estudante na sala comum 1 vez por semana para adequar materiais e apoiar o regente.", "tipo": "texto_longo" },
+        {
+          "id": "frequencia",
+          "rotulo": "3.1 Frequência e duração do atendimento na Sala de Recursos Multifuncionais",
+          "ajuda": "Ex.: 2 vezes por semana, sessões de 50 minutos.",
+          "tipo": "texto"
+        },
+        {
+          "id": "formato",
+          "rotulo": "Formato de atendimento",
+          "tipo": "escolha_unica",
+          "opcoes": [
+            "Individual",
+            "Coletivo",
+            "Individual e coletivo"
+          ]
+        },
+        {
+          "id": "colaborativo",
+          "rotulo": "Atuação colaborativa na sala comum",
+          "ajuda": "Ex.: o professor de AEE acompanhará o estudante na sala comum 1 vez por semana para adequar materiais e apoiar o regente.",
+          "tipo": "texto_longo"
+        },
         {
           "id": "profissionais",
           "rotulo": "3.2 Necessidade de apoios e profissionais especializados",
           "tipo": "verificacao",
-          "opcoes": ["Sim", "Não"],
+          "opcoes": [
+            "Sim",
+            "Não"
+          ],
           "linhas": [
             "Profissional de apoio escolar (descreva o papel: higiene, alimentação, locomoção, uso do material, interação com colegas)",
             "Tradutor/intérprete de Libras ou guia-intérprete (tradução de conteúdos e instruções para Libras)",
             "Serviços de orientação e mobilidade (ensina o estudante cego ou com baixa visão a andar com segurança pela escola)"
           ]
         },
-        { "id": "recursos_ta", "rotulo": "3.3 Recursos de tecnologia assistiva a confeccionar ou adaptar", "ajuda": "Recursos de baixo custo orientados pelo professor do AEE, para garantir permanência e participação a partir da eliminação das barreiras.", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Prancha ou álbum de Comunicação Alternativa (CAA)", "Atividades com fonte ampliada e contraste", "Engrossador de lápis, tesoura adaptada", "Plano inclinado", "Atividades com apoios visuais", "Materiais concretos"] },
-        { "id": "equipamentos", "rotulo": "Equipamentos e softwares necessários", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Computador ou tablet", "Leitor de tela", "Teclado adaptado"] },
-        { "id": "recursos_descricao", "rotulo": "Descreva cada recurso: objetivo e forma de uso. Orientações para a equipe escolar", "ajuda": "Ex.: reunião mensal com os regentes para ensinar o uso das pranchas de comunicação.", "tipo": "texto_longo" },
-        { "id": "saude", "rotulo": "3.4 Articulação intersetorial: saúde", "ajuda": "Terapias do estudante: fonoaudiologia, fisioterapia, terapia ocupacional, neurologia.", "tipo": "texto" },
-        { "id": "assistencia", "rotulo": "Assistência social", "ajuda": "Acompanhamentos no CRAS/CREAS ou benefícios sociais.", "tipo": "texto" }
+        {
+          "id": "recursos_ta",
+          "rotulo": "3.3 Recursos de tecnologia assistiva a confeccionar ou adaptar",
+          "ajuda": "Recursos de baixo custo orientados pelo professor do AEE, para garantir permanência e participação a partir da eliminação das barreiras.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Prancha ou álbum de Comunicação Alternativa (CAA)",
+            "Atividades com fonte ampliada e contraste",
+            "Engrossador de lápis, tesoura adaptada",
+            "Plano inclinado",
+            "Atividades com apoios visuais",
+            "Materiais concretos"
+          ]
+        },
+        {
+          "id": "equipamentos",
+          "rotulo": "Equipamentos e softwares necessários",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Computador ou tablet",
+            "Leitor de tela",
+            "Teclado adaptado"
+          ]
+        },
+        {
+          "id": "recursos_descricao",
+          "rotulo": "Descreva cada recurso: objetivo e forma de uso. Orientações para a equipe escolar",
+          "ajuda": "Ex.: reunião mensal com os regentes para ensinar o uso das pranchas de comunicação.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "saude",
+          "rotulo": "3.4 Articulação intersetorial: saúde",
+          "ajuda": "Terapias do estudante: fonoaudiologia, fisioterapia, terapia ocupacional, neurologia.",
+          "tipo": "texto"
+        },
+        {
+          "id": "assistencia",
+          "rotulo": "Assistência social",
+          "ajuda": "Acompanhamentos no CRAS/CREAS ou benefícios sociais.",
+          "tipo": "texto"
+        }
       ]
     },
     {
@@ -73,17 +245,84 @@
       "titulo": "4. Dimensão PEI: acessibilidade curricular",
       "descricao": "Responsabilidade do professor regente, com orientação do professor de AEE. Preencha um bloco por componente curricular.",
       "perguntas": [
-        { "id": "lp_objeto", "rotulo": "4.1 Língua Portuguesa: objeto de conhecimento (conteúdo trabalhado com a turma)", "tipo": "texto" },
-        { "id": "lp_bncc", "rotulo": "Habilidade da BNCC (código e resumo)", "ajuda": "Ex.: (EF35LP03) Identificar a ideia central do texto, demonstrando compreensão global.", "tipo": "texto" },
-        { "id": "lp_metas", "rotulo": "Objetivos e metas individualizadas: curto (1 a 2 meses), médio (3 a 4 meses) e longo prazo (até o fim do ano)", "ajuda": "O que o estudante vai aprender na prática, com apoios e recursos. Use indicadores observáveis.", "tipo": "texto_longo" },
-        { "id": "mat_objeto", "rotulo": "Matemática: objeto de conhecimento", "tipo": "texto" },
-        { "id": "mat_bncc", "rotulo": "Habilidade da BNCC (código e resumo)", "ajuda": "Ex.: (EF01MA06) Construir fatos básicos da adição.", "tipo": "texto" },
-        { "id": "mat_metas", "rotulo": "Objetivos e metas individualizadas: curto, médio e longo prazo", "ajuda": "Ex.: Curto: somas de 1 a 10 com tampinhas ou material dourado. Médio: probleminhas do cotidiano com apoio de imagens. Longo: números até 50 e somas de dois dígitos com calculadora.", "tipo": "texto_longo" },
-        { "id": "outros_componentes", "rotulo": "Outros componentes curriculares (Ciências, História, Geografia, Artes, Educação Física)", "ajuda": "Para cada um: objeto de conhecimento, habilidade da BNCC e metas de curto, médio e longo prazo.", "tipo": "texto_longo" },
-        { "id": "dua_apresentar", "rotulo": "4.2 Formas de apresentar o conteúdo (DUA)", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Materiais concretos (jogos, blocos, objetos reais)", "Imagens, esquemas visuais e vídeos curtos", "Frases curtas, tom de voz calmo e orientação passo a passo"] },
-        { "id": "dua_demonstrar", "rotulo": "Formas de o estudante demonstrar o aprendizado", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Respostas orais, apontando imagens ou usando pranchas de comunicação", "Trabalhos em duplas, colagens ou desenhos", "Digitação em computador ou tablet"] },
-        { "id": "dua_engajar", "rotulo": "Formas de engajar o estudante", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Usar os temas de interesse do estudante nas tarefas", "Tarefas em duplas colaborativas"] },
-        { "id": "flexibilizacoes", "rotulo": "4.3 Flexibilizações e organização do ambiente", "ajuda": "Ex.: textos resumidos em tópicos com imagens. Carteira perto do professor e longe da janela. Pausas de 5 minutos após cada atividade. Dupla funcional com um colega parceiro.", "tipo": "texto_longo" }
+        {
+          "id": "lp_objeto",
+          "rotulo": "4.1 Língua Portuguesa: objeto de conhecimento (conteúdo trabalhado com a turma)",
+          "tipo": "texto"
+        },
+        {
+          "id": "lp_bncc",
+          "rotulo": "Habilidade da BNCC (código e resumo)",
+          "ajuda": "Ex.: (EF35LP03) Identificar a ideia central do texto, demonstrando compreensão global.",
+          "tipo": "texto"
+        },
+        {
+          "id": "lp_metas",
+          "rotulo": "Objetivos e metas individualizadas: curto (1 a 2 meses), médio (3 a 4 meses) e longo prazo (até o fim do ano)",
+          "ajuda": "O que o estudante vai aprender na prática, com apoios e recursos. Use indicadores observáveis.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "mat_objeto",
+          "rotulo": "Matemática: objeto de conhecimento",
+          "tipo": "texto"
+        },
+        {
+          "id": "mat_bncc",
+          "rotulo": "Habilidade da BNCC (código e resumo)",
+          "ajuda": "Ex.: (EF01MA06) Construir fatos básicos da adição.",
+          "tipo": "texto"
+        },
+        {
+          "id": "mat_metas",
+          "rotulo": "Objetivos e metas individualizadas: curto, médio e longo prazo",
+          "ajuda": "Ex.: Curto: somas de 1 a 10 com tampinhas ou material dourado. Médio: probleminhas do cotidiano com apoio de imagens. Longo: números até 50 e somas de dois dígitos com calculadora.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "outros_componentes",
+          "rotulo": "Outros componentes curriculares (Ciências, História, Geografia, Artes, Educação Física)",
+          "ajuda": "Para cada um: objeto de conhecimento, habilidade da BNCC e metas de curto, médio e longo prazo.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "dua_apresentar",
+          "rotulo": "4.2 Formas de apresentar o conteúdo (DUA)",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Materiais concretos (jogos, blocos, objetos reais)",
+            "Imagens, esquemas visuais e vídeos curtos",
+            "Frases curtas, tom de voz calmo e orientação passo a passo"
+          ]
+        },
+        {
+          "id": "dua_demonstrar",
+          "rotulo": "Formas de o estudante demonstrar o aprendizado",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Respostas orais, apontando imagens ou usando pranchas de comunicação",
+            "Trabalhos em duplas, colagens ou desenhos",
+            "Digitação em computador ou tablet"
+          ]
+        },
+        {
+          "id": "dua_engajar",
+          "rotulo": "Formas de engajar o estudante",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Usar os temas de interesse do estudante nas tarefas",
+            "Tarefas em duplas colaborativas"
+          ]
+        },
+        {
+          "id": "flexibilizacoes",
+          "rotulo": "4.3 Flexibilizações e organização do ambiente",
+          "ajuda": "Ex.: textos resumidos em tópicos com imagens. Carteira perto do professor e longe da janela. Pausas de 5 minutos após cada atividade. Dupla funcional com um colega parceiro.",
+          "tipo": "texto_longo"
+        }
       ]
     },
     {
@@ -91,11 +330,91 @@
       "titulo": "5. Avaliação da aprendizagem e monitoramento",
       "descricao": "Quem preenche: professor regente e professor de AEE.",
       "perguntas": [
-        { "id": "formatos", "rotulo": "5.1 Formatos diferenciados de avaliação", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Avaliação prática com materiais concretos", "Portfólio de atividades", "Registros fotográficos e vídeos", "Avaliação oral ou por figuras"] },
-        { "id": "condicoes", "rotulo": "Condições de aplicação", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Tempo estendido", "Ambiente reservado e silencioso", "Mediação pedagógica (leitura das questões para o estudante)"] },
-        { "id": "ta_avaliacao", "rotulo": "Tecnologia assistiva na avaliação", "tipo": "escolha_multipla", "permite_outro": true, "opcoes": ["Computador", "Prancha de comunicação", "Lápis adaptado"] },
-        { "id": "monitoramento", "rotulo": "5.2 Reunião de monitoramento e ajustes do PEI/PAEE (AEE, regente e coordenação)", "tipo": "escolha_unica", "opcoes": ["Bimestral", "Trimestral"] },
-        { "id": "devolutiva", "rotulo": "Devolutiva para a família", "tipo": "escolha_unica", "opcoes": ["Bimestral", "Semestral"] }
+        {
+          "id": "formatos",
+          "rotulo": "5.1 Formatos diferenciados de avaliação",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Avaliação prática com materiais concretos",
+            "Portfólio de atividades",
+            "Registros fotográficos e vídeos",
+            "Avaliação oral ou por figuras"
+          ]
+        },
+        {
+          "id": "condicoes",
+          "rotulo": "Condições de aplicação",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Tempo estendido",
+            "Ambiente reservado e silencioso",
+            "Mediação pedagógica (leitura das questões para o estudante)"
+          ]
+        },
+        {
+          "id": "ta_avaliacao",
+          "rotulo": "Tecnologia assistiva na avaliação",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Computador",
+            "Prancha de comunicação",
+            "Lápis adaptado"
+          ]
+        },
+        {
+          "id": "monitoramento",
+          "rotulo": "5.2 Reunião de monitoramento e ajustes do PEI/PAEE (AEE, regente e coordenação)",
+          "tipo": "escolha_unica",
+          "opcoes": [
+            "Bimestral",
+            "Trimestral"
+          ]
+        },
+        {
+          "id": "devolutiva",
+          "rotulo": "Devolutiva para a família",
+          "tipo": "escolha_unica",
+          "opcoes": [
+            "Bimestral",
+            "Semestral"
+          ]
+        },
+        {
+          "id": "acoes_prazos",
+          "rotulo": "Quadro de ações: quem faz, até quando e situação",
+          "tipo": "tabela",
+          "ajuda": "Uma linha por ação do PAEE ou do PEI, com responsável e prazo.",
+          "colunas": [
+            {
+              "id": "acao",
+              "rotulo": "Estratégia ou ação",
+              "tipo": "texto"
+            },
+            {
+              "id": "responsavel",
+              "rotulo": "Responsável",
+              "tipo": "texto"
+            },
+            {
+              "id": "prazo",
+              "rotulo": "Prazo",
+              "tipo": "data"
+            },
+            {
+              "id": "situacao",
+              "rotulo": "Situação",
+              "tipo": "escolha",
+              "opcoes": [
+                "A fazer",
+                "Em andamento",
+                "Feito"
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -103,8 +422,22 @@
       "titulo": "6. Termo de aprovação e compromisso coletivo",
       "somente_equipe": true,
       "perguntas": [
-        { "id": "assinaturas", "rotulo": "Assinaturas", "tipo": "escolha_multipla", "opcoes": ["Professor regente", "Professor de AEE", "Gestão escolar / Coordenação", "Família / Responsável legal"] },
-        { "id": "data_aprovacao", "rotulo": "Data da aprovação", "tipo": "data" }
+        {
+          "id": "assinaturas",
+          "rotulo": "Assinaturas",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Professor regente",
+            "Professor de AEE",
+            "Gestão escolar / Coordenação",
+            "Família / Responsável legal"
+          ]
+        },
+        {
+          "id": "data_aprovacao",
+          "rotulo": "Data da aprovação",
+          "tipo": "data"
+        }
       ]
     }
   ]
