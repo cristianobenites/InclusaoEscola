@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const trechos = new Map<number, Trecho & { secao: string }>();
     for (const s of secoes) {
       for (const item of s.itens.filter((i) => i.length >= 12).slice(0, 10)) {
-        const { data } = await sb.rpc("busca_conhecimento", { p_consulta: item.slice(0, 300), p_limite: 2, p_grupos: ["caderno", "exemplo", "artigo"] });
+        const { data } = await sb.rpc("busca_conhecimento", { p_consulta: item.slice(0, 300), p_limite: 2, p_grupos: ["curso", "caderno", "modelo", "exemplo", "artigo"] });
         for (const t of (data ?? []) as Trecho[]) {
           const atual = trechos.get(t.trecho_id);
           if (!atual || atual.relevancia < t.relevancia) trechos.set(t.trecho_id, { ...t, secao: s.titulo });

@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     ];
     const trechos = new Map<number, Trecho>();
     for (const t of temas) {
-      const { data } = await sb.rpc("busca_conhecimento", { p_consulta: t, p_limite: 3, p_grupos: ["caderno", "regra"] });
+      const { data } = await sb.rpc("busca_conhecimento", { p_consulta: t, p_limite: 3, p_grupos: ["regra", "curso", "caderno", "modelo"] });
       for (const x of (data ?? []) as Trecho[]) if (!trechos.has(x.trecho_id)) trechos.set(x.trecho_id, x);
     }
     const lista = [...trechos.values()].sort((a, b) => b.relevancia - a.relevancia).slice(0, 10);

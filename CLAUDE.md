@@ -102,3 +102,10 @@ Documento "Considerações plataforma.docx" (Desktop). O que mudou:
 - **Pré-preenchimento** (`src/lib/preenche.ts`): no Estudo de Caso, banner "Trazer respostas da Ficha e da Entrevista" (mapeia Ficha v2+/Entrevista v2+ → Estudo v3; só campos vazios); no Documento Unificado, "Começar pela proposta da síntese" (última síntese → campos vazios, `_origem: sintese:<id>`).
 - Resposta às dúvidas dela: a síntese das seções NÃO é automática ao abrir; é por botão, e a equipe confere. O "2. Síntese do Estudo de Caso" do Documento Unificado é preenchido pela proposta do sistema (botão) ou à mão.
 - Scripts que geraram as v3: `scratchpad/gera-v3.py` da sessão (não está no repo; os JSONs são a fonte).
+
+## Segundo acervo (2026-11-07): curso e modelos
+
+- 6 zips do Drive extraídos em `C:/Users/Benites/Desktop/Vinicius/base-conhecimento-2` (fora do git). Grupos novos `curso` (prioridade 15) e `modelo` (25), migração 0010; `scripts/extrai-texto-2.py` (MAPA de arquivo → grupo/título; PULAR para o que não entra) e `ingere-conhecimento.py --so-texto` com `CONHECIMENTO_TEXTO` apontando para a pasta. Carga: 9 fontes de curso (1.664 trechos) + 15 modelos (176). Total na base: 4.352 trechos.
+- O curso dos roteiros se chama "Profissional de Apoio na Prática" (Instituto Autismo do Bem, 8 módulos, 180 h); há também a trilha "Decola AEE - Professor de AEE" (4 h) e o "Domine o PEI" (módulo 1). Os 3 roteiros por instrutora duplicam os cadernos de teleprompter e foram pulados.
+- NÃO carregados: vídeos .mp4 (5 GB, sem transcrição), protocolo de conduta PREENCHIDO (dados de saúde de criança real), PDFs só imagem (precisam de OCR). Ver `conhecimento/README.md`.
+- `feedback` e `sintese` buscam agora em regra, curso, caderno, modelo (+ exemplo e artigo no feedback).
