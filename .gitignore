@@ -15,3 +15,6 @@ conhecimento/texto/
 conhecimento/regras/
 conhecimento/exemplos-professores/
 conhecimento/texto/
+
+# casos de exemplo com material da formação do Instituto (repo público): fica só local
+scripts/carrega-exemplos.py

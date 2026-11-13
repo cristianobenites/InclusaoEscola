@@ -11,6 +11,7 @@ interface Fonte {
 }
 interface Saida {
   resumo: string;
+  aviso?: string | null;
   pontos_fortes: string[];
   alertas: { secao?: string; campo?: string; observacao: string; fonte: Fonte | null }[];
   sugestoes: { acao: string; porque: string; fonte: Fonte | null }[];
@@ -77,6 +78,7 @@ export default function PainelFeedback({ respostaId, aoErro }: { respostaId: str
           <div className="text-xs text-tinta-fraca">
             Gerado em {formatarDataHora(f.criado_em)} · {f.modo === "ia" ? `redação por IA (${f.modelo})` : "modo busca: trechos relevantes, sem redação por IA"}
           </div>
+          {f.saida.aviso && <p className="text-xs rounded-2xl bg-sol-fundo text-sol px-3.5 py-2 mb-2">{f.saida.aviso}</p>}
           <p className="text-sm leading-relaxed">{f.saida.resumo}</p>
 
           {f.saida.pontos_fortes?.length > 0 && (

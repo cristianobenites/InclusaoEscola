@@ -3,6 +3,7 @@
 // Sem GEMINI_API_KEY: proposta por regras (mapeamento dos guias do Instituto) + trechos dos Cadernos.
 // Com a chave: o modelo redige a proposta no mesmo formato, obrigado a citar fonte e página.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { anonimizador, chaveGemini, gerarTexto } from "../_shared/gemini.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -30,8 +31,7 @@ Deno.serve(async (req) => {
 
     const { data: ident } = await sb.from("estudantes_identidade").select("nome").eq("estudante_id", estudante_id).maybeSingle();
     const nome = ident?.nome ?? null;
-    const anon = (s: unknown) => typeof s === "string" && nome && nome.length > 2 ? s.replaceAll(new RegExp(nome.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "o estudante") : s;
-    const limpa = (d: Dados) => Object.fromEntries(Object.entries(d).map(([k, v]) => [k, Array.isArray(v) ? v.map(anon) : anon(v)]));
+    const limpa = (d: Dados) => anonimizador(nome).fundo(d) as Dados;
     const F = limpa(ficha.dados as Dados), E = limpa(entrevista.dados as Dados), C = estudo ? limpa(estudo.dados as Dados) : {};
 
     // 1. proposta por regras (sempre; serve de base e de fallback)
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     ];
     const trechos = new Map<number, Trecho>();
     for (const t of temas) {
-      const { data } = await sb.rpc("busca_conhecimento", { p_consulta: t, p_limite: 3, p_grupos: ["caderno", "regra"] });
+      const { data } = await sb.rpc("busca_conhecimento", { p_consulta: t, p_limite: 3, p_grupos: ["regra", "curso", "caderno", "modelo"] });
       for (const x of (data ?? []) as Trecho[]) if (!trechos.has(x.trecho_id)) trechos.set(x.trecho_id, x);
     }
     const lista = [...trechos.values()].sort((a, b) => b.relevancia - a.relevancia).slice(0, 10);
@@ -61,20 +61,28 @@ Deno.serve(async (req) => {
       if (t) j.fonte = { titulo: t.titulo, pagina: t.pagina };
     }
 
-    let modo = "regras", modelo: string | null = null, resumo = "";
+    let modo = "regras", modelo: string | null = null, resumo = "", tentativas: string[] = [], aviso: string | null = null;
     let saidaCampos = campos, saidaJust = justificativas;
-    const chave = Deno.env.get("GEMINI_API_KEY");
+    const chave = await chaveGemini();
     if (chave) {
-      modo = "ia"; modelo = Deno.env.get("GEMINI_MODELO") ?? "gemini-2.5-flash";
+      modo = "ia";
       const { data: regrasTxt } = await sb.rpc("regras_do_instituto");
       const { data: form } = await sb.from("formularios").select("esquema").eq("id", "documento-unificado").eq("versao", 1).single();
-      const r = await comGemini(chave, modelo, form?.esquema, { F, E, C }, campos, regrasTxt ?? "", lista);
-      if (r) { saidaCampos = { ...campos, ...r.campos }; saidaJust = { ...justificativas, ...r.justificativas }; resumo = r.resumo; }
+      try {
+        const r = await comGemini(chave, form?.esquema, { F, E, C }, campos, regrasTxt ?? "", lista);
+        modelo = r.modelo; tentativas = r.tentativas;
+        if (r.ok) { saidaCampos = { ...campos, ...r.campos }; saidaJust = { ...justificativas, ...r.justificativas }; resumo = r.resumo; }
+        else aviso = "A IA respondeu em um formato que não deu para ler; esta proposta é a do modo regras.";
+      } catch (e) {
+        // Google indisponível (503/429 em todos os modelos): entrega a proposta por regras em vez de falhar
+        modo = "regras"; modelo = null;
+        aviso = "A IA estava indisponível neste momento (" + (e as Error).message.slice(0, 160) + "). Esta proposta é a do modo regras; gere de novo mais tarde para a redação por IA.";
+      }
     }
     if (!resumo) resumo = resumoPorRegras(saidaCampos, !!estudo);
 
     const saida = {
-      resumo, campos: saidaCampos, justificativas: saidaJust,
+      resumo, aviso, campos: saidaCampos, justificativas: saidaJust,
       base: { ficha: ficha.id, entrevista: entrevista.id, estudo: estudo?.id ?? null },
       trechos: lista.map((t) => ({ grupo: t.grupo, titulo: t.titulo, pagina: t.pagina, texto: t.texto })),
     };
@@ -82,7 +90,7 @@ Deno.serve(async (req) => {
       estudante_id, respostas_ids: [ficha.id, entrevista.id, ...(estudo ? [estudo.id] : [])], modelo: modelo ?? "regras-v1", prompt_versao: modo, saida, criado_por: quem.user.id,
     }).select("id, criado_em").single();
     if (e2) return json({ erro: e2.message }, 500);
-    await sb.from("auditoria").insert({ quem: quem.user.id, acao: "sintese.gerou", alvo: "estudantes:" + estudante_id, detalhe: { modo, modelo, campos: Object.keys(saidaCampos).length } });
+    await sb.from("auditoria").insert({ quem: quem.user.id, acao: "sintese.gerou", alvo: "estudantes:" + estudante_id, detalhe: { modo, modelo, campos: Object.keys(saidaCampos).length, tentativas } });
     return json({ id: salvo.id, modo, modelo, criado_em: salvo.criado_em, saida });
   } catch (e) {
     return json({ erro: (e as Error).message }, 500);
@@ -92,7 +100,7 @@ Deno.serve(async (req) => {
 /* ---------------- regras: formulários → Documento Unificado ---------------- */
 
 const txt = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-const arr = (v: unknown) => (Array.isArray(v) ? v.map(String) : []);
+const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === "string") as string[] : []);
 const tem = (lista: string[], re: RegExp) => lista.some((x) => re.test(x));
 const esc = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, string>) : {});
 const ver = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, { opcao?: string; detalhe?: string }>) : {});
@@ -106,7 +114,7 @@ function regras(F: Dados, E: Dados, C: Dados) {
   const guiaEC = G("Guia do Instituto: Estudo de Caso");
   const guiaFO = G("Guia do Instituto: Ficha de Observação");
   const guiaEF = G("Guia do Instituto: Entrevista com a Família");
-  const todoTexto = Object.values({ ...F, ...E, ...C }).map((v) => (typeof v === "string" ? v : Array.isArray(v) ? v.join(" ") : "")).join(" \n ").toLowerCase();
+  const todoTexto = Object.values({ ...F, ...E, ...C }).map((v) => (typeof v === "string" ? v : Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x : Object.values(x as Record<string, string>).join(" "))).join(" ") : "")).join(" \n ").toLowerCase();
   const fala = (re: RegExp) => re.test(todoTexto);
 
   // 1. Equipe de apoio presente
@@ -282,20 +290,29 @@ function resumoPorRegras(c: Dados, temEstudo: boolean) {
 
 /* ---------------- modo IA ---------------- */
 
-async function comGemini(chave: string, modelo: string, esquema: unknown, dados: Dados, base: Dados, regras: string, trechos: Trecho[]) {
+async function comGemini(chave: string, esquema: unknown, dados: Dados, base: Dados, regras: string, trechos: Trecho[]) {
   const sistema = `Você apoia equipes escolares da rede pública brasileira a elaborar o Documento Unificado (PAEE e PEI) a partir do Estudo de Caso, dentro do Programa Decola AEE do Instituto Inclusão na Escola.
 Devolva APENAS JSON: {"resumo": string, "campos": {<id do campo>: valor}, "justificativas": {<id>: {"porque": string, "fonte": {"titulo": string, "pagina": number|null}}}}.
 Os ids e os valores válidos estão no ESQUEMA (para escolha_multipla use um array com os textos exatos das opções e, se precisar, um item "Outro: ..."; para verificacao use {linha: {opcao, detalhe}}; para escolha_unica, o texto da opção; para texto, string).
-REGRAS: 1) baseie-se só nas RESPOSTAS, nas REGRAS DO INSTITUTO e nos TRECHOS; cite fonte e página em cada justificativa. 2) Barreira é do contexto escolar, nunca característica do estudante. 3) Nunca use linguagem clínica ou diagnóstico. 4) Metas do PEI em curto, médio e longo prazo, observáveis e mensuráveis, ligadas ao que o estudante já faz. 5) Objeto de conhecimento e habilidade BNCC: proponha só se as respostas indicarem o conteúdo; senão deixe vazio e explique. 6) Linguagem Simples, pt-BR. 7) Você recebe uma PROPOSTA BASE feita por regras: melhore, corrija e complete; mantenha o que estiver certo.`;
+REGRAS: 1) baseie-se só nas RESPOSTAS, nas REGRAS DO INSTITUTO e nos TRECHOS; cite fonte e página em cada justificativa. 2) Barreira é do contexto escolar, nunca característica do estudante. 3) Nunca use linguagem clínica ou diagnóstico. 4) Metas do PEI em curto, médio e longo prazo, observáveis e mensuráveis, ligadas ao que o estudante já faz. 5) Objeto de conhecimento e habilidade BNCC: proponha só se as respostas indicarem o conteúdo; senão deixe vazio e explique. 6) Linguagem Simples, pt-BR. Nunca escreva nome de pessoa: diga "o estudante", "a família", "o professor". Quando a base for um formulário e não um livro, use como fonte o nome do formulário ("Ficha de Observação", "Entrevista com a Família", "Estudo de Caso") e pagina null. 7) Você recebe uma PROPOSTA BASE feita por regras: melhore, corrija e complete; mantenha o que estiver certo.`;
   const usuario = `ESQUEMA DO DOCUMENTO UNIFICADO:\n${JSON.stringify(esquema)}\n\nRESPOSTAS (Ficha F, Entrevista E, Estudo de Caso C):\n${JSON.stringify(dados)}\n\nPROPOSTA BASE POR REGRAS:\n${JSON.stringify(base)}\n\nREGRAS DO INSTITUTO:\n${regras.slice(0, 40000)}\n\nTRECHOS:\n${trechos.map((t, i) => `[${i + 1}] ${t.titulo}${t.pagina ? ", página " + t.pagina : ""}:\n${t.texto}`).join("\n\n")}`;
-  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${chave}`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: sistema }] }, contents: [{ role: "user", parts: [{ text: usuario }] }], generationConfig: { temperature: 0.3, responseMimeType: "application/json", maxOutputTokens: 8192 } }),
-  });
-  if (!resp.ok) throw new Error(`Gemini ${resp.status}: ${(await resp.text()).slice(0, 300)}`);
-  const j = await resp.json();
-  const texto = j.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
-  try { const r = JSON.parse(texto); return { resumo: String(r.resumo ?? ""), campos: r.campos ?? {}, justificativas: r.justificativas ?? {} }; } catch { return null; }
+  const { texto, modelo, tentativas } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 8192 });
+  try {
+    const r = JSON.parse(texto);
+    // o modelo às vezes devolve a justificativa como texto solto; o app espera {porque, fonte}
+    const just: Record<string, Just> = {};
+    for (const [k, j] of Object.entries((r.justificativas ?? {}) as Record<string, unknown>)) {
+      if (typeof j === "string") just[k] = { porque: j };
+      else if (j && typeof j === "object") {
+        const f = (j as { fonte?: { titulo?: unknown; pagina?: unknown } }).fonte;
+        just[k] = { porque: String((j as { porque?: unknown }).porque ?? "") };
+        if (f && typeof f === "object" && f.titulo) just[k].fonte = { titulo: String(f.titulo), pagina: typeof f.pagina === "number" ? f.pagina : null };
+      }
+    }
+    return { ok: true, modelo, tentativas, resumo: String(r.resumo ?? ""), campos: r.campos ?? {}, justificativas: just };
+  } catch {
+    return { ok: false, modelo, tentativas, resumo: "", campos: {}, justificativas: {} };
+  }
 }
 
 function json(b: unknown, status = 200) {

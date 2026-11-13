@@ -1,0 +1,280 @@
+{
+  "id": "entrevista-familia",
+  "versao": 3,
+  "titulo": "Entrevista com a Família e Responsáveis",
+  "finalidade": "Garantir um momento de escuta, diálogo pedagógico e acolhimento com a família, sem caráter avaliativo ou julgador. As respostas servem para planejar recursos acessíveis e eliminar barreiras de aprendizagem.",
+  "instrucoes": [
+    "Faça as perguntas de forma leve e natural, em tom de conversa, e anote as respostas nos campos.",
+    "Não use este momento para avaliar ou julgar a família.",
+    "Cada campo traz a pergunta sugerida e exemplos de registro.",
+    "Cada pergunta tem um botão \"Entender a pergunta\" com a explicação, exemplos de resposta e, se precisar, uma ajuda da IA."
+  ],
+  "secoes": [
+    {
+      "id": "encontro",
+      "titulo": "Cabeçalho da entrevista",
+      "perguntas": [
+        {
+          "id": "data",
+          "rotulo": "Data da conversa",
+          "tipo": "data",
+          "obrigatoria": true
+        },
+        {
+          "id": "familiar",
+          "rotulo": "Nome do familiar ou responsável entrevistado",
+          "tipo": "texto",
+          "obrigatoria": true
+        },
+        {
+          "id": "vinculo",
+          "rotulo": "Vínculo com o estudante",
+          "ajuda": "Ex.: mãe, pai, avó, tutor.",
+          "tipo": "texto"
+        },
+        {
+          "id": "profissionais",
+          "rotulo": "Profissionais da escola presentes",
+          "tipo": "texto"
+        },
+        {
+          "id": "local",
+          "rotulo": "Local da entrevista",
+          "tipo": "texto"
+        }
+      ]
+    },
+    {
+      "id": "rotina",
+      "titulo": "1. Informações sobre o cotidiano do estudante",
+      "perguntas": [
+        {
+          "id": "rotina_casa",
+          "rotulo": "Rotina em casa e em outros espaços",
+          "ajuda": "Pergunte: \"Como é o dia a dia do estudante desde que acorda até a hora de dormir?\" Anote horários de sono, refeições, tempo de tela, passeios e atividades fora de casa.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "faz_sozinho",
+          "rotulo": "Atividades que realiza com autonomia",
+          "ajuda": "Pergunte: \"O que ele consegue fazer sozinho em casa?\" Ex.: toma banho sozinho, escolhe as roupas, come sem ajuda, organiza os brinquedos.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "precisa_ajuda",
+          "rotulo": "Atividades em que precisa de apoio, e que tipo de ajuda recebe",
+          "ajuda": "Pergunte: \"Em quais momentos ele precisa de ajuda? Como a ajuda é oferecida?\" Ex.: auxílio para escovar os dentes, amarrar os sapatos, servir o prato, lembrar horários. Isso é muito importante para planejar objetivos e apoios na escola.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "cuidados",
+          "rotulo": "Saúde, alimentação, sono e higiene: o que a escola precisa saber",
+          "ajuda": "Pergunte: \"Existe algo na alimentação, no sono, na saúde ou na higiene que a escola precise saber para cuidar melhor dele?\"",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Alimentação: seletividade alimentar (recusa certos alimentos, cores ou texturas)",
+            "Sono: dificuldade para dormir, acorda várias vezes, toma remédio para dormir, precisa de soneca",
+            "Saúde/segurança: medicação contínua, alergias, crises convulsivas, fuga de espaços abertos"
+          ]
+        },
+        {
+          "id": "cuidados_detalhe",
+          "rotulo": "Detalhes sobre os cuidados marcados",
+          "ajuda": "Ex.: horário da medicação, nome do remédio, alimentos que recusa.",
+          "tipo": "texto_longo"
+        }
+      ]
+    },
+    {
+      "id": "comunicacao",
+      "titulo": "2. Comunicação, interação e interesses",
+      "perguntas": [
+        {
+          "id": "formas_comunicacao",
+          "rotulo": "Formas de comunicação",
+          "ajuda": "Pergunte: \"Como ele costuma se comunicar em casa quando quer algo?\" Marque todas as citadas. Se usa Comunicação Alternativa, pergunte o que já utiliza: será a referência para a escola.",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Fala oral (frases, palavras isoladas ou sons)",
+            "Gestos e expressões faciais (balança a cabeça, sorri, chora)",
+            "Aponta para objetos ou imagens, ou puxa o adulto pela mão",
+            "Libras",
+            "Comunicação Aumentativa e Alternativa (pranchas, cartões de rotina, aplicativos)",
+            "Escrita ou desenho"
+          ]
+        },
+        {
+          "id": "expressa",
+          "rotulo": "Expressão de sentimentos e desconfortos",
+          "ajuda": "Pergunte: \"Como ele demonstra quando está com dor, bravo, triste ou feliz?\" Ex.: chora, isola-se, bate as mãos, verbaliza, procura o abraço do responsável. Anote também o que ajuda nesses momentos.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "interesses",
+          "rotulo": "Interesses e brincadeiras preferidas",
+          "ajuda": "Pergunte: \"O que ele mais gosta de fazer no tempo livre? Quais os assuntos ou brinquedos favoritos?\" Ex.: carrinhos, dinossauros, música, vídeos específicos, jogos de encaixe, correr no quintal.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "relacoes",
+          "rotulo": "Interação social",
+          "ajuda": "Pergunte: \"Como é o convívio dele com familiares, vizinhos e outras crianças?\" Ex.: interage bem com todos, prefere adultos, tem receio de desconhecidos, interage só se incentivado.",
+          "tipo": "texto_longo"
+        }
+      ]
+    },
+    {
+      "id": "escola",
+      "titulo": "3. Trajetória escolar e participação na escola",
+      "perguntas": [
+        {
+          "id": "sente_escola",
+          "rotulo": "Percepção sobre a experiência escolar",
+          "ajuda": "Pergunte: \"Como vocês sentem a relação dele com a escola atual ou com as anteriores?\"",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "participa_melhor",
+          "rotulo": "Situações de maior participação e maiores dificuldades",
+          "ajuda": "Pergunte: \"Em quais momentos ele se engaja melhor na escola? Quais as maiores dificuldades?\" Ex.: participa bem de artes e Educação Física, mas tem dificuldade em tarefas escritas longas ou locais barulhentos.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "estrategias_anteriores",
+          "rotulo": "Estratégias que já funcionaram",
+          "ajuda": "Pergunte: \"Alguma ideia já funcionou muito bem com ele em outra escola ou em casa?\" Ex.: quadros de rotina com fotos, avisar antes de mudar de atividade, pausas curtas.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "sentimentos_escola",
+          "rotulo": "O que ele demonstra na hora de ir para a escola",
+          "ajuda": "Ex.: demonstra alegria e se arruma rápido, fica ansioso ou chora, recusa-se a entrar no portão.",
+          "tipo": "texto_longo"
+        }
+      ]
+    },
+    {
+      "id": "habilidades",
+      "titulo": "4. Potencialidades, apoios e recursos",
+      "perguntas": [
+        {
+          "id": "pontos_fortes",
+          "rotulo": "Capacidades e potencialidades",
+          "ajuda": "Pergunte: \"O que seu filho sabe fazer? Quais as maiores qualidades e habilidades dele?\" Ex.: carinhoso, atento aos detalhes, excelente memória, insistente para concluir tarefas, habilidade com eletrônicos.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "recursos",
+          "rotulo": "Recursos de tecnologia assistiva e acessibilidade usados em casa",
+          "ajuda": "Pergunte: \"Ele usa algum recurso especial em casa para se comunicar, estudar ou se locomover?\"",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Prancha de Comunicação Alternativa",
+            "Leitor de tela ou aplicativos no tablet ou celular",
+            "Lápis engrossado, tesoura adaptada, óculos, abafador de ruído",
+            "Cadeira de rodas, órteses, bengala"
+          ]
+        },
+        {
+          "id": "terapias",
+          "rotulo": "Acompanhamento externo: saúde e assistência social",
+          "ajuda": "Pergunte: \"Ele faz acompanhamento com profissionais fora da escola? Com que frequência?\" Ex.: fonoaudiologia, terapia ocupacional, psicologia, fisioterapia, neurologista, CRAS/CREAS.",
+          "tipo": "texto_longo"
+        }
+      ]
+    },
+    {
+      "id": "parceria",
+      "titulo": "5. Expectativas e parceria com a escola",
+      "perguntas": [
+        {
+          "id": "expectativas",
+          "rotulo": "Expectativas da família para este ano",
+          "ajuda": "Pergunte: \"O que vocês esperam que ele aprenda e desenvolva na escola este ano?\" Ex.: ganhar autonomia, fazer amigos, desenvolver a comunicação, aprender a ler e escrever.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "apoios_essenciais",
+          "rotulo": "Apoios que a família considera fundamentais",
+          "ajuda": "Pergunte: \"Qual apoio vocês acham fundamental que a escola ofereça?\" Ex.: mediação pedagógica, troca diária de informações pela agenda.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "canal",
+          "rotulo": "Como a família prefere acompanhar o plano do estudante",
+          "tipo": "escolha_multipla",
+          "permite_outro": true,
+          "opcoes": [
+            "Reuniões presenciais (ex.: bimestrais)",
+            "Mensagens por aplicativo",
+            "Agenda ou caderno de recados",
+            "Ligações telefônicas"
+          ]
+        },
+        {
+          "id": "mais_info",
+          "rotulo": "Informações adicionais",
+          "ajuda": "Espaço livre para qualquer outro relato importante trazido pelos responsáveis.",
+          "tipo": "texto_longo"
+        }
+      ]
+    },
+    {
+      "id": "registro",
+      "titulo": "Síntese da entrevista",
+      "descricao": "Preenchida pelos profissionais que conduziram a entrevista. Resuma as informações principais em tópicos. O botão \"Sugerir síntese\" monta um rascunho a partir das respostas da família; confira e ajuste.",
+      "somente_equipe": true,
+      "perguntas": [
+        {
+          "id": "sintese_fortes",
+          "rotulo": "Principais potencialidades identificadas",
+          "ajuda": "Ex.: boa memória visual, afetividade, facilidade com tecnologia.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "sintese_apoios",
+          "rotulo": "Principais demandas de apoio observadas",
+          "ajuda": "Ex.: apoio para higiene, suporte para comunicação alternativa, mediação nas atividades escritas.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "sintese_barreiras",
+          "rotulo": "Barreiras relatadas pela família",
+          "ajuda": "Ex.: dificuldades de interação com colegas, sobrecarga sensorial em ambientes barulhentos.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "sintese_recursos",
+          "rotulo": "Recursos ou estratégias já utilizadas",
+          "ajuda": "Ex.: imagens para antecipar a rotina, pausas organizadas.",
+          "tipo": "texto_longo"
+        },
+        {
+          "id": "encaminhamentos",
+          "rotulo": "Encaminhamentos necessários",
+          "tipo": "escolha_multipla",
+          "opcoes": [
+            "Estudo de Caso (reunião da equipe)",
+            "PEI / PAEE (adequações curriculares e Plano de AEE)",
+            "Encaminhamento à saúde (avaliação ou acompanhamento externo)",
+            "Encaminhamento ao serviço social",
+            "Conversa com a família",
+            "Pedido de profissional de apoio escolar",
+            "Recursos de Tecnologia Assistiva (prancha, tablet, materiais adaptados)"
+          ],
+          "permite_outro": true,
+          "ajuda": "Marque todos os encaminhamentos que a conversa com a família indica."
+        },
+        {
+          "id": "proximas_acoes",
+          "rotulo": "Detalhes dos encaminhamentos",
+          "ajuda": "Ex.: levar os dados para a reunião do Estudo de Caso; solicitar relatório da fonoaudióloga à família.",
+          "tipo": "texto_longo"
+        }
+      ]
+    }
+  ]
+}
