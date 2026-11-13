@@ -109,3 +109,10 @@ Documento "Considerações plataforma.docx" (Desktop). O que mudou:
 - O curso dos roteiros se chama "Profissional de Apoio na Prática" (Instituto Autismo do Bem, 8 módulos, 180 h); há também a trilha "Decola AEE - Professor de AEE" (4 h) e o "Domine o PEI" (módulo 1). Os 3 roteiros por instrutora duplicam os cadernos de teleprompter e foram pulados.
 - NÃO carregados: vídeos .mp4 (5 GB, sem transcrição), protocolo de conduta PREENCHIDO (dados de saúde de criança real), PDFs só imagem (precisam de OCR). Ver `conhecimento/README.md`.
 - `feedback` e `sintese` buscam agora em regra, curso, caderno, modelo (+ exemplo e artigo no feedback).
+
+## Anti-pausa do banco (2026-11-13)
+
+- O projeto pausou de novo em 13/11 (6 dias sem requisições). Sintoma: DNS do `*.supabase.co` falha (getaddrinfo) e a Management API devolve status `INACTIVE`. Religar só no painel, logado como cristiano.terrazul@gmail.com ("Restore project"); API e MCP dão 403 para a conta do CLI.
+- Proteção: `api/ping.js` (consulta leve com a chave anon) + `crons` em `vercel.json` (todo dia às 09:00 UTC). Só roda em deploy de produção, isto é, depois do merge na main. O `rewrites` exclui `api/`.
+- `python scripts/mantem-banco-acordado.py` faz o mesmo ping manualmente e registra em `logs/ping-banco.log` (ignorado pelo git). Tarefa agendada no Windows não foi criada (o modo automático barra).
+- Definitivo: plano Pro do Supabase (não pausa).
