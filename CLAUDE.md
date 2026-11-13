@@ -113,6 +113,6 @@ Documento "Considerações plataforma.docx" (Desktop). O que mudou:
 ## Anti-pausa do banco (2026-11-13)
 
 - O projeto pausou de novo em 13/11 (6 dias sem requisições). Sintoma: DNS do `*.supabase.co` falha (getaddrinfo) e a Management API devolve status `INACTIVE`. Religar só no painel, logado como cristiano.terrazul@gmail.com ("Restore project"); API e MCP dão 403 para a conta do CLI.
-- Proteção: `api/ping.js` (consulta leve com a chave anon) + `crons` em `vercel.json` (todo dia às 09:00 UTC). Só roda em deploy de produção, isto é, depois do merge na main. O `rewrites` exclui `api/`.
+- Proteção PREPARADA, AINDA NÃO COMMITADA (o modo automático barrou o commit e a tarefa agendada; falta o usuário autorizar): `api/ping.js` (consulta leve com a chave anon) + `crons` em `vercel.json` (todo dia às 09:00 UTC), arquivos alterados só na pasta local. Depois de commitado, só roda em deploy de produção (merge na main). O `rewrites` exclui `api/`.
 - `python scripts/mantem-banco-acordado.py` faz o mesmo ping manualmente e registra em `logs/ping-banco.log` (ignorado pelo git). Tarefa agendada no Windows não foi criada (o modo automático barra).
 - Definitivo: plano Pro do Supabase (não pausa).
