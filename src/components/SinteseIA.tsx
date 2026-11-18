@@ -63,7 +63,7 @@ export default function SinteseIA({ estudanteId, respostas, aoErro, aoOk }: { es
   const sinteses = useQuery({
     queryKey: ["sinteses", estudanteId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("sinteses_ia").select("*, perfis:criado_por(nome)").eq("estudante_id", estudanteId).order("criado_em", { ascending: false });
+      const { data, error } = await supabase.from("sinteses_ia").select("*, perfis:criado_por(nome)").eq("estudante_id", estudanteId).eq("tipo", "documento").order("criado_em", { ascending: false });
       if (error) throw error;
       return data as unknown as Sintese[];
     },

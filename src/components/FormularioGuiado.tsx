@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Check, Lock, HelpCircle, Sparkles, Plus, Trash2, X } from "lucide-react";
 import type { Formulario, LinhaTabela, Pergunta, Respostas, Secao, ValorEscala, ValorVerificacao } from "@/formularios/tipos";
 import { supabase } from "@/lib/supabase";
+import Ditado from "@/components/Ditado";
 
 interface Props {
   formulario: Formulario;
@@ -11,11 +12,12 @@ interface Props {
   somenteLeitura?: boolean;
   equipe?: boolean; // pode preencher as seções "somente_equipe"
   extras?: Record<string, ReactNode>; // conteúdo extra no topo de uma seção (ex.: botão "Sugerir síntese")
+  rodapeCampo?: (p: Pergunta) => ReactNode; // conteúdo logo abaixo de um campo (ex.: sugestão do sistema)
 }
 
 const OUTRO = "Outro: ";
 
-export default function FormularioGuiado({ formulario, valores, aoMudar, somenteLeitura, equipe, extras }: Props) {
+export default function FormularioGuiado({ formulario, valores, aoMudar, somenteLeitura, equipe, extras, rodapeCampo }: Props) {
   const [secaoAtiva, setSecaoAtiva] = useState(formulario.secoes[0]?.id);
 
   const progresso = useMemo(() => {
@@ -86,6 +88,7 @@ export default function FormularioGuiado({ formulario, valores, aoMudar, somente
             bloqueada={!!somenteLeitura || (!!s.somente_equipe && !equipe)}
             motivo={s.somente_equipe && !equipe ? "Esta seção é preenchida pela equipe pedagógica." : undefined}
             extra={extras?.[s.id]}
+            rodapeCampo={rodapeCampo}
           />
         ))}
       </div>
@@ -101,6 +104,7 @@ function SecaoCard({
   bloqueada,
   motivo,
   extra,
+  rodapeCampo,
 }: {
   secao: Secao;
   formularioId: string;
@@ -109,6 +113,7 @@ function SecaoCard({
   bloqueada: boolean;
   motivo?: string;
   extra?: ReactNode;
+  rodapeCampo?: (p: Pergunta) => ReactNode;
 }) {
   return (
     <section id={`secao-${secao.id}`} className="card p-5 sm:p-7 scroll-mt-24">
@@ -122,7 +127,10 @@ function SecaoCard({
       {!bloqueada && extra && <div className="no-print mt-3">{extra}</div>}
       <div className="mt-5 space-y-6">
         {secao.perguntas.map((p) => (
-          <Campo key={p.id} pergunta={p} formularioId={formularioId} valor={valores[p.id]} aoMudar={(v) => aoMudar(p.id, v)} bloqueada={bloqueada} />
+          <div key={p.id}>
+            <Campo pergunta={p} formularioId={formularioId} valor={valores[p.id]} aoMudar={(v) => aoMudar(p.id, v)} bloqueada={bloqueada} />
+            {!bloqueada && rodapeCampo?.(p)}
+          </div>
         ))}
       </div>
     </section>
@@ -181,6 +189,7 @@ function Campo({
             placeholder="Descreva o que foi observado, com fatos e sem rótulos."
           />
           {ajuda}
+          {!bloqueada && <Ditado valor={(valor as string) ?? ""} aoMudar={aoMudar} />}
         </div>
       );
     case "escolha_unica":

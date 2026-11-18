@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save, CheckCircle2, Printer, Sparkles, Import } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle2, Printer, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { acharFormulario } from "@/formularios";
@@ -15,6 +15,7 @@ import PainelFeedback from "@/components/PainelFeedback";
 import ImportarGuia from "@/components/ImportarGuia";
 import { preencherEstudoDeCaso, preencherDocumentoUnificado } from "@/lib/preenche";
 import type { Sintese } from "@/components/SinteseIA";
+import PreparaEstudo, { CaixaSugestao, aplicar, pendentes, type SugestaoEstudo } from "@/components/PreparaEstudo";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -38,10 +39,60 @@ export default function Preencher() {
     queryFn: async () => {
       const { data } = await supabase.from("respostas").select("*").eq("estudante_id", estudanteId!).eq("status", "concluido").in("formulario_id", ["ficha-observacao", "entrevista-familia"]).order("atualizado_em", { ascending: false });
       const lista = (data ?? []) as Resposta[];
-      const { data: sint } = await supabase.from("sinteses_ia").select("*").eq("estudante_id", estudanteId!).order("criado_em", { ascending: false }).limit(1);
+      const { data: sint } = await supabase.from("sinteses_ia").select("*").eq("estudante_id", estudanteId!).eq("tipo", "documento").order("criado_em", { ascending: false }).limit(1);
       return { ficha: lista.find((r) => r.formulario_id === "ficha-observacao") ?? null, entrevista: lista.find((r) => r.formulario_id === "entrevista-familia") ?? null, sintese: ((sint ?? []) as Sintese[])[0] ?? null };
     },
   });
+
+  // Insights e sugestões para a reunião do Estudo de Caso (última geração deste estudante)
+  const [preparando, setPreparando] = useState(false);
+  const sugestaoEstudo = useQuery({
+    queryKey: ["sugestao-estudo", estudanteId],
+    enabled: formularioId === "estudo-de-caso",
+    queryFn: async () => {
+      const { data } = await supabase.from("sinteses_ia").select("*").eq("estudante_id", estudanteId!).eq("tipo", "estudo-de-caso").order("criado_em", { ascending: false }).limit(1);
+      return ((data ?? []) as unknown as SugestaoEstudo[])[0] ?? null;
+    },
+  });
+  const sugPendentes = pendentes(formularioId === "estudo-de-caso" ? sugestaoEstudo.data : null, valores);
+
+  async function gerarSugestoesEstudo() {
+    setPreparando(true);
+    try {
+      const f = fontes.data;
+      const base = preencherEstudoDeCaso((f?.ficha?.dados as Respostas) ?? null, (f?.entrevista?.dados as Respostas) ?? null, {}).respostas;
+      const { data, error } = await supabase.functions.invoke("sintese", { body: { acao: "estudo_de_caso", estudante_id: estudanteId, base } });
+      if (error) throw new Error(error.message);
+      if (data?.erro) throw new Error(data.erro);
+      // nova geração: as dispensas antigas deixam de valer
+      setValores((atual) => {
+        const { _dispensadas: _fora, ...resto } = atual;
+        void _fora;
+        return resto;
+      });
+      await qc.invalidateQueries({ queryKey: ["sugestao-estudo", estudanteId] });
+      setToast(data.modo === "ia" ? "Insights e sugestões prontos. A equipe decide o que usar." : "Sugestões montadas a partir das respostas (sem redação por IA). A equipe decide o que usar.");
+    } catch (err) {
+      setAviso("Não foi possível preparar a reunião: " + (err as Error).message);
+    } finally {
+      setPreparando(false);
+    }
+  }
+  function usarSugestao(ids: string[]) {
+    const s = sugestaoEstudo.data;
+    if (!s || !ids.length) return;
+    setValores((atual) => {
+      const novo: Respostas = { ...atual, _sugestao: s.id };
+      for (const id of ids) novo[id] = aplicar(atual[id], s.saida.campos[id]);
+      return novo;
+    });
+    setSujo(true);
+    registrar("estudo.usou_sugestao", `sinteses_ia:${s.id}`, { campos: ids });
+  }
+  function dispensarSugestao(id: string) {
+    setValores((atual) => ({ ...atual, _dispensadas: [...new Set([...(Array.isArray(atual._dispensadas) ? (atual._dispensadas as string[]) : []), id])] }));
+    setSujo(true);
+  }
 
   function trazerRespostas() {
     const f = fontes.data;
@@ -231,20 +282,15 @@ export default function Preencher() {
       </header>
 
       {!concluido && formulario.id === "estudo-de-caso" && (
-        <div className="no-print card p-4 sm:p-5 mb-6 flex flex-wrap items-center gap-3 bg-marca-fundo/40">
-          <Import size={20} className="text-marca shrink-0" />
-          <div className="flex-1 min-w-[240px] text-sm">
-            <div className="font-medium">Trazer respostas da Ficha de Observação e da Entrevista com a Família</div>
-            <div className="text-xs text-tinta-suave mt-0.5">
-              {fontes.data?.ficha || fontes.data?.entrevista
-                ? `Disponível: ${[fontes.data?.ficha && "Ficha de Observação", fontes.data?.entrevista && "Entrevista com a Família"].filter(Boolean).join(" e ")}. Só completa o que estiver vazio.`
-                : "Conclua a Ficha de Observação ou a Entrevista com a Família para usar este atalho."}
-            </div>
-          </div>
-          <button className="btn-primario !py-2" disabled={!fontes.data?.ficha && !fontes.data?.entrevista} onClick={trazerRespostas}>
-            <Import size={16} /> Trazer respostas
-          </button>
-        </div>
+        <PreparaEstudo
+          temFicha={!!fontes.data?.ficha}
+          temEntrevista={!!fontes.data?.entrevista}
+          sugestao={sugestaoEstudo.data ?? null}
+          ocupado={preparando}
+          qtdPendentes={Object.keys(sugPendentes).length}
+          aoGerar={gerarSugestoesEstudo}
+          aoUsarTodas={() => usarSugestao(Object.keys(sugPendentes))}
+        />
       )}
       {!concluido && formulario.id === "documento-unificado" && (
         <div className="no-print card p-4 sm:p-5 mb-6 flex flex-wrap items-center gap-3 bg-sol-fundo/50">
@@ -281,6 +327,17 @@ export default function Preencher() {
                   ]),
               )
             : undefined
+        }
+        rodapeCampo={(p) =>
+          p.id in sugPendentes ? (
+            <CaixaSugestao
+              valor={sugPendentes[p.id]}
+              porque={sugestaoEstudo.data?.saida.justificativas?.[p.id]?.porque}
+              fonte={sugestaoEstudo.data?.saida.justificativas?.[p.id]?.fonte}
+              aoUsar={() => usarSugestao([p.id])}
+              aoDispensar={() => dispensarSugestao(p.id)}
+            />
+          ) : null
         }
         aoMudar={(k, v) => {
           setValores((atual) => ({ ...atual, [k]: v }));
