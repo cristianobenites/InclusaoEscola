@@ -15,7 +15,7 @@ import PainelFeedback from "@/components/PainelFeedback";
 import ImportarGuia from "@/components/ImportarGuia";
 import { preencherEstudoDeCaso, preencherDocumentoUnificado } from "@/lib/preenche";
 import type { Sintese } from "@/components/SinteseIA";
-import PreparaEstudo, { CaixaSugestao, aplicar, pendentes, type SugestaoEstudo } from "@/components/PreparaEstudo";
+import PreparaEstudo, { CaixaSugestao, LIMITE_OUTRA_SUGESTAO, aplicar, pendentes, type SugestaoEstudo } from "@/components/PreparaEstudo";
 
 export default function Preencher() {
   const { id: estudanteId, formularioId, respostaId } = useParams();
@@ -88,6 +88,20 @@ export default function Preencher() {
     });
     setSujo(true);
     registrar("estudo.usou_sugestao", `sinteses_ia:${s.id}`, { campos: ids });
+  }
+  // Outra sugestão só para um campo (com orientação opcional da equipe) e volta à anterior
+  async function outraSugestao(campo: string, orientacao: string, voltar = false) {
+    const sg = sugestaoEstudo.data;
+    if (!sg) return;
+    try {
+      const { data, error } = await supabase.functions.invoke("sintese", { body: { acao: "estudo_campo", sugestao_id: sg.id, campo, orientacao, voltar } });
+      if (error) throw new Error(error.message);
+      if (data?.erro) throw new Error(data.erro);
+      await qc.invalidateQueries({ queryKey: ["sugestao-estudo", estudanteId] });
+      setToast(voltar ? "Voltamos à sugestão anterior." : "Nova sugestão pronta para este campo.");
+    } catch (err) {
+      setAviso((voltar ? "Não foi possível voltar à sugestão anterior: " : "Não foi possível gerar outra sugestão: ") + (err as Error).message);
+    }
   }
   function dispensarSugestao(id: string) {
     setValores((atual) => ({ ...atual, _dispensadas: [...new Set([...(Array.isArray(atual._dispensadas) ? (atual._dispensadas as string[]) : []), id])] }));
@@ -336,6 +350,10 @@ export default function Preencher() {
               fonte={sugestaoEstudo.data?.saida.justificativas?.[p.id]?.fonte}
               aoUsar={() => usarSugestao([p.id])}
               aoDispensar={() => dispensarSugestao(p.id)}
+              aoOutra={sugestaoEstudo.data?.prompt_versao === "ia" ? (o) => outraSugestao(p.id, o) : undefined}
+              aoVoltar={() => outraSugestao(p.id, "", true)}
+              restantes={LIMITE_OUTRA_SUGESTAO - (sugestaoEstudo.data?.saida.regeracoes?.[p.id] ?? 0)}
+              temAnterior={(sugestaoEstudo.data?.saida.historico?.[p.id]?.length ?? 0) > 0}
             />
           ) : null
         }

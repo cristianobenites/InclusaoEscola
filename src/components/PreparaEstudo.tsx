@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Check, X, Lightbulb, AlertTriangle, HelpCircle, ThumbsUp, HeartPulse, Scale, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Check, X, Lightbulb, AlertTriangle, HelpCircle, ThumbsUp, HeartPulse, Scale, ChevronDown, ChevronUp, RefreshCw, Undo2 } from "lucide-react";
 import { formatarDataHora } from "@/pages/Estudante";
 import { valorEmTexto } from "@/components/SinteseIA";
 import type { Respostas, ValorPergunta, LinhaTabela } from "@/formularios/tipos";
@@ -14,8 +14,12 @@ export interface SugestaoEstudo {
     aviso?: string | null;
     campos: Record<string, ValorPergunta>;
     justificativas: Record<string, { porque: string; fonte?: { titulo: string; pagina: number | null } }>;
+    historico?: Record<string, { valor: ValorPergunta; just: unknown }[]>; // sugestões anteriores de cada campo
+    regeracoes?: Record<string, number>; // quantas vezes a equipe pediu outra sugestão por campo
   };
 }
+
+export const LIMITE_OUTRA_SUGESTAO = 3;
 
 /* ---------- regras de "usar" e de "já está no formulário" ---------- */
 
@@ -68,8 +72,45 @@ export function pendentes(s: SugestaoEstudo | null | undefined, valores: Respost
 
 /* ---------- caixa de sugestão embaixo de um campo ---------- */
 
-export function CaixaSugestao({ valor, porque, fonte, aoUsar, aoDispensar }: { valor: ValorPergunta; porque?: string; fonte?: { titulo: string; pagina: number | null }; aoUsar: () => void; aoDispensar: () => void }) {
+export function CaixaSugestao({
+  valor, porque, fonte, aoUsar, aoDispensar, aoOutra, aoVoltar, restantes = 0, temAnterior = false,
+}: {
+  valor: ValorPergunta;
+  porque?: string;
+  fonte?: { titulo: string; pagina: number | null };
+  aoUsar: () => void;
+  aoDispensar: () => void;
+  aoOutra?: (orientacao: string) => Promise<void>; // pede outra sugestão só para este campo
+  aoVoltar?: () => Promise<void>; // volta à sugestão anterior
+  restantes?: number;
+  temAnterior?: boolean;
+}) {
+  const [pedindo, setPedindo] = useState(false);
+  const [orientacao, setOrientacao] = useState("");
+  const [ocupado, setOcupado] = useState(false);
   const itens = Array.isArray(valor) ? (valor as unknown[]).map((x) => (typeof x === "string" ? x : valorEmTexto([x]))) : null;
+
+  async function gerar() {
+    if (!aoOutra) return;
+    setOcupado(true);
+    try {
+      await aoOutra(orientacao.trim());
+      setPedindo(false);
+      setOrientacao("");
+    } finally {
+      setOcupado(false);
+    }
+  }
+  async function voltar() {
+    if (!aoVoltar) return;
+    setOcupado(true);
+    try {
+      await aoVoltar();
+    } finally {
+      setOcupado(false);
+    }
+  }
+
   return (
     <div className="no-print mt-2 rounded-2xl border border-sol/40 bg-sol-fundo/50 px-3.5 py-3">
       <div className="flex items-center gap-1.5 text-xs font-medium text-sol">
@@ -88,14 +129,64 @@ export function CaixaSugestao({ valor, porque, fonte, aoUsar, aoDispensar }: { v
           {fonte?.titulo ? ` Fonte: ${fonte.titulo}${fonte.pagina ? ", página " + fonte.pagina : ""}.` : ""}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-2">
-        <button type="button" className="inline-flex items-center gap-1 rounded-full bg-marca px-3 py-1 text-xs font-medium text-white hover:bg-marca-forte" onClick={aoUsar}>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <button type="button" className="inline-flex items-center gap-1 rounded-full bg-marca px-3 py-1 text-xs font-medium text-white hover:bg-marca-forte disabled:opacity-60" onClick={aoUsar} disabled={ocupado}>
           <Check size={13} /> Usar
         </button>
-        <button type="button" className="inline-flex items-center gap-1 rounded-full border border-papel-borda bg-white px-3 py-1 text-xs font-medium text-tinta-suave hover:bg-papel" onClick={aoDispensar}>
+        <button type="button" className="inline-flex items-center gap-1 rounded-full border border-papel-borda bg-white px-3 py-1 text-xs font-medium text-tinta-suave hover:bg-papel disabled:opacity-60" onClick={aoDispensar} disabled={ocupado}>
           <X size={13} /> Dispensar
         </button>
+        {aoOutra && (
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded-full border border-papel-borda bg-white px-3 py-1 text-xs font-medium text-marca hover:bg-marca-fundo disabled:opacity-60 disabled:text-tinta-fraca"
+            onClick={() => setPedindo(!pedindo)}
+            disabled={ocupado || restantes <= 0}
+            title={restantes <= 0 ? `Este campo já teve ${LIMITE_OUTRA_SUGESTAO} novas sugestões` : "Pedir outra sugestão só para este campo"}
+          >
+            <RefreshCw size={13} /> Outra sugestão
+          </button>
+        )}
+        {aoVoltar && temAnterior && (
+          <button type="button" className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-tinta-suave hover:bg-white disabled:opacity-60" onClick={voltar} disabled={ocupado}>
+            <Undo2 size={13} /> Voltar à anterior
+          </button>
+        )}
       </div>
+      {aoOutra && restantes <= 0 && (
+        <p className="mt-1.5 text-[11px] text-tinta-fraca">Este campo já teve {LIMITE_OUTRA_SUGESTAO} novas sugestões. Use a que preferir e ajuste o texto direto no campo.</p>
+      )}
+      {pedindo && aoOutra && (
+        <div className="mt-2.5 rounded-xl bg-white border border-papel-borda p-3">
+          <label className="text-xs font-medium">O que você quer diferente? <span className="font-normal text-tinta-fraca">(opcional)</span></label>
+          <input
+            className="campo mt-1.5 !py-1.5 text-sm"
+            placeholder="Ex.: mais curta; focar na comunicação; falta falar do recreio"
+            value={orientacao}
+            maxLength={300}
+            onChange={(e) => setOrientacao(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                gerar();
+              }
+            }}
+            disabled={ocupado}
+            autoFocus
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button type="button" className="inline-flex items-center gap-1 rounded-full bg-marca px-3 py-1 text-xs font-medium text-white hover:bg-marca-forte disabled:opacity-60" onClick={gerar} disabled={ocupado}>
+              <Sparkles size={13} /> {ocupado ? "Gerando…" : "Gerar outra"}
+            </button>
+            <button type="button" className="text-xs text-tinta-suave hover:underline" onClick={() => setPedindo(false)} disabled={ocupado}>
+              Cancelar
+            </button>
+            <span className="text-[11px] text-tinta-fraca ml-auto">
+              {restantes} de {LIMITE_OUTRA_SUGESTAO} tentativas neste campo · leva uns 15 segundos
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

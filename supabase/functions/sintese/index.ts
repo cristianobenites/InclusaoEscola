@@ -4,7 +4,7 @@
 // Com a chave: o modelo redige a proposta no mesmo formato, obrigado a citar fonte e página.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { anonimizador, chaveGemini, gerarTexto } from "../_shared/gemini.ts";
-import { sugerirEstudoDeCaso } from "./estudo.ts";
+import { regerarCampo, sugerirEstudoDeCaso } from "./estudo.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -26,6 +26,10 @@ Deno.serve(async (req) => {
     if (corpo.acao === "estudo_de_caso") {
       const r = await sugerirEstudoDeCaso(sb, quem.user.id, corpo);
       return json(r, "erro" in r ? 400 : 200);
+    }
+    if (corpo.acao === "estudo_campo") {
+      const r = await regerarCampo(sb, quem.user.id, corpo);
+      return json(r, 200); // erros de negócio voltam em { erro } para a tela mostrar a mensagem
     }
     const { estudante_id } = corpo;
 

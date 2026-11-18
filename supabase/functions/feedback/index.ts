@@ -91,7 +91,7 @@ async function explicarPergunta(c: { formulario_id?: string; rotulo?: string; aj
   const sistema = `Você ajuda professores e famílias da rede pública brasileira a preencher formulários do Programa Decola AEE (educação inclusiva). Explique a pergunta em Linguagem Simples (frases curtas, sem jargão), diga o que a escola faz com essa informação e dê 2 ou 3 exemplos de resposta boa, concretos e sem nome de pessoa. Nunca use linguagem clínica nem rótulos; barreira é do contexto, não do estudante. Responda APENAS JSON: {"explicacao": string, "exemplos": string[]}.`;
   const usuario = `FORMULÁRIO: ${c.formulario_id ?? ""}\nPERGUNTA: ${c.rotulo ?? ""}\nORIENTAÇÃO DO GUIA: ${c.ajuda ?? "(nenhuma)"}\nOPÇÕES (se houver): ${(c.opcoes ?? []).join(" | ") || "(campo aberto)"}`;
   try {
-    const { texto } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 1024 });
+    const { texto } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 1024, tempoMaximoMs: 25_000 });
     const j = JSON.parse(texto);
     return { explicacao: String(j.explicacao ?? base.explicacao), exemplos: Array.isArray(j.exemplos) ? j.exemplos.map(String).slice(0, 3) : [], modo: "ia" };
   } catch {
@@ -121,7 +121,7 @@ async function sintetizarSecao(sb: any, c: { formulario_id: string; formulario_v
   const sistema = `Você apoia equipes escolares do Programa Decola AEE (educação inclusiva, rede pública brasileira). Recebe as respostas de um formulário sobre um estudante (sem nome) e escreve a SÍNTESE pedida, campo a campo, em Linguagem Simples: tópicos curtos separados por ponto e vírgula, só com o que está nas respostas, sem inventar e sem linguagem clínica ou rótulos. Barreira é do contexto escolar, nunca característica do estudante. Nunca escreva nome de pessoa. Responda APENAS JSON com os ids dos campos como chaves e o texto como valor.`;
   const usuario = `FORMULÁRIO: ${esquema.titulo}\n\nRESPOSTAS:\n${secoes.map((s) => `## ${s.titulo}\n${s.texto.trim() || "(sem registro)"}`).join("\n\n")}\n\nCAMPOS DA SÍNTESE A ESCREVER (id: o que pede):\n${alvos.map((p) => `- ${p.id}: ${p.rotulo}${p.ajuda ? " (" + p.ajuda + ")" : ""}`).join("\n")}`;
   try {
-    const { texto, modelo } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 2048 });
+    const { texto, modelo } = await gerarTexto(chave, sistema, usuario, { maxOutputTokens: 2048, tempoMaximoMs: 30_000 });
     const j = JSON.parse(texto) as Record<string, unknown>;
     const campos: Record<string, string> = {};
     for (const p of alvos) if (typeof j[p.id] === "string" && (j[p.id] as string).trim()) campos[p.id] = (j[p.id] as string).trim();
