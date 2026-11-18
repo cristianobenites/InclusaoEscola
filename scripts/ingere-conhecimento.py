@@ -23,7 +23,7 @@ import migra  # noqa: E402
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 PASTA_TEXTO = pathlib.Path(os.environ.get("CONHECIMENTO_TEXTO", r"C:/Users/Benites/Desktop/Vinicius/base-conhecimento/texto-extraido"))
 PASTA_MD = RAIZ / "conhecimento"
-PRIORIDADE = {"regra": 10, "caderno": 20, "exemplo": 30, "artigo": 40, "referencia": 60}
+PRIORIDADE = {"regra": 10, "curso": 15, "caderno": 20, "modelo": 25, "exemplo": 30, "artigo": 40, "referencia": 60}
 TAM = 1400   # caracteres por trecho
 SOBRA = 200  # sobreposição entre trechos
 
@@ -102,20 +102,21 @@ def carregar(tok, grupo, titulo, arquivo, texto, chave=None, secao_por_trecho=No
 
 def main():
     so = sys.argv[sys.argv.index("--so") + 1] if "--so" in sys.argv else None
+    so_texto = "--so-texto" in sys.argv  # só os .txt de CONHECIMENTO_TEXTO (não recarrega regras/exemplos .md)
     chave = os.environ.get("GEMINI_API_KEY")
     print("embeddings:", "SIM (Gemini)" if chave else "não (só busca textual); exporte GEMINI_API_KEY para gerar")
     tok = migra.token_cli()
     total = 0
     for arq in sorted(PASTA_TEXTO.glob("*__*.txt")):
         grupo, titulo = arq.stem.split("__", 1)
-        if grupo in ("regra", "referencia"):
+        if grupo in ("regra", "referencia") and not so_texto:
             continue  # as regras entram pelos .md de conhecimento/regras (versão canônica)
         if "implante coclear" in titulo.lower():
             continue  # arquivo recebido é cópia idêntica de "CAA escola TEA" (aviso dado em 30/10)
         if so and grupo != so:
             continue
         total += carregar(tok, grupo, titulo, arq.name, arq.read_text(encoding="utf-8"), chave)
-    for arq in sorted(PASTA_MD.rglob("*.md")):
+    for arq in ([] if so_texto else sorted(PASTA_MD.rglob("*.md"))):
         if arq.name.lower() == "readme.md":
             continue
         grupo = "regra" if "regras" in arq.parts else "exemplo"

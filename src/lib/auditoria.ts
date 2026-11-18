@@ -31,6 +31,9 @@ export function rotuloAcao(acao: string): string {
     "tela.abriu_formulario": "Abriu um formulário",
     "feedback.gerou": "Pediu feedback dos materiais",
     "sintese.gerou": "Gerou a síntese (proposta de PAEE e PEI)",
+    "estudo.sugeriu": "Gerou insights e sugestões para o Estudo de Caso",
+    "estudo.usou_sugestao": "Usou sugestão do sistema no Estudo de Caso",
+    "tela.abriu_comparacao": "Abriu a comparação equipe x sistema",
   };
   if (fixos[acao]) return fixos[acao];
   const [tabela, op] = acao.split(".");
@@ -39,6 +42,8 @@ export function rotuloAcao(acao: string): string {
     estudantes_identidade: "identificação do estudante",
     respostas: "resposta de formulário",
     sinteses_ia: "síntese da IA",
+    decisoes_comparacao: "decisão da comparação equipe x sistema",
+    feedbacks: "feedback dos materiais",
     estudos_caso: "Estudo de Caso",
     perfis: "perfil de usuário",
     escolas: "escola",
