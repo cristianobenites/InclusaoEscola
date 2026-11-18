@@ -22,14 +22,19 @@ export function anonimizador(nome: string | null) {
   return { texto, fundo };
 }
 
+// Ordem medida em produção (nov/2026): com a chave gratuita, 3.8/3.7/3.5 quase sempre devolvem 503 ou
+// travam até o tempo esgotar; o 3-flash-preview é o que responde. Por isso ele vai na frente.
 export const MODELOS_RESERVA = [
+  "gemini-3-flash-preview",
+  "gemini-3.6-flash",
   "gemini-3.8-flash",
   "gemini-3.7-flash",
-  "gemini-3.6-flash",
   "gemini-3.5-flash",
-  "gemini-3-flash-preview",
   "gemini-3.1-flash-lite",
 ];
+
+// Enquanto a função fica "quente", lembramos qual modelo respondeu por último e começamos por ele.
+let ultimoQueRespondeu: string | null = null;
 
 // Chave e modelo: primeiro os Secrets da função (GEMINI_API_KEY / GEMINI_MODELO); se não houver,
 // o Vault do banco (função public.segredo, só service_role).
@@ -55,6 +60,7 @@ export async function chaveGemini(): Promise<string | null> {
 export async function modelosParaTentar(): Promise<string[]> {
   const preferido = Deno.env.get("GEMINI_MODELO")?.trim() || (await doVault("GEMINI_MODELO"));
   const lista = preferido ? [preferido, ...MODELOS_RESERVA.filter((m) => m !== preferido)] : [...MODELOS_RESERVA];
+  if (ultimoQueRespondeu && lista.includes(ultimoQueRespondeu)) return [ultimoQueRespondeu, ...lista.filter((m) => m !== ultimoQueRespondeu)];
   return lista;
 }
 
@@ -62,9 +68,11 @@ export async function gerarTexto(
   chave: string,
   sistema: string,
   usuario: string,
-  opcoes: { maxOutputTokens?: number; temperature?: number } = {},
+  opcoes: { maxOutputTokens?: number; temperature?: number; tempoMaximoMs?: number } = {},
 ): Promise<{ texto: string; modelo: string; tentativas: string[] }> {
-  const TEMPO_MAXIMO_MS = 60_000; // por tentativa; a função inteira precisa caber em 150 s
+  // por tentativa; a função inteira precisa caber em 150 s. Pedidos curtos passam um tempo menor
+  // para não ficar esperando um modelo sobrecarregado.
+  const TEMPO_MAXIMO_MS = opcoes.tempoMaximoMs ?? 60_000;
   const corpo = {
     systemInstruction: { parts: [{ text: sistema }] },
     contents: [{ role: "user", parts: [{ text: usuario }] }],
@@ -96,6 +104,7 @@ export async function gerarTexto(
         const texto = j.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("") ?? "";
         if (texto.trim()) {
           tentativas.push(`${modelo}: ok (${dur()})`); console.log("gemini", tentativas.at(-1));
+          ultimoQueRespondeu = modelo;
           return { texto, modelo, tentativas };
         }
         tentativas.push(`${modelo}: resposta vazia (${j.candidates?.[0]?.finishReason ?? "?"}, ${dur()})`);

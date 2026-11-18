@@ -33,6 +33,7 @@ export function rotuloAcao(acao: string): string {
     "sintese.gerou": "Gerou a síntese (proposta de PAEE e PEI)",
     "estudo.sugeriu": "Gerou insights e sugestões para o Estudo de Caso",
     "estudo.usou_sugestao": "Usou sugestão do sistema no Estudo de Caso",
+    "estudo.outra_sugestao": "Pediu outra sugestão para um campo do Estudo de Caso",
     "tela.abriu_comparacao": "Abriu a comparação equipe x sistema",
   };
   if (fixos[acao]) return fixos[acao];
