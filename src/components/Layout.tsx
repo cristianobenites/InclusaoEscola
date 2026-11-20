@@ -18,19 +18,19 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="no-print sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-papel-borda">
-        <div className="mx-auto max-w-6xl px-4 h-16 flex items-center gap-4">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 h-16 flex items-center gap-2 sm:gap-4">
           <NavLink to="/estudantes" className="flex items-center shrink-0" aria-label="Início">
             <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-9 hidden sm:block" />
             <img src="/marca-instituto.svg" alt="Instituto Inclusão na Escola" className="h-9 sm:hidden" />
           </NavLink>
-          <nav className="flex items-center gap-1 ml-2">
+          <nav className="flex items-center gap-0.5 sm:gap-1 sm:ml-2">
             {itens.filter((i) => !i.soAdmin || perfil?.papel === "superadmin" || perfil?.papel === "gestao").map(({ para, rotulo, Icone }) => (
               <NavLink
                 key={para}
                 to={para}
                 className={({ isActive }) =>
                   clsx(
-                    "flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-2 rounded-full px-3 sm:px-3.5 py-2 text-sm font-medium transition-colors",
                     isActive ? "bg-marca-fundo text-marca" : "text-tinta hover:bg-papel",
                   )
                 }
@@ -40,7 +40,7 @@ export default function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-1 sm:gap-3">
             {perfil && (
               <NavLink
                 to="/perfil"
@@ -62,8 +62,8 @@ export default function Layout() {
               </NavLink>
             )}
             <button
-              className="btn-secundario !px-3"
-              title="Sair"
+              className="btn-secundario !px-3 sm:!px-4 shrink-0"
+              title="Sair do sistema"
               onClick={async () => {
                 await registrar("acesso.logout");
                 navegar("/entrar", { replace: true });
@@ -71,6 +71,7 @@ export default function Layout() {
               }}
             >
               <LogOut size={16} />
+              <span>Sair</span>
             </button>
           </div>
         </div>
