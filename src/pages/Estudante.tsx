@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import type { Estudante as TEstudante, Resposta } from "@/lib/tipos";
 import { FORMULARIOS } from "@/formularios";
 import SinteseIA from "@/components/SinteseIA";
+import EquipeEstudante from "@/components/EquipeEstudante";
 import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
 import { registrar } from "@/lib/auditoria";
@@ -85,6 +86,8 @@ export default function Estudante() {
           </div>
         </div>
       </div>
+
+      <EquipeEstudante estudanteId={e.id} aoErro={setAviso} aoOk={setToast} />
 
       <div className="grid gap-4 lg:grid-cols-2">
         {FORMULARIOS.map((f) => {

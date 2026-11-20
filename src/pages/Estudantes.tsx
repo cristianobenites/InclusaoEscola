@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
-import type { Escola, Estudante, Turma } from "@/lib/tipos";
+import { type Escola, type Estudante, type Papel, type Turma } from "@/lib/tipos";
 import Aviso from "@/components/Aviso";
 
 export default function Estudantes() {
@@ -36,6 +36,10 @@ export default function Estudantes() {
     queryFn: async () => (await supabase.from("turmas").select("*").order("nome")).data as Turma[],
   });
 
+  const nomeEscola = new Map((escolas.data ?? []).map((s) => [s.id, s.nome]));
+  const variasEscolas = (escolas.data?.length ?? 0) > 1;
+  const semEscola = escolas.isSuccess && (escolas.data?.length ?? 0) === 0;
+
   const lista = (estudantes.data ?? []).filter((e) => {
     const t = busca.trim().toLowerCase();
     if (!t) return true;
@@ -48,13 +52,23 @@ export default function Estudantes() {
         <div>
           <h1 className="text-2xl sm:text-3xl">Estudantes</h1>
           <p className="text-sm text-tinta-suave mt-1">
-            Cada estudante recebe um código. O nome fica guardado à parte e nunca vai para a IA.
+            {perfil ? QUEM_APARECE[perfil.papel] : ""} O nome fica guardado à parte e nunca vai para a IA.
           </p>
         </div>
-        <button className="btn-primario" onClick={() => setAbrirNovo(true)}>
+        <button className="btn-primario" onClick={() => setAbrirNovo(true)} disabled={semEscola}>
           <Plus size={16} /> Novo estudante
         </button>
       </div>
+
+      {semEscola && (
+        <div className="card p-5 mb-4 border-sol/50 bg-sol-fundo/40">
+          <p className="font-medium">O seu usuário ainda não está ligado a uma escola.</p>
+          <p className="text-sm text-tinta-suave mt-1">
+            Peça à Secretaria de Educação do seu município para incluir a escola em que você atua. Depois disso você
+            consegue cadastrar e acompanhar estudantes.
+          </p>
+        </div>
+      )}
 
       <div className="relative mb-4 max-w-md">
         <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta-fraca" />
@@ -74,15 +88,16 @@ export default function Estudantes() {
           <p className="text-sm text-tinta-suave mt-1">Cadastre o primeiro para começar a Ficha de Observação.</p>
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {lista.map((e) => (
             <li key={e.id}>
               <Link to={`/estudantes/${e.id}`} className="card block p-5 hover:border-marca transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="font-bold truncate">{e.estudantes_identidade?.nome ?? "(sem nome)"}</div>
+                    <div className="font-medium truncate">{e.estudantes_identidade?.nome ?? "(sem nome)"}</div>
                     <div className="text-xs text-tinta-fraca mt-0.5">
                       {e.turmas?.nome ?? e.ano_turma ?? "Turma não informada"}
+                      {variasEscolas && nomeEscola.get(e.escola_id) ? " · " + nomeEscola.get(e.escola_id) : ""}
                     </div>
                   </div>
                   <ChevronRight size={18} className="text-tinta-fraca shrink-0" />
@@ -98,7 +113,7 @@ export default function Estudantes() {
         <NovoEstudante
           escolas={escolas.data ?? []}
           turmas={turmas.data ?? []}
-          escolaPadrao={perfil?.escola_id ?? escolas.data?.[0]?.id ?? ""}
+          escolaPadrao={(escolas.data ?? []).find((s) => s.id === perfil?.escola_id)?.id ?? escolas.data?.[0]?.id ?? ""}
           aoFechar={() => setAbrirNovo(false)}
           aoSalvar={() => {
             setAbrirNovo(false);
@@ -112,6 +127,16 @@ export default function Estudantes() {
     </div>
   );
 }
+
+// frase do topo: quem aparece na lista para cada papel
+const QUEM_APARECE: Record<Papel, string> = {
+  superadmin: "Você enxerga os estudantes de todos os municípios.",
+  gestao: "Você enxerga os estudantes de todas as escolas do município.",
+  direcao: "Você enxerga os estudantes da sua escola.",
+  coordenacao: "Você enxerga os estudantes da sua escola.",
+  professor_aee: "Você enxerga os estudantes das escolas em que atua.",
+  professor_regente: "Aqui aparecem os estudantes que você cadastrou ou acompanha.",
+};
 
 function NovoEstudante({
   escolas,

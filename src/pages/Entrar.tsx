@@ -2,19 +2,14 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
-import { NOME_PAPEL, PAPEIS_ABERTOS, type Papel } from "@/lib/tipos";
 import Aviso from "@/components/Aviso";
 import { registrar } from "@/lib/auditoria";
-import clsx from "clsx";
 
 export default function Entrar() {
   const { sessao, carregando } = useAuth();
   const navegar = useNavigate();
-  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState("");
-  const [papel, setPapel] = useState<Papel>("professor_regente");
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
@@ -23,27 +18,11 @@ export default function Entrar() {
   async function enviar(e: FormEvent) {
     e.preventDefault();
     if (!email.trim() || !senha) return setAviso("Informe e-mail e senha.");
-    if (modo === "criar" && !nome.trim()) return setAviso("Informe o seu nome.");
     setOcupado(true);
     try {
-      if (modo === "entrar") {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
-        if (error) throw error;
-        await registrar("acesso.login", undefined, { navegador: navigator.userAgent.slice(0, 120) });
-      } else {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password: senha,
-          options: { data: { nome: nome.trim(), papel } },
-        });
-        if (error) throw error;
-        if (!data.session) {
-          setAviso("Conta criada. Confirme o e-mail que enviamos para entrar.");
-          setModo("entrar");
-          return;
-        }
-        await registrar("acesso.user_signedup", undefined, { papel });
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
+      if (error) throw error;
+      await registrar("acesso.login", undefined, { navegador: navigator.userAgent.slice(0, 120) });
       navegar("/estudantes", { replace: true });
     } catch (err) {
       setAviso(traduzErro((err as Error).message));
@@ -93,36 +72,8 @@ export default function Entrar() {
         />
         <form onSubmit={enviar} className="relative card w-full max-w-md p-7 sm:p-9 bg-white/95">
           <img src="/logo-instituto.svg" alt="Instituto Inclusão na Escola" className="h-10 mb-7 lg:hidden" />
-          <div className="flex rounded-full bg-papel p-1 mb-6">
-            {(["entrar", "criar"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setModo(m)}
-                className={clsx(
-                  "flex-1 rounded-full py-2 text-sm font-medium transition-colors",
-                  modo === m ? "bg-white shadow-card text-tinta" : "text-tinta-fraca",
-                )}
-              >
-                {m === "entrar" ? "Entrar" : "Criar conta"}
-              </button>
-            ))}
-          </div>
-
-          {modo === "criar" && (
-            <>
-              <label className="rotulo">Seu nome</label>
-              <input className="campo mb-4" value={nome} onChange={(e) => setNome(e.target.value)} autoComplete="name" />
-              <label className="rotulo">Seu papel na rede</label>
-              <select className="campo mb-4" value={papel} onChange={(e) => setPapel(e.target.value as Papel)}>
-                {PAPEIS_ABERTOS.map((p) => (
-                  <option key={p} value={p}>
-                    {NOME_PAPEL[p]}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
+          <h2 className="text-xl mb-1">Entrar</h2>
+          <p className="text-sm text-tinta-suave mb-6">Use o e-mail e a senha que você recebeu.</p>
           <label className="rotulo">E-mail</label>
           <input
             className="campo mb-4"
@@ -138,13 +89,16 @@ export default function Entrar() {
             type="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            autoComplete={modo === "entrar" ? "current-password" : "new-password"}
+            autoComplete="current-password"
           />
           <button className="btn-primario w-full" disabled={ocupado}>
-            {ocupado ? "Aguarde…" : modo === "entrar" ? "Entrar" : "Criar conta"}
+            {ocupado ? "Aguarde…" : "Entrar"}
           </button>
           <p className="ajuda mt-4 text-center">
-            Dados de estudantes são sensíveis. Use apenas a conta institucional e não compartilhe a senha.
+            Ainda não tem acesso ou esqueceu a senha? Fale com a Secretaria de Educação do seu município.
+          </p>
+          <p className="ajuda mt-2 text-center">
+            Dados de estudantes são sensíveis. O acesso é pessoal: não compartilhe a senha.
           </p>
         </form>
       </main>
@@ -155,8 +109,7 @@ export default function Entrar() {
 
 function traduzErro(m: string) {
   if (/invalid login/i.test(m)) return "E-mail ou senha incorretos.";
-  if (/at least 6/i.test(m)) return "A senha precisa ter pelo menos 6 caracteres.";
-  if (/already registered/i.test(m)) return "Já existe uma conta com este e-mail.";
+  if (/banned/i.test(m)) return "Este acesso está bloqueado. Fale com a Secretaria de Educação.";
   if (/rate limit/i.test(m)) return "Muitas tentativas. Aguarde um minuto e tente de novo.";
   return m;
 }

@@ -1,15 +1,26 @@
-export type Papel = "superadmin" | "gestao" | "coordenacao" | "professor_aee" | "professor_regente";
+export type Papel = "superadmin" | "gestao" | "direcao" | "coordenacao" | "professor_aee" | "professor_regente";
 
 export const NOME_PAPEL: Record<Papel, string> = {
   superadmin: "Administrador da plataforma",
-  gestao: "Gestão municipal",
+  gestao: "Secretaria de Educação",
+  direcao: "Direção da escola",
   coordenacao: "Coordenação pedagógica",
   professor_aee: "Professor(a) de AEE",
   professor_regente: "Professor(a) regente",
 };
 
-// papéis que uma pessoa pode escolher ao criar conta (superadmin só por convite)
-export const PAPEIS_ABERTOS: Papel[] = ["gestao", "coordenacao", "professor_aee", "professor_regente"];
+// O que cada papel enxerga (a regra de verdade está no banco, migração 0013)
+export const ALCANCE_PAPEL: Record<Papel, string> = {
+  superadmin: "Enxerga todos os municípios.",
+  gestao: "Enxerga todas as escolas do município e administra os usuários dele.",
+  direcao: "Enxerga todos os estudantes das escolas marcadas.",
+  coordenacao: "Enxerga todos os estudantes das escolas marcadas.",
+  professor_aee: "Enxerga todos os estudantes das escolas marcadas.",
+  professor_regente: "Enxerga só os estudantes que cadastrou ou em cuja equipe foi incluído, nas escolas marcadas.",
+};
+
+// papéis cujo alcance depende das escolas marcadas
+export const PAPEL_PRECISA_ESCOLA: Papel[] = ["direcao", "coordenacao", "professor_aee", "professor_regente"];
 
 export interface Perfil {
   id: string;
@@ -17,6 +28,7 @@ export interface Perfil {
   papel: Papel;
   municipio_id: string | null;
   escola_id: string | null;
+  trocar_senha?: boolean;
 }
 
 export interface Escola {
