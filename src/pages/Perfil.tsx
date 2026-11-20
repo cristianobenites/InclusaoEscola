@@ -28,9 +28,13 @@ export default function Perfil() {
     queryFn: async () => {
       const [m, s] = await Promise.all([
         perfil?.municipio_id ? supabase.from("municipios").select("nome").eq("id", perfil.municipio_id).maybeSingle() : null,
-        perfil?.escola_id ? supabase.from("escolas").select("nome").eq("id", perfil.escola_id).maybeSingle() : null,
+        supabase.from("perfis_escolas").select("escolas(nome)").eq("perfil_id", perfil!.id),
       ]);
-      return { municipio: m?.data?.nome ?? null, escola: s?.data?.nome ?? null };
+      const escolas = ((s.data ?? []) as unknown as { escolas: { nome: string } | null }[])
+        .map((x) => x.escolas?.nome)
+        .filter((x): x is string => !!x)
+        .sort((a, b) => a.localeCompare(b, "pt-BR"));
+      return { municipio: m?.data?.nome ?? null, escolas };
     },
   });
 
@@ -62,6 +66,11 @@ export default function Perfil() {
       const { error } = await supabase.auth.updateUser({ password: senhaNova });
       if (error) throw error;
       await registrar("acesso.user_updated_password");
+      if (perfil?.trocar_senha) {
+        // deixou de usar a senha inicial: some o lembrete
+        await supabase.rpc("senha_trocada");
+        await recarregarPerfil();
+      }
       setSenhaAtual("");
       setSenhaNova("");
       setSenhaConfirma("");
@@ -103,8 +112,18 @@ export default function Perfil() {
             <input className="campo bg-papel" value={lugar.data?.municipio ?? "—"} readOnly />
           </div>
           <div>
-            <label className="rotulo">Escola</label>
-            <input className="campo bg-papel" value={lugar.data?.escola ?? "Todas do município"} readOnly />
+            <label className="rotulo">{(lugar.data?.escolas.length ?? 0) > 1 ? "Escolas" : "Escola"}</label>
+            <input
+              className="campo bg-papel"
+              value={
+                lugar.data?.escolas.length
+                  ? lugar.data.escolas.join(", ")
+                  : perfil.papel === "gestao" || perfil.papel === "superadmin"
+                    ? "Todas do município"
+                    : "Nenhuma escola ligada ainda"
+              }
+              readOnly
+            />
           </div>
         </div>
         <div className="mt-5 flex justify-end">
@@ -128,6 +147,7 @@ export default function Perfil() {
               onChange={(e) => setSenhaAtual(e.target.value)}
               autoComplete="current-password"
             />
+            {perfil.trocar_senha && <p className="ajuda">No primeiro acesso, é a senha inicial que você recebeu.</p>}
           </div>
           <div>
             <label className="rotulo">Nova senha</label>

@@ -4,7 +4,7 @@ import { Plus, KeyRound, Ban, CircleCheck, Pencil, RefreshCw, ChevronDown, Chevr
 import clsx from "clsx";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
-import { NOME_PAPEL, type Escola, type Papel, type Turma } from "@/lib/tipos";
+import { ALCANCE_PAPEL, NOME_PAPEL, PAPEL_PRECISA_ESCOLA, type Escola, type Papel, type Turma } from "@/lib/tipos";
 import { rotuloAcao } from "@/lib/auditoria";
 import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
@@ -24,6 +24,9 @@ interface Usuario {
   ultimo_acesso: string | null;
   criado_em: string;
   bloqueado: boolean;
+  escolas_ids: string[] | null;
+  escolas_nomes: string[] | null;
+  trocar_senha: boolean | null;
 }
 
 interface Atividade {
@@ -135,6 +138,9 @@ function Usuarios({
   const { perfil } = useAuth();
   const [abrirNovo, setAbrirNovo] = useState(false);
   const [aberto, setAberto] = useState<string | null>(null);
+  const [busca, setBusca] = useState("");
+  const [filtroMunicipio, setFiltroMunicipio] = useState("");
+  const [filtroEscola, setFiltroEscola] = useState("");
 
   const usuarios = useQuery({
     queryKey: ["admin-usuarios"],
@@ -159,12 +165,21 @@ function Usuarios({
     recarregar();
   }
 
+  const termo = busca.trim().toLowerCase();
+  const lista = (usuarios.data ?? []).filter(
+    (u) =>
+      (!termo || u.nome.toLowerCase().includes(termo) || (u.email ?? "").toLowerCase().includes(termo)) &&
+      (!filtroMunicipio || u.municipio_id === filtroMunicipio) &&
+      (!filtroEscola || (u.escolas_ids ?? []).includes(filtroEscola)),
+  );
+  const escolasDoFiltro = escolas.filter((s) => !filtroMunicipio || s.municipio_id === filtroMunicipio);
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <p className="text-sm text-tinta-suave">
-          {usuarios.data?.length ?? 0} usuário(s). O cadastro aberto continua existindo; aqui você cria contas com papel e
-          escola já definidos.
+          {lista.length === (usuarios.data?.length ?? 0) ? lista.length : `${lista.length} de ${usuarios.data?.length ?? 0}`} usuário(s).
+          Cada pessoa enxerga só o que o papel e as escolas dela permitem.
         </p>
         <div className="flex gap-2">
           <button className="btn-secundario" onClick={recarregar} title="Atualizar">
@@ -176,13 +191,43 @@ function Usuarios({
         </div>
       </div>
 
+      <div className="grid gap-2 sm:grid-cols-3 mb-4">
+        <input className="campo" placeholder="Buscar por nome ou e-mail" value={busca} onChange={(e) => setBusca(e.target.value)} />
+        {superadmin && (
+          <select
+            className="campo"
+            value={filtroMunicipio}
+            onChange={(e) => {
+              setFiltroMunicipio(e.target.value);
+              setFiltroEscola("");
+            }}
+            aria-label="Filtrar por município"
+          >
+            <option value="">Todos os municípios</option>
+            {municipios.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.nome}
+              </option>
+            ))}
+          </select>
+        )}
+        <select className="campo" value={filtroEscola} onChange={(e) => setFiltroEscola(e.target.value)} aria-label="Filtrar por escola">
+          <option value="">Todas as escolas</option>
+          {escolasDoFiltro.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nome}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-papel text-xs uppercase tracking-wide text-tinta-fraca">
             <tr>
               <th className="text-left px-4 py-3">Nome</th>
               <th className="text-left px-4 py-3 hidden md:table-cell">Papel</th>
-              <th className="text-left px-4 py-3 hidden lg:table-cell">Escola</th>
+              <th className="text-left px-4 py-3 hidden lg:table-cell">Onde atua</th>
               <th className="text-left px-4 py-3 hidden sm:table-cell">Último acesso</th>
               <th className="px-4 py-3" />
             </tr>
@@ -195,7 +240,7 @@ function Usuarios({
                 </td>
               </tr>
             )}
-            {(usuarios.data ?? []).map((u) => (
+            {lista.map((u) => (
               <UsuarioLinha
                 key={u.id}
                 u={u}
@@ -265,8 +310,10 @@ function UsuarioLinha({
   const [nome, setNome] = useState(u.nome);
   const [papel, setPapel] = useState<Papel>(u.papel);
   const [municipioId, setMunicipioId] = useState(u.municipio_id ?? "");
-  const [escolaId, setEscolaId] = useState(u.escola_id ?? "");
+  const [escolasIds, setEscolasIds] = useState<string[]>(u.escolas_ids ?? (u.escola_id ? [u.escola_id] : []));
   const [ocupado, setOcupado] = useState(false);
+  const precisaEscola = PAPEL_PRECISA_ESCOLA.includes(u.papel);
+  const semEscola = precisaEscola && (u.escolas_nomes?.length ?? 0) === 0;
 
   async function salvar(e: FormEvent) {
     e.preventDefault();
@@ -276,7 +323,7 @@ function UsuarioLinha({
       p_nome: nome.trim(),
       p_papel: papel,
       p_municipio: municipioId || null,
-      p_escola: escolaId || null,
+      p_escolas: PAPEL_PRECISA_ESCOLA.includes(papel) ? escolasIds : [],
     });
     setOcupado(false);
     if (error) return aoErro(traduz(error.message));
@@ -290,11 +337,22 @@ function UsuarioLinha({
           <div className="font-medium">
             {u.nome} {eu && <span className="chip bg-marca-suave text-marca ml-1">você</span>}
             {u.bloqueado && <span className="chip bg-erro-suave text-erro ml-1">bloqueado</span>}
+            {u.trocar_senha && <span className="chip bg-sol-fundo text-sol ml-1">senha inicial</span>}
           </div>
           <div className="text-xs text-tinta-fraca">{u.email}</div>
         </td>
         <td className="px-4 py-3 hidden md:table-cell">{NOME_PAPEL[u.papel]}</td>
-        <td className="px-4 py-3 hidden lg:table-cell text-tinta-suave">{u.escola ?? u.municipio ?? "—"}</td>
+        <td className="px-4 py-3 hidden lg:table-cell text-tinta-suave">
+          {semEscola ? (
+            <span className="chip bg-erro-suave text-erro">sem escola: não enxerga nada</span>
+          ) : precisaEscola ? (
+            u.escolas_nomes!.join(", ")
+          ) : u.papel === "superadmin" ? (
+            "Todos os municípios"
+          ) : (
+            `Todas as escolas de ${u.municipio ?? "(sem município)"}`
+          )}
+        </td>
         <td className="px-4 py-3 hidden sm:table-cell text-tinta-suave">
           {u.ultimo_acesso ? formatarDataHora(u.ultimo_acesso) : "nunca entrou"}
         </td>
@@ -331,10 +389,11 @@ function UsuarioLinha({
                   value={municipioId}
                   onChange={(e) => {
                     setMunicipioId(e.target.value);
-                    setEscolaId("");
+                    setEscolasIds([]);
                   }}
                   disabled={!superadmin}
                 >
+                  {!municipioId && <option value="">Escolha…</option>}
                   {municipios.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.nome}
@@ -343,18 +402,15 @@ function UsuarioLinha({
                 </select>
               </div>
               <div>
-                <label className="rotulo">Escola</label>
-                <select className="campo" value={escolaId} onChange={(e) => setEscolaId(e.target.value)}>
-                  <option value="">Todas do município</option>
-                  {escolas
-                    .filter((s) => s.municipio_id === municipioId)
-                    .map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.nome}
-                      </option>
-                    ))}
-                </select>
+                <label className="rotulo">Escolas em que atua</label>
+                <EscolhaEscolas
+                  papel={papel}
+                  escolas={escolas.filter((s) => s.municipio_id === municipioId)}
+                  marcadas={escolasIds}
+                  aoMudar={setEscolasIds}
+                />
               </div>
+              <p className="ajuda !mt-0 sm:col-span-2 lg:col-span-4">{ALCANCE_PAPEL[papel]}</p>
               <div className="sm:col-span-2 lg:col-span-4 flex flex-wrap gap-2 justify-end">
                 <button type="button" className="btn-secundario" onClick={aoRedefinir}>
                   <KeyRound size={16} /> Redefinir senha
@@ -399,7 +455,7 @@ function NovoUsuario({
   const [email, setEmail] = useState("");
   const [papel, setPapel] = useState<Papel>("professor_regente");
   const [municipioId, setMunicipioId] = useState(municipioPadrao);
-  const [escolaId, setEscolaId] = useState("");
+  const [escolasIds, setEscolasIds] = useState<string[]>([]);
   const [senha, setSenha] = useState(gerarSenha());
   const [ocupado, setOcupado] = useState(false);
 
@@ -408,6 +464,8 @@ function NovoUsuario({
     if (!nome.trim() || !email.trim()) return aoErro("Informe nome e e-mail.");
     if (!municipioId) return aoErro("Escolha o município.");
     if (senha.length < 8) return aoErro("A senha precisa ter pelo menos 8 caracteres.");
+    const precisa = PAPEL_PRECISA_ESCOLA.includes(papel);
+    if (precisa && escolasIds.length === 0) return aoErro("Marque pelo menos uma escola. Sem escola, esta pessoa não enxerga nenhum estudante.");
     setOcupado(true);
     const { error } = await supabase.rpc("admin_cria_usuario", {
       p_email: email.trim(),
@@ -415,7 +473,7 @@ function NovoUsuario({
       p_nome: nome.trim(),
       p_papel: papel,
       p_municipio: municipioId,
-      p_escola: escolaId || null,
+      p_escolas: precisa ? escolasIds : [],
     });
     setOcupado(false);
     if (error) return aoErro(traduz(error.message));
@@ -455,7 +513,7 @@ function NovoUsuario({
               value={municipioId}
               onChange={(e) => {
                 setMunicipioId(e.target.value);
-                setEscolaId("");
+                setEscolasIds([]);
               }}
               disabled={!superadmin}
             >
@@ -467,17 +525,14 @@ function NovoUsuario({
             </select>
           </div>
           <div className="sm:col-span-2">
-            <label className="rotulo">Escola</label>
-            <select className="campo" value={escolaId} onChange={(e) => setEscolaId(e.target.value)}>
-              <option value="">Todas do município</option>
-              {escolas
-                .filter((s) => s.municipio_id === municipioId)
-                .map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nome}
-                  </option>
-                ))}
-            </select>
+            <label className="rotulo">Escolas em que atua</label>
+            <EscolhaEscolas
+              papel={papel}
+              escolas={escolas.filter((s) => s.municipio_id === municipioId)}
+              marcadas={escolasIds}
+              aoMudar={setEscolasIds}
+            />
+            <p className="ajuda">{ALCANCE_PAPEL[papel]}</p>
           </div>
           <div className="sm:col-span-2">
             <label className="rotulo">Senha inicial</label>
@@ -487,7 +542,7 @@ function NovoUsuario({
                 Gerar
               </button>
             </div>
-            <p className="ajuda">Envie por um canal seguro. Depois a pessoa pode trocar.</p>
+            <p className="ajuda">Envie por um canal seguro. A pessoa é lembrada de trocar em "Meu perfil".</p>
           </div>
         </div>
         <div className="mt-6 flex justify-end gap-2">
@@ -499,6 +554,44 @@ function NovoUsuario({
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+/* ---------------- Escolas em que a pessoa atua ---------------- */
+
+function EscolhaEscolas({
+  papel,
+  escolas,
+  marcadas,
+  aoMudar,
+}: {
+  papel: Papel;
+  escolas: Escola[];
+  marcadas: string[];
+  aoMudar: (ids: string[]) => void;
+}) {
+  if (!PAPEL_PRECISA_ESCOLA.includes(papel)) {
+    return (
+      <p className="campo bg-papel text-sm text-tinta-suave">
+        {papel === "superadmin" ? "Todos os municípios" : "Todas as escolas do município"}
+      </p>
+    );
+  }
+  if (escolas.length === 0) return <p className="campo bg-papel text-sm text-tinta-suave">Este município ainda não tem escolas.</p>;
+  return (
+    <div className="rounded-2xl border border-papel-borda bg-white px-3 py-2 max-h-44 overflow-auto space-y-1">
+      {escolas.map((s) => (
+        <label key={s.id} className="flex items-center gap-2 text-sm py-0.5 cursor-pointer">
+          <input
+            type="checkbox"
+            className="accent-marca w-4 h-4 shrink-0"
+            checked={marcadas.includes(s.id)}
+            onChange={(e) => aoMudar(e.target.checked ? [...marcadas, s.id] : marcadas.filter((x) => x !== s.id))}
+          />
+          {s.nome}
+        </label>
+      ))}
     </div>
   );
 }
@@ -868,6 +961,8 @@ function traduz(m: string) {
   if (/já existe usuário/i.test(m)) return "Já existe um usuário com este e-mail.";
   if (/pelo menos 8/i.test(m)) return "A senha precisa ter pelo menos 8 caracteres.";
   if (/e-mail inválido/i.test(m)) return "O e-mail parece inválido.";
+  if (/não pertence ao município/i.test(m)) return "Há escola marcada que não é do município escolhido.";
+  if (/próprio papel/i.test(m)) return "Você não pode alterar o próprio papel.";
   if (/row-level security/i.test(m)) return "Você não tem permissão para esta ação.";
   return m;
 }

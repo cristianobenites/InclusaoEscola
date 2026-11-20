@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Users, FileText, LogOut, Settings, UserRound } from "lucide-react";
+import { Users, FileText, LogOut, Settings, UserRound, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/contexts/Auth";
 import { NOME_PAPEL } from "@/lib/tipos";
 import { registrar } from "@/lib/auditoria";
@@ -76,6 +76,17 @@ export default function Layout() {
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8 flex-1">
+        {perfil?.trocar_senha && (
+          <div className="no-print mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-sol/50 bg-sol-fundo/50 px-4 py-3">
+            <ShieldAlert size={18} className="text-sol shrink-0" />
+            <p className="text-sm flex-1 min-w-[14rem]">
+              Você ainda usa a senha inicial. Para proteger os dados dos estudantes, crie uma senha só sua.
+            </p>
+            <NavLink to="/perfil" className="btn-secundario !py-1.5 text-sm">
+              Trocar senha
+            </NavLink>
+          </div>
+        )}
         <Outlet />
       </main>
       <footer className="no-print text-center text-xs text-tinta-fraca py-6">

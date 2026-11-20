@@ -47,6 +47,8 @@ export function rotuloAcao(acao: string): string {
     feedbacks: "feedback dos materiais",
     estudos_caso: "Estudo de Caso",
     perfis: "perfil de usuário",
+    perfis_escolas: "vínculo de usuário com escola",
+    estudantes_equipe: "pessoa na equipe do estudante",
     escolas: "escola",
     turmas: "turma",
     municipios: "município",
