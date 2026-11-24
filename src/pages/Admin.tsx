@@ -153,12 +153,8 @@ function Usuarios({
   });
   const recarregar = () => qc.invalidateQueries({ queryKey: ["admin-usuarios"] });
 
-  async function redefinirSenha(u: Usuario) {
-    const senha = gerarSenha();
-    const { error } = await supabase.rpc("admin_redefine_senha", { p_id: u.id, p_senha: senha });
-    if (error) return aoErro(traduz(error.message));
-    aoErro(`Nova senha de ${u.nome}:\n\n${senha}\n\nAnote e envie por um canal seguro. Ela não será mostrada de novo.`);
-  }
+  // quem administra escolhe a nova senha (o padrão combinado é o próprio e-mail da pessoa)
+  const [redefinindo, setRedefinindo] = useState<Usuario | null>(null);
   async function bloquear(u: Usuario, bloquear: boolean) {
     const { error } = await supabase.rpc("admin_bloqueia", { p_id: u.id, p_bloquear: bloquear });
     if (error) return aoErro(traduz(error.message));
@@ -251,7 +247,7 @@ function Usuarios({
                 municipios={municipios}
                 escolas={escolas}
                 superadmin={superadmin}
-                aoRedefinir={() => redefinirSenha(u)}
+                aoRedefinir={() => setRedefinindo(u)}
                 aoBloquear={(b) => bloquear(u, b)}
                 aoSalvo={() => {
                   aoOk("Usuário atualizado");
@@ -263,6 +259,24 @@ function Usuarios({
           </tbody>
         </table>
       </div>
+
+      {redefinindo && (
+        <RedefinirSenha
+          u={redefinindo}
+          aoFechar={() => setRedefinindo(null)}
+          aoFeito={(senha, eEmail) => {
+            const u = redefinindo;
+            setRedefinindo(null);
+            recarregar();
+            aoErro(
+              eEmail
+                ? `Senha de ${u.nome} redefinida.\n\nA nova senha é o próprio e-mail da pessoa:\n${senha}\n\nEla será lembrada de trocar em "Meu perfil".`
+                : `Senha de ${u.nome} redefinida.\n\nNova senha:\n${senha}\n\nAnote e envie por um canal seguro. Ela não será mostrada de novo.`,
+            );
+          }}
+          aoErro={aoErro}
+        />
+      )}
 
       {abrirNovo && (
         <NovoUsuario
@@ -552,6 +566,83 @@ function NovoUsuario({
           </button>
           <button className="btn-primario" disabled={ocupado}>
             {ocupado ? "Criando…" : "Criar usuário"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ---------------- Redefinir a senha de uma pessoa ---------------- */
+
+function RedefinirSenha({
+  u,
+  aoFechar,
+  aoFeito,
+  aoErro,
+}: {
+  u: Usuario;
+  aoFechar: () => void;
+  aoFeito: (senha: string, eEmail: boolean) => void;
+  aoErro: (m: string) => void;
+}) {
+  const email = (u.email ?? "").trim().toLowerCase();
+  // já vem com o e-mail, que é a senha inicial combinada; dá para digitar outra ou gerar uma aleatória
+  const [senha, setSenha] = useState(email);
+  const [ocupado, setOcupado] = useState(false);
+  const curta = senha.length < 8;
+
+  async function confirmar(e: FormEvent) {
+    e.preventDefault();
+    if (curta) return aoErro("A senha precisa ter pelo menos 8 caracteres.");
+    setOcupado(true);
+    const { error } = await supabase.rpc("admin_redefine_senha", { p_id: u.id, p_senha: senha });
+    setOcupado(false);
+    if (error) return aoErro(traduz(error.message));
+    aoFeito(senha, senha === email);
+  }
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-tinta/40 p-4">
+      <form onSubmit={confirmar} className="card w-full max-w-lg p-6 sm:p-8">
+        <h2 className="text-xl">Redefinir senha</h2>
+        <p className="text-sm text-tinta-suave mt-1 mb-5 break-words">
+          {u.nome} · {u.email}
+        </p>
+        <label className="rotulo" htmlFor="nova-senha">
+          Nova senha
+        </label>
+        <input
+          id="nova-senha"
+          className="campo font-mono"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          autoFocus
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
+        />
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button type="button" className="btn-secundario !py-1.5 text-sm" onClick={() => setSenha(email)}>
+            Usar o e-mail da pessoa
+          </button>
+          <button type="button" className="btn-secundario !py-1.5 text-sm" onClick={() => setSenha(gerarSenha())}>
+            Gerar uma aleatória
+          </button>
+        </div>
+        <p className="ajuda">
+          {curta
+            ? "A senha precisa ter pelo menos 8 caracteres."
+            : senha === email
+              ? 'A senha será o próprio e-mail, em letras minúsculas. A pessoa é lembrada de trocar em "Meu perfil".'
+              : 'A senha antiga deixa de valer na hora. A pessoa é lembrada de trocar em "Meu perfil".'}
+        </p>
+        <div className="mt-6 flex justify-end gap-2">
+          <button type="button" className="btn-secundario" onClick={aoFechar}>
+            Cancelar
+          </button>
+          <button className="btn-primario" disabled={ocupado || curta}>
+            <KeyRound size={16} /> {ocupado ? "Redefinindo…" : "Redefinir senha"}
           </button>
         </div>
       </form>
