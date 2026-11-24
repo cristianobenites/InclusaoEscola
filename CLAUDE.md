@@ -143,3 +143,11 @@ Pedido do usuário ao cadastrar o primeiro município real (Santa Maria do Salto
 - **Teste das regras**: `python scripts/testa-governanca.py` cria municípios e pessoas fictícias ("ZZ ..."), consulta o banco como cada papel (41 conferências) e apaga tudo. Rodar depois de qualquer mudança em política ou função de acesso.
 - **Santa Maria do Salto (MG)**, cadastrado em 20/11: 5 escolas (EM Juscelino Kubitschek, EM Pindorama, EMM Castelo Branco, Creche Municipal Francisco de Assis, EE José Joaquim Cabral) e 66 usuários (4 Secretaria, 4 direção, 2 AEE, 56 regentes). Pendências com a Silvia: e-mail inválido de uma professora (com "ç", não cadastrada), um e-mail repetido com dois nomes (virou uma conta) e a escola ESTADUAL dentro do município (a Secretaria municipal enxerga).
 - Prints com nomes reais ficam em `reports/privado/` (ignorado localmente em `.git/info/exclude`), nunca em `reports/prints/`.
+
+## Página "Modelos" e menu do celular (2026-11-24)
+
+- Na formação de 24/11 em Santa Maria do Salto, professoras abriram o menu "Formulários" (vitrine só de leitura, `/formularios`) e acharam que o celular "não deixava digitar" (dois vídeos da Silvia). Não era o aparelho: a vitrine usa `somenteLeitura`.
+- Correção: o menu passou a se chamar **Modelos**, a página tem aviso no topo ("só para conhecer, aqui não dá para responder"), barra fixa embaixo com botão para Estudantes, e a barra pisca quando alguém toca num campo travado. No celular o menu mostra o nome embaixo de cada ícone (Estudantes, Modelos, Admin).
+- REGRA: tela só de leitura precisa dizer que é só de leitura e apontar onde se preenche. Preenchimento é sempre Estudantes → estudante → documento.
+- Travas que continuam de propósito: documento **concluído** fica fechado; professor regente não preenche as seções da equipe (Síntese da Ficha e da Entrevista, Validação do Estudo de Caso, Termo do Documento Unificado), com o aviso "Esta seção é preenchida pela equipe pedagógica".
+
