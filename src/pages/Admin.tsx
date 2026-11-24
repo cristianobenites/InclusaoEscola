@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/Auth";
 import { ALCANCE_PAPEL, NOME_PAPEL, PAPEL_PRECISA_ESCOLA, type Escola, type Papel, type Turma } from "@/lib/tipos";
 import { rotuloAcao } from "@/lib/auditoria";
+import { TODAS_VERSOES } from "@/formularios";
 import Aviso from "@/components/Aviso";
 import Toast from "@/components/Toast";
 import { formatarDataHora } from "@/pages/Estudante";
@@ -611,6 +612,7 @@ function HistoricoDoUsuario({ id }: { id: string }) {
     },
   });
   const lista = historico.data ?? [];
+  const rotulos = useRotulos();
   const entradas = lista.filter((a) => a.acao === "acesso.login" || a.acao === "acesso.sessao");
   const acoes = lista.filter((a) => !a.acao.startsWith("acesso."));
 
@@ -637,7 +639,7 @@ function HistoricoDoUsuario({ id }: { id: string }) {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-papel-borda">
               {lista.map((a, i) => (
-                <AtividadeLinha key={i} a={a} aberto={aberto === i} alternar={() => setAberto(aberto === i ? null : i)} semQuem />
+                <AtividadeLinha key={i} a={a} aberto={aberto === i} alternar={() => setAberto(aberto === i ? null : i)} rotulos={rotulos} semQuem />
               ))}
             </tbody>
           </table>
@@ -673,6 +675,7 @@ function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
   });
 
   const lista = atividade.data ?? [];
+  const rotulos = useRotulos();
   const resumo = useMemo(() => {
     const porPessoa = new Map<string, number>();
     lista.forEach((a) => porPessoa.set(a.quem_nome ?? a.quem_email ?? "sistema", (porPessoa.get(a.quem_nome ?? a.quem_email ?? "sistema") ?? 0) + 1));
@@ -724,11 +727,11 @@ function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
         <table className="w-full text-sm">
           <thead className="bg-papel text-xs uppercase tracking-wide text-tinta-fraca">
             <tr>
-              <th className="text-left px-4 py-3">Quando</th>
-              <th className="text-left px-4 py-3">Quem</th>
-              <th className="text-left px-4 py-3">O que fez</th>
-              <th className="text-left px-4 py-3 hidden md:table-cell">Detalhe</th>
-              <th className="px-2 py-3" />
+              <th className="text-left px-3 sm:px-4 py-3">Quando</th>
+              <th className="text-left px-3 sm:px-4 py-3">Quem</th>
+              <th className="text-left px-3 sm:px-4 py-3">O que fez</th>
+              <th className="text-left px-3 sm:px-4 py-3 hidden md:table-cell">Detalhe</th>
+              <th className="px-1.5 sm:px-2 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-papel-borda">
@@ -747,7 +750,7 @@ function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
               </tr>
             )}
             {lista.map((a, i) => (
-              <AtividadeLinha key={i} a={a} aberto={aberto === i} alternar={() => setAberto(aberto === i ? null : i)} />
+              <AtividadeLinha key={i} a={a} aberto={aberto === i} alternar={() => setAberto(aberto === i ? null : i)} rotulos={rotulos} />
             ))}
           </tbody>
         </table>
@@ -756,18 +759,31 @@ function AtividadeLista({ aoErro }: { aoErro: (m: string) => void }) {
   );
 }
 
-function AtividadeLinha({ a, aberto, alternar, semQuem }: { a: Atividade; aberto: boolean; alternar: () => void; semQuem?: boolean }) {
-  const temDetalhe = !!a.detalhe && Object.keys(a.detalhe).length > 0;
+function AtividadeLinha({
+  a,
+  aberto,
+  alternar,
+  rotulos,
+  semQuem,
+}: {
+  a: Atividade;
+  aberto: boolean;
+  alternar: () => void;
+  rotulos: Rotulos;
+  semQuem?: boolean;
+}) {
+  // abre quando há algo a contar: detalhe gravado ou um alvo que dá para situar (estudante, documento, usuário)
+  const temDetalhe = (!!a.detalhe && Object.keys(a.detalhe).length > 0) || !!partesDoAlvo(a.alvo).id;
   return (
     <>
       <tr className="hover:bg-papel/60 cursor-pointer" onClick={temDetalhe ? alternar : undefined}>
-        <td className="px-4 py-2.5 whitespace-nowrap text-tinta-suave">{formatarDataHora(a.quando)}</td>
+        <td className="px-3 sm:px-4 py-2.5 sm:whitespace-nowrap text-tinta-suave">{formatarDataHora(a.quando)}</td>
         {!semQuem && (
-          <td className="px-4 py-2.5">
+          <td className="px-3 sm:px-4 py-2.5">
             <div className="font-medium">{a.quem_nome ?? a.quem_email ?? "sistema"}</div>
           </td>
         )}
-        <td className="px-4 py-2.5">
+        <td className="px-3 sm:px-4 py-2.5">
           <span
             className={clsx(
               "chip",
@@ -777,13 +793,13 @@ function AtividadeLinha({ a, aberto, alternar, semQuem }: { a: Atividade; aberto
             {rotuloAcao(a.acao)}
           </span>
         </td>
-        <td className="px-4 py-2.5 hidden md:table-cell text-xs text-tinta-fraca">{resumoDetalhe(a)}</td>
-        <td className="px-2 py-2.5 text-tinta-fraca">{temDetalhe && (aberto ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}</td>
+        <td className="px-3 sm:px-4 py-2.5 hidden md:table-cell text-xs text-tinta-fraca">{resumoDetalhe(a, rotulos)}</td>
+        <td className="px-1.5 sm:px-2 py-2.5 text-tinta-fraca">{temDetalhe && (aberto ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}</td>
       </tr>
       {aberto && temDetalhe && (
         <tr className="bg-papel/50">
-          <td colSpan={semQuem ? 4 : 5} className="px-4 py-3">
-            <DetalheAmigavel a={a} />
+          <td colSpan={semQuem ? 4 : 5} className="px-3 sm:px-4 py-3">
+            <DetalheAmigavel a={a} rotulos={rotulos} />
           </td>
         </tr>
       )}
@@ -798,33 +814,45 @@ const NOME_FORMULARIO: Record<string, string> = {
   "documento-unificado": "Documento Unificado (PAEE e PEI)",
 };
 
-function resumoDetalhe(a: Atividade): string {
+function resumoDetalhe(a: Atividade, rotulos: Rotulos): string {
   const d = a.detalhe ?? {};
-  if (a.origem === "auth") return [d.navegador, d.ip].filter(Boolean).join(" · ") as string;
+  const alvo = partesDoAlvo(a.alvo);
+  if (a.origem === "auth") return typeof d.navegador === "string" ? aparelho(d.navegador) : "";
   if (a.acao.startsWith("tela.") || a.acao.startsWith("acesso.")) {
     const partes: string[] = [];
     if (typeof d.formulario === "string") partes.push(NOME_FORMULARIO[d.formulario] ?? d.formulario);
-    if (typeof d.codigo === "string") partes.push("estudante " + d.codigo);
+    const estudanteId = alvo.tabela === "estudantes" ? alvo.id : typeof d.estudante === "string" ? d.estudante : null;
+    const estudante = estudanteId ? rotulos.nomes.get(estudanteId) : undefined;
+    if (estudante) partes.push(estudante);
+    else if (typeof d.codigo === "string") partes.push("estudante " + d.codigo);
     if (typeof d.navegador === "string") partes.push(d.navegador.includes("iPhone") ? "iPhone" : d.navegador.includes("Android") ? "Android" : "computador");
     return partes.join(" · ");
   }
   const depois = (d.depois ?? d.antes) as Record<string, unknown> | undefined;
-  if (!depois) return a.alvo ?? "";
+  if (!depois) {
+    // ações da IA e do painel: situa pelo alvo, nunca mostra o código interno
+    const nome = alvo.id ? rotulos.nomes.get(alvo.id) : undefined;
+    if (nome) return nome;
+    if (typeof d.campo === "string") return ROTULO_PERGUNTA.get(d.campo) ?? "";
+    if (Array.isArray(d.campos)) return `${d.campos.length} ${d.campos.length === 1 ? "campo" : "campos"}`;
+    return typeof d.email === "string" ? d.email : "";
+  }
   const partes: string[] = [];
   if (typeof depois.codigo === "string") partes.push(depois.codigo);
   if (typeof depois.nome === "string") partes.push(depois.nome);
   if (typeof depois.formulario_id === "string") partes.push(NOME_FORMULARIO[depois.formulario_id as string] ?? (depois.formulario_id as string));
-  if (typeof depois.status === "string") partes.push(depois.status);
+  if (typeof depois.status === "string") partes.push(SITUACAO[depois.status] ?? depois.status);
   if (typeof depois.email === "string") partes.push(depois.email);
-  return partes.join(" · ") || (a.alvo ?? "");
+  return partes.join(" · ");
 }
 
 /* ---------------- Detalhe amigável ----------------
-   O detalhe aberto era o JSON cru do gatilho (pedido de 24/11: "parece um
-   json, seria melhor algo mais amigável"). Agora cada registro vira linhas
-   em português: contexto (estudante, escola, formulário — com UUID trocado
-   pelo nome), e "o que mudou / foi cadastrado / foi excluído" campo a campo.
-   O JSON continua disponível numa sanfona discreta de dados técnicos. */
+   Nada de JSON na tela (pedidos de 24/11: "parece um json solto, como um
+   bug para usuário leigo"). Cada registro vira linhas em português.
+   Registros do banco: contexto (estudante, escola, formulário, com o UUID
+   trocado pelo nome) e "o que mudou / foi cadastrado / foi excluído".
+   Ações de tela: o alvo ("estudantes:<id>", "respostas:<id>"...) é
+   resolvido para estudante, escola, turma, documento e situação. */
 
 const UUID_RX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -832,6 +860,7 @@ const UUID_RX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const CAMPOS_OCULTOS = new Set([
   "id", "quem", "criado_por", "respondido_por", "criado_em", "atualizado_em",
   "formulario_versao", "respostas_ids", "prompt_versao", "modelo", "esquema", "perfil_id",
+  "tentativas", "resposta_id", "sintese_id", "tabela",
 ]);
 
 // Chaves que situam o registro (aparecem sempre, mesmo sem mudança)
@@ -844,8 +873,8 @@ const ROTULO_CAMPO: Record<string, string> = {
   email: "E-mail",
   papel: "Papel",
   status: "Situação",
-  formulario: "Formulário",
-  formulario_id: "Formulário",
+  formulario: "Documento",
+  formulario_id: "Documento",
   versao: "Versão",
   titulo: "Título",
   descricao: "Descrição",
@@ -854,6 +883,7 @@ const ROTULO_CAMPO: Record<string, string> = {
   navegador: "Aparelho",
   municipio_id: "Município",
   escola_id: "Escola",
+  escolas: "Escolas",
   turma_id: "Turma",
   estudante: "Estudante",
   estudante_id: "Estudante",
@@ -869,6 +899,14 @@ const ROTULO_CAMPO: Record<string, string> = {
   revisao: "Revisão da equipe",
   texto: "Texto",
   ativo: "Ativo",
+  modo: "Como foi gerado",
+  trechos: "Trechos dos materiais consultados",
+  campo: "Campo do documento",
+  campos: "Campos",
+  com_orientacao: "Escreveu o que queria diferente",
+  decisao: "Decisão da equipe",
+  comentario: "Comentário",
+  tipo: "Tipo",
 };
 
 const SITUACAO: Record<string, string> = {
@@ -879,6 +917,27 @@ const SITUACAO: Record<string, string> = {
   revisada: "revisada",
   descartada: "descartada",
 };
+
+const MODO: Record<string, string> = {
+  ia: "com inteligência artificial",
+  regras: "pelas regras do Instituto, sem inteligência artificial",
+  busca: "busca nos materiais, sem inteligência artificial",
+  guia: "orientação do guia, sem inteligência artificial",
+};
+
+const TIPO_SINTESE: Record<string, string> = {
+  "estudo-de-caso": "sugestões para o Estudo de Caso",
+  documento: "proposta de PAEE e PEI",
+};
+
+// id da pergunta → rótulo (as versões mais novas vencem)
+const ROTULO_PERGUNTA: Map<string, string> = (() => {
+  const mapa = new Map<string, string>();
+  for (const f of [...TODAS_VERSOES].sort((a, b) => a.versao - b.versao)) {
+    for (const s of f.secoes) for (const p of s.perguntas) mapa.set(p.id, p.rotulo);
+  }
+  return mapa;
+})();
 
 function rotuloCampo(chave: string): string {
   return ROTULO_CAMPO[chave] ?? chave.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
@@ -892,14 +951,27 @@ function aparelho(ua: string): string {
   return nav ? `${onde} · ${nav}` : onde;
 }
 
-/** Um mapa único UUID → nome legível (estudantes, escolas, turmas, municípios, pessoas). */
-function useNomesParaDetalhe(): Map<string, string> {
+interface EstudanteRotulo {
+  nome: string | null;
+  codigo: string;
+  escola_id: string;
+  turma_id: string | null;
+  ano_turma: string | null;
+}
+interface Rotulos {
+  /** UUID → nome legível (estudantes, escolas, turmas, municípios, pessoas) */
+  nomes: Map<string, string>;
+  estudantes: Map<string, EstudanteRotulo>;
+}
+
+/** Nomes para trocar os códigos internos por gente, escola e turma. Chamar uma vez por lista. */
+function useRotulos(): Rotulos {
   const estudantes = useQuery({
-    queryKey: ["rotulos-estudantes"],
+    queryKey: ["rotulos-estudantes-completo"],
     staleTime: 60_000,
     queryFn: async () =>
-      (await supabase.from("estudantes").select("id, codigo, estudantes_identidade(nome)")).data as
-        | { id: string; codigo: string; estudantes_identidade: { nome: string } | null }[]
+      (await supabase.from("estudantes").select("id, codigo, escola_id, turma_id, ano_turma, estudantes_identidade(nome)")).data as
+        | { id: string; codigo: string; escola_id: string; turma_id: string | null; ano_turma: string | null; estudantes_identidade: { nome: string } | null }[]
         | null,
   });
   const municipios = useQuery({
@@ -919,16 +991,25 @@ function useNomesParaDetalhe(): Map<string, string> {
     queryFn: async () => (await supabase.rpc("admin_usuarios")).data as Usuario[],
   });
   return useMemo(() => {
-    const mapa = new Map<string, string>();
+    const nomes = new Map<string, string>();
+    const porEstudante = new Map<string, EstudanteRotulo>();
     for (const e of estudantes.data ?? []) {
-      mapa.set(e.id, e.estudantes_identidade?.nome ? `${e.estudantes_identidade.nome} (${e.codigo})` : e.codigo);
+      const nome = e.estudantes_identidade?.nome ?? null;
+      nomes.set(e.id, nome ? `${nome} (${e.codigo})` : e.codigo);
+      porEstudante.set(e.id, { nome, codigo: e.codigo, escola_id: e.escola_id, turma_id: e.turma_id, ano_turma: e.ano_turma });
     }
-    for (const m of municipios.data ?? []) mapa.set(m.id, m.nome);
-    for (const e of escolas.data ?? []) mapa.set(e.id, e.nome);
-    for (const t of turmas.data ?? []) mapa.set(t.id, t.nome);
-    for (const u of usuarios.data ?? []) mapa.set(u.id, u.nome);
-    return mapa;
+    for (const m of municipios.data ?? []) nomes.set(m.id, m.nome);
+    for (const e of escolas.data ?? []) nomes.set(e.id, e.nome);
+    for (const t of turmas.data ?? []) nomes.set(t.id, t.nome);
+    for (const u of usuarios.data ?? []) nomes.set(u.id, u.nome);
+    return { nomes, estudantes: porEstudante };
   }, [estudantes.data, municipios.data, escolas.data, turmas.data, usuarios.data]);
+}
+
+/** Separa "tabela:id" do alvo; id só vale se for um UUID. */
+function partesDoAlvo(alvo: string | null): { tabela: string; id: string | null; novo: boolean } {
+  const [tabela, resto = ""] = (alvo ?? "").split(":");
+  return { tabela, id: UUID_RX.test(resto) ? resto : null, novo: resto === "nova" };
 }
 
 /** Valor legível para uma chave; null = não vale a pena mostrar. */
@@ -937,9 +1018,20 @@ function valorAmigavel(chave: string, valor: unknown, nomes: Map<string, string>
   if (chave === "navegador") return aparelho(String(valor));
   if (typeof valor === "boolean") return valor ? "sim" : "não";
   if (chave === "status" && typeof valor === "string") return SITUACAO[valor] ?? valor;
+  if (chave === "modo" && typeof valor === "string") return MODO[valor] ?? valor;
   if (chave === "papel" && typeof valor === "string") return (NOME_PAPEL as Record<string, string>)[valor] ?? valor;
   if ((chave === "formulario" || chave === "formulario_id") && typeof valor === "string") {
     return NOME_FORMULARIO[valor] ?? valor;
+  }
+  if (chave === "campo" && typeof valor === "string") return ROTULO_PERGUNTA.get(valor) ?? valor;
+  if (chave === "tipo" && typeof valor === "string") return TIPO_SINTESE[valor] ?? valor;
+  if (Array.isArray(valor)) {
+    const itens = valor
+      .filter((x): x is string => typeof x === "string")
+      .map((x) => (UUID_RX.test(x) ? nomes.get(x) : chave === "campos" ? ROTULO_PERGUNTA.get(x) ?? x : x))
+      .filter((x): x is string => !!x);
+    if (!itens.length) return valor.length ? `${valor.length} ${valor.length === 1 ? "item" : "itens"}` : null;
+    return itens.join("; ");
   }
   if (typeof valor === "object") {
     const n = Object.keys(valor as object).length;
@@ -959,9 +1051,9 @@ function LinhasDeDetalhe({ titulo, linhas }: { titulo?: string; linhas: [string,
       {titulo && <p className="text-[11px] uppercase tracking-wide text-tinta-fraca mb-1">{titulo}</p>}
       <div className="space-y-0.5">
         {linhas.map(([rotulo, valor], i) => (
-          <div key={i} className="flex flex-wrap gap-x-2 text-sm">
-            <span className="w-44 shrink-0 font-medium text-tinta-suave">{rotulo}</span>
-            <span className="min-w-0">{valor}</span>
+          <div key={i} className="flex flex-wrap gap-x-2 text-sm mb-1 sm:mb-0">
+            <span className="w-full sm:w-44 shrink-0 font-medium text-tinta-suave">{rotulo}</span>
+            <span className="min-w-0 break-words">{valor}</span>
           </div>
         ))}
       </div>
@@ -969,12 +1061,47 @@ function LinhasDeDetalhe({ titulo, linhas }: { titulo?: string; linhas: [string,
   );
 }
 
-function DetalheAmigavel({ a }: { a: Atividade }) {
-  const nomes = useNomesParaDetalhe();
+/** Estudante, escola e turma a partir do id do estudante. */
+function linhasDoEstudante(id: string | null | undefined, rotulos: Rotulos): [string, ReactNode][] {
+  const e = id ? rotulos.estudantes.get(id) : undefined;
+  if (!e) return [];
+  const linhas: [string, ReactNode][] = [["Estudante", e.nome ? `${e.nome} (${e.codigo})` : e.codigo]];
+  const escola = rotulos.nomes.get(e.escola_id);
+  if (escola) linhas.push(["Escola", escola]);
+  const turma = (e.turma_id && rotulos.nomes.get(e.turma_id)) || e.ano_turma;
+  if (turma) linhas.push(["Turma", turma]);
+  return linhas;
+}
+
+interface DoAlvo {
+  estudante_id: string;
+  formulario_id?: string;
+  status?: string;
+  tipo?: string;
+}
+
+function DetalheAmigavel({ a, rotulos }: { a: Atividade; rotulos: Rotulos }) {
+  const { nomes } = rotulos;
   const d = a.detalhe ?? {};
   const antes = (d.antes ?? null) as Record<string, unknown> | null;
   const depois = (d.depois ?? null) as Record<string, unknown> | null;
   const registro = depois ?? antes;
+  const alvo = partesDoAlvo(a.alvo);
+
+  // Ação de tela sobre um documento ou uma síntese: busca de qual estudante é
+  const doAlvo = useQuery({
+    queryKey: ["atividade-alvo", a.alvo],
+    enabled: !registro && !!alvo.id && (alvo.tabela === "respostas" || alvo.tabela === "sinteses_ia"),
+    staleTime: 60_000,
+    queryFn: async (): Promise<DoAlvo | null> => {
+      if (alvo.tabela === "respostas") {
+        const { data } = await supabase.from("respostas").select("estudante_id, formulario_id, status").eq("id", alvo.id!).maybeSingle();
+        return data as DoAlvo | null;
+      }
+      const { data } = await supabase.from("sinteses_ia").select("estudante_id, tipo").eq("id", alvo.id!).maybeSingle();
+      return data as DoAlvo | null;
+    },
+  });
 
   const linha = (chave: string, bruto: unknown): [string, ReactNode] | null => {
     const v = valorAmigavel(chave, bruto, nomes);
@@ -984,9 +1111,15 @@ function DetalheAmigavel({ a }: { a: Atividade }) {
   let blocos: ReactNode;
   if (registro) {
     // Registro de banco (cadastro, alteração ou exclusão feita pelos gatilhos)
-    const contexto = CAMPOS_CONTEXTO
-      .map((c) => linha(c, registro[c]))
-      .filter((x): x is [string, ReactNode] => x !== null);
+    const estudanteId = alvo.tabela === "estudantes" ? alvo.id : typeof registro.estudante_id === "string" ? registro.estudante_id : null;
+    const doEstudante = linhasDoEstudante(estudanteId, rotulos);
+    const jaSituado = doEstudante.length ? ["estudante", "estudante_id", "escola_id", "turma_id"] : [];
+    const contexto = doEstudante.concat(
+      CAMPOS_CONTEXTO
+        .filter((c) => !jaSituado.includes(c))
+        .map((c) => linha(c, registro[c]))
+        .filter((x): x is [string, ReactNode] => x !== null),
+    );
 
     const visiveis = (obj: Record<string, unknown>) =>
       Object.keys(obj).filter((c) => !CAMPOS_OCULTOS.has(c) && !(CAMPOS_CONTEXTO as readonly string[]).includes(c));
@@ -1021,31 +1154,63 @@ function DetalheAmigavel({ a }: { a: Atividade }) {
         <>
           <LinhasDeDetalhe linhas={contexto} />
           <LinhasDeDetalhe titulo={titulo} linhas={linhas} />
+          {!contexto.length && !linhas.length && <p className="text-sm text-tinta-fraca">Sem mais detalhes deste registro.</p>}
         </>
       );
     }
   } else {
-    // Ação de tela ou de acesso: o detalhe já é plano ({estudante, formulario, navegador, ip…})
-    const linhas = Object.keys(d)
-      .filter((c) => !CAMPOS_OCULTOS.has(c))
-      .map((c) => linha(c, d[c]))
-      .filter((x): x is [string, ReactNode] => x !== null);
+    // Ação de tela, de acesso ou da IA: situa (estudante, escola, turma, documento) e traduz o resto
+    const estudanteId =
+      alvo.tabela === "estudantes" ? alvo.id : typeof d.estudante === "string" ? d.estudante : doAlvo.data?.estudante_id ?? null;
+    const linhas = linhasDoEstudante(estudanteId, rotulos);
+    const temEstudante = linhas.length > 0;
+
+    if (alvo.tabela === "perfis" && alvo.id && nomes.get(alvo.id)) linhas.push(["Usuário", nomes.get(alvo.id)!]);
+
+    const formulario = typeof d.formulario === "string" ? d.formulario : doAlvo.data?.formulario_id;
+    if (formulario) linhas.push(["Documento", NOME_FORMULARIO[formulario] ?? formulario]);
+    if (alvo.tabela === "respostas") {
+      const situacao = alvo.novo ? "novo, ainda não salvo" : doAlvo.data?.status ? SITUACAO[doAlvo.data.status] ?? doAlvo.data.status : null;
+      if (situacao) linhas.push(["Situação do documento", situacao]);
+    }
+    if (alvo.tabela === "sinteses_ia" && doAlvo.data?.tipo) {
+      linhas.push(["Sobre", TIPO_SINTESE[doAlvo.data.tipo] ?? doAlvo.data.tipo]);
+    }
+
+    for (const c of Object.keys(d)) {
+      if (CAMPOS_OCULTOS.has(c) || c === "estudante" || c === "formulario") continue;
+      if (c === "codigo" && temEstudante) continue; // o código já aparece junto do nome
+      if (c === "campos" && typeof d[c] === "number") {
+        linhas.push(["Campos com sugestão", String(d[c])]);
+        continue;
+      }
+      if (c === "campos" && Array.isArray(d[c])) {
+        const usados = (d[c] as unknown[]).filter((x): x is string => typeof x === "string").map((x) => ROTULO_PERGUNTA.get(x) ?? x);
+        linhas.push([
+          "Sugestões usadas",
+          <>
+            {usados.length} {usados.length === 1 ? "campo" : "campos"}
+            <ul className="mt-1 list-disc pl-5 text-tinta-suave">
+              {usados.map((u, i) => (
+                <li key={i}>{u}</li>
+              ))}
+            </ul>
+          </>,
+        ]);
+        continue;
+      }
+      const l = linha(c, d[c]);
+      if (l) linhas.push(l);
+    }
+
     blocos = linhas.length ? (
       <LinhasDeDetalhe linhas={linhas} />
     ) : (
-      <p className="text-sm text-tinta-fraca">Sem mais detalhes deste registro.</p>
+      <p className="text-sm text-tinta-fraca">{doAlvo.isLoading ? "Carregando…" : "Sem mais detalhes deste registro."}</p>
     );
   }
 
-  return (
-    <div className="space-y-3">
-      {blocos}
-      <details>
-        <summary className="cursor-pointer text-[11px] text-tinta-fraca select-none">dados técnicos</summary>
-        <pre className="mt-1 text-xs whitespace-pre-wrap break-all max-h-80 overflow-auto">{JSON.stringify(a.detalhe, null, 2)}</pre>
-      </details>
-    </div>
-  );
+  return <div className="space-y-3">{blocos}</div>;
 }
 
 /* ---------------- Estrutura ---------------- */
