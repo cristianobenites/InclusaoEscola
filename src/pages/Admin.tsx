@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, KeyRound, Ban, CircleCheck, Pencil, RefreshCw, ChevronDown, ChevronUp, Building2, History } from "lucide-react";
 import clsx from "clsx";
@@ -783,7 +783,7 @@ function AtividadeLinha({ a, aberto, alternar, semQuem }: { a: Atividade; aberto
       {aberto && temDetalhe && (
         <tr className="bg-papel/50">
           <td colSpan={semQuem ? 4 : 5} className="px-4 py-3">
-            <pre className="text-xs whitespace-pre-wrap break-all max-h-80 overflow-auto">{JSON.stringify(a.detalhe, null, 2)}</pre>
+            <DetalheAmigavel a={a} />
           </td>
         </tr>
       )}
@@ -817,6 +817,235 @@ function resumoDetalhe(a: Atividade): string {
   if (typeof depois.status === "string") partes.push(depois.status);
   if (typeof depois.email === "string") partes.push(depois.email);
   return partes.join(" · ") || (a.alvo ?? "");
+}
+
+/* ---------------- Detalhe amigável ----------------
+   O detalhe aberto era o JSON cru do gatilho (pedido de 24/11: "parece um
+   json, seria melhor algo mais amigável"). Agora cada registro vira linhas
+   em português: contexto (estudante, escola, formulário — com UUID trocado
+   pelo nome), e "o que mudou / foi cadastrado / foi excluído" campo a campo.
+   O JSON continua disponível numa sanfona discreta de dados técnicos. */
+
+const UUID_RX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Campos que são encanamento do banco, não informação para quem lê
+const CAMPOS_OCULTOS = new Set([
+  "id", "quem", "criado_por", "respondido_por", "criado_em", "atualizado_em",
+  "formulario_versao", "respostas_ids", "prompt_versao", "modelo", "esquema", "perfil_id",
+]);
+
+// Chaves que situam o registro (aparecem sempre, mesmo sem mudança)
+const CAMPOS_CONTEXTO = ["estudante", "estudante_id", "formulario", "formulario_id", "escola_id", "turma_id", "municipio_id"] as const;
+
+const ROTULO_CAMPO: Record<string, string> = {
+  nome: "Nome",
+  codigo: "Código do estudante",
+  ano_turma: "Ano da turma",
+  email: "E-mail",
+  papel: "Papel",
+  status: "Situação",
+  formulario: "Formulário",
+  formulario_id: "Formulário",
+  versao: "Versão",
+  titulo: "Título",
+  descricao: "Descrição",
+  uf: "UF",
+  ip: "Rede (IP)",
+  navegador: "Aparelho",
+  municipio_id: "Município",
+  escola_id: "Escola",
+  turma_id: "Turma",
+  estudante: "Estudante",
+  estudante_id: "Estudante",
+  arquivado: "Arquivado",
+  bloqueado: "Bloqueado",
+  trocar_senha: "Precisa trocar a senha",
+  data_nascimento: "Nascimento",
+  responsavel_nome: "Responsável",
+  responsavel_contato: "Contato do responsável",
+  dados: "Respostas preenchidas",
+  conteudo: "Conteúdo",
+  saida: "Texto gerado pelo sistema",
+  revisao: "Revisão da equipe",
+  texto: "Texto",
+  ativo: "Ativo",
+};
+
+const SITUACAO: Record<string, string> = {
+  rascunho: "rascunho",
+  concluido: "concluído",
+  validado: "validado",
+  gerada: "gerada",
+  revisada: "revisada",
+  descartada: "descartada",
+};
+
+function rotuloCampo(chave: string): string {
+  return ROTULO_CAMPO[chave] ?? chave.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+}
+
+/** Traduz o user agent para "computador · Chrome", "iPhone · Safari" etc. */
+function aparelho(ua: string): string {
+  const onde = ua.includes("iPhone") ? "iPhone" : ua.includes("iPad") ? "iPad" : ua.includes("Android") ? "celular Android" : "computador";
+  const nav = ua.includes("Edg") ? "Edge" : ua.includes("OPR") || ua.includes("Opera") ? "Opera"
+    : ua.includes("Chrome") ? "Chrome" : ua.includes("Firefox") ? "Firefox" : ua.includes("Safari") ? "Safari" : "";
+  return nav ? `${onde} · ${nav}` : onde;
+}
+
+/** Um mapa único UUID → nome legível (estudantes, escolas, turmas, municípios, pessoas). */
+function useNomesParaDetalhe(): Map<string, string> {
+  const estudantes = useQuery({
+    queryKey: ["rotulos-estudantes"],
+    staleTime: 60_000,
+    queryFn: async () =>
+      (await supabase.from("estudantes").select("id, codigo, estudantes_identidade(nome)")).data as
+        | { id: string; codigo: string; estudantes_identidade: { nome: string } | null }[]
+        | null,
+  });
+  const municipios = useQuery({
+    queryKey: ["municipios"],
+    queryFn: async () => (await supabase.from("municipios").select("*").order("nome")).data as Municipio[],
+  });
+  const escolas = useQuery({
+    queryKey: ["escolas"],
+    queryFn: async () => (await supabase.from("escolas").select("*").order("nome")).data as Escola[],
+  });
+  const turmas = useQuery({
+    queryKey: ["turmas"],
+    queryFn: async () => (await supabase.from("turmas").select("*").order("nome")).data as Turma[],
+  });
+  const usuarios = useQuery({
+    queryKey: ["admin-usuarios"],
+    queryFn: async () => (await supabase.rpc("admin_usuarios")).data as Usuario[],
+  });
+  return useMemo(() => {
+    const mapa = new Map<string, string>();
+    for (const e of estudantes.data ?? []) {
+      mapa.set(e.id, e.estudantes_identidade?.nome ? `${e.estudantes_identidade.nome} (${e.codigo})` : e.codigo);
+    }
+    for (const m of municipios.data ?? []) mapa.set(m.id, m.nome);
+    for (const e of escolas.data ?? []) mapa.set(e.id, e.nome);
+    for (const t of turmas.data ?? []) mapa.set(t.id, t.nome);
+    for (const u of usuarios.data ?? []) mapa.set(u.id, u.nome);
+    return mapa;
+  }, [estudantes.data, municipios.data, escolas.data, turmas.data, usuarios.data]);
+}
+
+/** Valor legível para uma chave; null = não vale a pena mostrar. */
+function valorAmigavel(chave: string, valor: unknown, nomes: Map<string, string>): string | null {
+  if (valor === null || valor === undefined || valor === "") return null;
+  if (chave === "navegador") return aparelho(String(valor));
+  if (typeof valor === "boolean") return valor ? "sim" : "não";
+  if (chave === "status" && typeof valor === "string") return SITUACAO[valor] ?? valor;
+  if (chave === "papel" && typeof valor === "string") return (NOME_PAPEL as Record<string, string>)[valor] ?? valor;
+  if ((chave === "formulario" || chave === "formulario_id") && typeof valor === "string") {
+    return NOME_FORMULARIO[valor] ?? valor;
+  }
+  if (typeof valor === "object") {
+    const n = Object.keys(valor as object).length;
+    return n ? `${n} campo${n === 1 ? "" : "s"} preenchido${n === 1 ? "" : "s"}` : null;
+  }
+  const s = String(valor);
+  if (UUID_RX.test(s)) return nomes.get(s) ?? null; // UUID sem nome conhecido só confunde
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return formatarDataHora(s);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return new Date(`${s}T12:00:00`).toLocaleDateString("pt-BR");
+  return s;
+}
+
+function LinhasDeDetalhe({ titulo, linhas }: { titulo?: string; linhas: [string, ReactNode][] }) {
+  if (!linhas.length) return null;
+  return (
+    <div>
+      {titulo && <p className="text-[11px] uppercase tracking-wide text-tinta-fraca mb-1">{titulo}</p>}
+      <div className="space-y-0.5">
+        {linhas.map(([rotulo, valor], i) => (
+          <div key={i} className="flex flex-wrap gap-x-2 text-sm">
+            <span className="w-44 shrink-0 font-medium text-tinta-suave">{rotulo}</span>
+            <span className="min-w-0">{valor}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DetalheAmigavel({ a }: { a: Atividade }) {
+  const nomes = useNomesParaDetalhe();
+  const d = a.detalhe ?? {};
+  const antes = (d.antes ?? null) as Record<string, unknown> | null;
+  const depois = (d.depois ?? null) as Record<string, unknown> | null;
+  const registro = depois ?? antes;
+
+  const linha = (chave: string, bruto: unknown): [string, ReactNode] | null => {
+    const v = valorAmigavel(chave, bruto, nomes);
+    return v === null ? null : [rotuloCampo(chave), v];
+  };
+
+  let blocos: ReactNode;
+  if (registro) {
+    // Registro de banco (cadastro, alteração ou exclusão feita pelos gatilhos)
+    const contexto = CAMPOS_CONTEXTO
+      .map((c) => linha(c, registro[c]))
+      .filter((x): x is [string, ReactNode] => x !== null);
+
+    const visiveis = (obj: Record<string, unknown>) =>
+      Object.keys(obj).filter((c) => !CAMPOS_OCULTOS.has(c) && !(CAMPOS_CONTEXTO as readonly string[]).includes(c));
+
+    if (antes && depois) {
+      const mudadas = visiveis(depois)
+        .concat(visiveis(antes))
+        .filter((c, i, arr) => arr.indexOf(c) === i)
+        .filter((c) => JSON.stringify(antes[c]) !== JSON.stringify(depois[c]));
+      const linhas = mudadas
+        .map((c): [string, ReactNode] => [
+          rotuloCampo(c),
+          <>
+            <span className="text-tinta-fraca">{valorAmigavel(c, antes[c], nomes) ?? "vazio"}</span>
+            <span className="mx-1.5 text-tinta-fraca">→</span>
+            <span className="font-medium">{valorAmigavel(c, depois[c], nomes) ?? "vazio"}</span>
+          </>,
+        ]);
+      blocos = (
+        <>
+          <LinhasDeDetalhe linhas={contexto} />
+          <LinhasDeDetalhe titulo="O que mudou" linhas={linhas} />
+          {!linhas.length && <p className="text-sm text-tinta-fraca">Só campos internos mudaram (nada visível).</p>}
+        </>
+      );
+    } else {
+      const titulo = depois ? "O que foi cadastrado" : "O que foi excluído";
+      const linhas = visiveis(registro)
+        .map((c) => linha(c, registro[c]))
+        .filter((x): x is [string, ReactNode] => x !== null);
+      blocos = (
+        <>
+          <LinhasDeDetalhe linhas={contexto} />
+          <LinhasDeDetalhe titulo={titulo} linhas={linhas} />
+        </>
+      );
+    }
+  } else {
+    // Ação de tela ou de acesso: o detalhe já é plano ({estudante, formulario, navegador, ip…})
+    const linhas = Object.keys(d)
+      .filter((c) => !CAMPOS_OCULTOS.has(c))
+      .map((c) => linha(c, d[c]))
+      .filter((x): x is [string, ReactNode] => x !== null);
+    blocos = linhas.length ? (
+      <LinhasDeDetalhe linhas={linhas} />
+    ) : (
+      <p className="text-sm text-tinta-fraca">Sem mais detalhes deste registro.</p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {blocos}
+      <details>
+        <summary className="cursor-pointer text-[11px] text-tinta-fraca select-none">dados técnicos</summary>
+        <pre className="mt-1 text-xs whitespace-pre-wrap break-all max-h-80 overflow-auto">{JSON.stringify(a.detalhe, null, 2)}</pre>
+      </details>
+    </div>
+  );
 }
 
 /* ---------------- Estrutura ---------------- */
